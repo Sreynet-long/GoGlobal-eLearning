@@ -1,33 +1,25 @@
-import React from "react";
-import {
-  View,
-  ScrollView,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import Topbar from "../../components/headers/Topbar";
-import HeroBanner from "../../components/home/HeroBanner";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import FreeCourse from "../../components/home/FreeCourse";
-import TrendingCourse from "../../components/home/TrendingCourse";
-import UtilityModules from "../../components/home/UtilityModules";
+import HeroBanner from "../../components/home/HeroBanner";
 import StatesRow from "../../components/home/StatesRow";
+import TrendingCourse from "../../components/home/TrendingCourse";
 import VideoCard from "../../components/home/VideoCard";
 
 export default function Index() {
   return (
     <View style={styles.screenContainer}>
       <Topbar />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <HeroBanner />
-        <StatesRow/>
-        <VideoCard/>
-        {/* <UtilityModules/> */}
-        <TrendingCourse/>
-        <FreeCourse/>
-      </ScrollView>
+      <View style={styles.contentContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <HeroBanner />
+          <StatesRow />
+          <VideoCard />
+          {/* <UtilityModules/> */}
+          <TrendingCourse />
+          <FreeCourse />
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -35,7 +27,14 @@ export default function Index() {
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#25375aff",
+  },
+  contentContainer: {
+    flex: 1,
+    overflow: "hidden",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "white",
   },
   scrollContent: {
     paddingHorizontal: 16,
