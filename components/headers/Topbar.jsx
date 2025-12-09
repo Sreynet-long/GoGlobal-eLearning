@@ -1,24 +1,45 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Platform, StatusBar, StyleSheet, Text, View, TouchableOpacity } from "react-native"; 
-import ProfileAvatar from './ProfileAvatar'; 
-
-const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 44 : (StatusBar.currentHeight || 20);
+import { useState } from "react";
+import {
+  Image,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Notification from "./Notification";
+const STATUS_BAR_HEIGHT =
+  Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 20;
 
 export default function Topbar() {
+  const [currentLang, setCurrentLang] = useState("en");
+
+  const toggleLanguage = () => {
+    const newLang = currentLang === "en" ? "kh" : "en";
+    setCurrentLang(newLang);
+    // console.log(`language change to: ${newLang}`);
+  };
   return (
     <View style={styles.topContainer}>
       <View style={styles.header}>
         <View style={styles.left}>
-            <Text style={styles.text}>GO eLEARNING</Text>
+          <Image
+            source={require("../../assets/logos/logo.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.text}>GO eLEARNING</Text>
         </View>
         <View style={styles.right}>
-          <View style={styles.flagPlaceholder}>
-             <Text style={styles.flagText}>🇬🇧</Text>
-          </View>
-          
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={30} color="#FFFFFF" /> 
+          <TouchableOpacity
+            style={styles.flagPlaceholder}
+            onPress={toggleLanguage}
+          >
+            <Text style={styles.flagText}>
+              {currentLang === "en" ? "🇬🇧" : "🇰🇭"}
+            </Text>
           </TouchableOpacity>
+          <Notification />
         </View>
       </View>
     </View>
@@ -27,33 +48,33 @@ export default function Topbar() {
 
 const styles = StyleSheet.create({
   topContainer: {
-    backgroundColor: "#25375aff", 
-    paddingTop: STATUS_BAR_HEIGHT, 
+    backgroundColor: "#25375aff",
+    paddingTop: STATUS_BAR_HEIGHT,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 12, 
+    paddingVertical: 12,
+  },
+  logo: {
+    width: 35,
+    height: 35,
+    marginRight: 8,
+    resizeMode: "contain",
   },
   left: {
     flexDirection: "row",
     alignItems: "center",
   },
-  greetingGroup: {
-    marginLeft: 12,
-  },
+
   text: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
   },
-  viewProfileText: {
-    fontSize: 12,
-    color: "#fff",
-    opacity: 0.8,
-  },
+
   right: {
     flexDirection: "row",
     alignItems: "center",
@@ -61,13 +82,13 @@ const styles = StyleSheet.create({
   },
   flagPlaceholder: {
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: "#fff",
     borderRadius: 5,
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
   flagText: {
     fontSize: 16,
-    color: '#fff',
-  }
+    color: "#fff",
+  },
 });
