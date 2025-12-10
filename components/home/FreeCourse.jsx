@@ -1,10 +1,10 @@
-import { Text, View, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity, ScrollView, StyleSheet, ImageBackground } from "react-native";
 
 
-const CourseCard = ({ title }) => (
-  <View style={styles.courseCard}>
+const CourseCard = ({ title , image}) => (
+  <ImageBackground  source={image} style={styles.courseCard} imageStyle={{borderRadius: 10}}>
     <Text style={styles.courseCardTitle}>{title}</Text>
-  </View>
+  </ImageBackground>
 );
 export default function FreeCourse() {
   return (
@@ -20,10 +20,10 @@ export default function FreeCourse() {
         showsHorizontalScrollIndicator={false}
         style={styles.horizontalCourseScroll}
       >
-        <CourseCard title="Introduction to HTML" />
-        <CourseCard title="C++ Variables & Types" />
-        <CourseCard title="Excel 101" />
-        <CourseCard title="JavaScript Fundamentals" />
+        <CourseCard title="Introduction to HTML" image={require("../../assets/courses/html.png")} />
+        <CourseCard title="C++ Variables & Types" image={require("../../assets/courses/cpp-var.png")}/>
+        <CourseCard title="Excel 101" image={require("../../assets/courses/excel.png")} />
+        <CourseCard title="JavaScript Fundamentals" image={require("../../assets/courses/js.jpg")} />
       </ScrollView>
     </View>
   );
@@ -66,5 +66,8 @@ const styles = StyleSheet.create({
   courseCardTitle: {
     fontWeight: "600",
     fontSize: 14,
+    marginTop: 60,
+    color: "white",
+    fontWeight: "bold"
   },
 })

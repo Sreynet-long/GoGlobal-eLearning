@@ -1,10 +1,17 @@
-import { Text, View, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ImageBackground,
+} from "react-native";
 
-
-const CourseCard = ({ title }) => (
-  <View style={styles.courseCard}>
+const CourseCard = ({ title, image }) => (
+  <ImageBackground source={image} style={styles.courseCard} imageStyle={{borderRadius: 10}}>
     <Text style={styles.courseCardTitle}>{title}</Text>
-  </View>
+  </ImageBackground>
 );
 export default function TrendingCourse() {
   return (
@@ -20,16 +27,28 @@ export default function TrendingCourse() {
         showsHorizontalScrollIndicator={false}
         style={styles.horizontalCourseScroll}
       >
-        <CourseCard title="Python for Data Science" />
-        <CourseCard title="CompTIA Security+" />
-        <CourseCard title="React Native Mobile" />
-        <CourseCard title="DevOps with Docker" />
+        <CourseCard
+          title="Python for Data Science"
+          image={require("../../assets/courses/python.png")}
+        />
+        <CourseCard
+          title="CompTIA Security+"
+          image={require("../../assets/courses/security.png")}
+        />
+        <CourseCard
+          title="React Native Mobile"
+          image={require("../../assets/courses/react-native.png")}
+        />
+        <CourseCard
+          title="DevOps with Docker"
+          image={require("../../assets/courses/security.png")}
+        />
       </ScrollView>
     </View>
   );
 }
 const styles = StyleSheet.create({
-      sectionHeader: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -46,7 +65,7 @@ const styles = StyleSheet.create({
     color: "#3F51B5",
     fontWeight: "500",
   },
-    horizontalCourseScroll: {
+  horizontalCourseScroll: {
     paddingBottom: 10,
   },
   courseCard: {
@@ -66,6 +85,8 @@ const styles = StyleSheet.create({
   courseCardTitle: {
     fontWeight: "600",
     fontSize: 14,
+    marginTop: 60,
+    color: "white",
+    fontWeight: "bold"
   },
-
-})
+});

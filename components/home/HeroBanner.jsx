@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,19 +19,19 @@ const BANNER_DATA = [
     id: 1,
     title: "Tech Skills",
     subtitle: "Explore All 240+ Courses",
-    color: "#4682B4",
+    image: require("../../assets/banners/tech-skill.png"),
   },
   {
     id: 2,
     title: "50% OFF SALE!",
     subtitle: "On All Cloud Certifications until Friday.",
-    color: "#FF7F50",
+    image: require("../../assets/banners/sale-off.png"),
   },
   {
     id: 3,
     title: "NEW: C++ Class",
     subtitle: "Beginner to Advanced in 8 Weeks.",
-    color: "#3CB371",
+    image: require("../../assets/banners/cpp.png"),
   },
 ];
 
@@ -58,7 +59,7 @@ const HeroBanner = () => {
       });
       // Update the index state
       setActiveIndex(nextIndex);
-    }, SCROLL_DELAY); 
+    }, SCROLL_DELAY);
   };
 
   useEffect(() => {
@@ -82,14 +83,11 @@ const HeroBanner = () => {
         scrollEnabled={false}
       >
         {BANNER_DATA.map((item, index) => (
-          <TouchableOpacity
+          <ImageBackground
             key={item.id}
-            style={[
-              styles.slide,
-              { width: SLIDE_WIDTH, backgroundColor: item.color },
-            ]}
-            onPress={() => console.log("Banner pressed: ", item.title)}
-            disabled={true}
+            source={item.image}
+            style={[styles.slide, { width: SLIDE_WIDTH }]}
+            imageStyle={{ borderRadius: 12 }}
           >
             <View style={styles.textOverlay}>
               <Text style={styles.slideTitle}>{item.title}</Text>
@@ -98,7 +96,7 @@ const HeroBanner = () => {
                 <Text style={styles.slideButtonText}>Explore Now</Text>
               </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          </ImageBackground>
         ))}
       </ScrollView>
 
@@ -119,14 +117,13 @@ const styles = StyleSheet.create({
   carouselContainer: {
     height: 160,
     marginBottom: 15,
-    borderRadius: 12,
-    overflow: "hidden",
   },
   slide: {
-    height: "100%",
+    height: "160",
     justifyContent: "center",
     padding: 20,
     borderRadius: 12,
+    overflow: "hidden"
   },
   textOverlay: {
     justifyContent: "center",
