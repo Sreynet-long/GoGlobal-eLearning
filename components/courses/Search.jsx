@@ -15,7 +15,6 @@ export default function Search() {
           style={styles.searchInput}
           placeholder="Search courses or skills..."
           placeholderTextColor="#888"
-          value=""
         />
       </View>
     </View>

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 const Category = [
+  { name: "All", icon: "apps-outline" },
   { name: "Web Dev", icon: "logo-html5" },
   { name: "Graphic Design", icon: "color-palette-outline" },
   { name: "UX UI", icon: "layers-outline" },
@@ -17,13 +18,13 @@ const Category = [
   { name: "Video Editing", icon: "film-outline" },
 ];
 
-const CategoryPill = ({ name, icon }) => (
-  <TouchableOpacity style={styles.categoryPill}>
+const CategoryPill = ({ name, icon, onPress }) => (
+  <TouchableOpacity style={styles.categoryPill} onPress={() => onPress(name)}>
     <Ionicons name={icon} size={18} color="#25375aff" />
     <Text style={styles.categoryPillText}>{name}</Text>
   </TouchableOpacity>
 );
-export default function FeatureCategory() {
+export default function FeatureCategory({onSelectedCategory}) {
   return (
     <View>
       <Text style={styles.sectionTitle}>Course Categories</Text>
@@ -33,7 +34,7 @@ export default function FeatureCategory() {
         style={styles.categoryScroll}
       >
         {Category.map((cat, index) => (
-          <CategoryPill key={index} name={cat.name} icon={cat.icon} />
+          <CategoryPill key={index} name={cat.name} icon={cat.icon} onPress={onSelectedCategory}/>
         ))}
       </ScrollView>
     </View>
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginTop: 15,
+    marginTop: 10,
     marginBottom: 10,
     color: "#333",
   },

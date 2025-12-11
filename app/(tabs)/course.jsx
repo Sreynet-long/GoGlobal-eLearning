@@ -1,27 +1,33 @@
-import {View, Text, StyleSheet,ScrollView} from "react-native";
-import Topbar from "../../components/headers/Topbar";
-import Search from "../../components/courses/Search";
+import { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import CourseList from "../../components/courses/CourseList";
 import FeatureCategory from "../../components/courses/FeatureCategory";
+import Search from "../../components/courses/Search";
+import Topbar from "../../components/headers/Topbar";
 
 export default function course() {
+  const [selectedCategory, setSelectedCategory] = useState(null);
   return (
     <View style={styles.screenContainer}>
-      <Topbar/>
+      <Topbar />
       <View style={styles.contentContainer}>
-      <Search/>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <FeatureCategory/>
-      </ScrollView>
+        <Search />
+        <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
+        <FeatureCategory onSelectedCategory={setSelectedCategory} />
+        </View>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <CourseList selectedCategory={selectedCategory} />
+        </ScrollView>
       </View>
     </View>
-  )
+  );
 }
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
     backgroundColor: "#25375aff",
   },
-    contentContainer: {
+  contentContainer: {
     flex: 1,
     overflow: "hidden",
     borderTopLeftRadius: 30,
@@ -31,5 +37,5 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 80,
-  }
+  },
 });
