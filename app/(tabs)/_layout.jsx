@@ -38,7 +38,7 @@ export default function TabLayout() {
       <MaterialIcons name="menu-book" size={24} color="black" />
       <Foundation name="book-bookmark" size={24} color="black" />
       <Tabs.Screen
-        name="course"
+        name="courses"
         options={{
           title: "Course",
           tabBarIcon: ({ color, focused }) => {
