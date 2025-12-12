@@ -9,6 +9,9 @@ import {
   View,
 } from "react-native";
 import Notification from "./Notification";
+import Flag_en from "../../assets/flags/en.png";
+import Flag_kh from "../../assets/flags/kh.png";
+
 const STATUS_BAR_HEIGHT =
   Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 20;
 
@@ -20,8 +23,12 @@ export default function Topbar() {
     setCurrentLang(newLang);
     // console.log(`language change to: ${newLang}`);
   };
+
+  const changeFlag = () => {
+    return currentLang === "en" ? Flag_en : Flag_kh;
+  }
   return (
-    <View style={styles.topContainer}>
+    <View style={styles.topContainer}> 
       <View style={styles.header}>
         <View style={styles.left}>
           <Image
@@ -35,9 +42,7 @@ export default function Topbar() {
             style={styles.flagPlaceholder}
             onPress={toggleLanguage}
           >
-            <Text style={styles.flagText}>
-              {currentLang === "en" ? "🇬🇧" : "🇰🇭"}
-            </Text>
+            <Image source={changeFlag()} style={{ width: 20, height: 15 }} />
           </TouchableOpacity>
           <Notification />
         </View>
