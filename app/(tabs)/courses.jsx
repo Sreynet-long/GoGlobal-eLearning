@@ -5,7 +5,7 @@ import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
 
-export default function course() {
+export default function courses() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   return (
     <View style={styles.screenContainer}>

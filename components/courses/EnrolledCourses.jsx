@@ -6,7 +6,7 @@ const Courses = [
     title: "HTML & CSS for Beginners",
     constructor: "Author 1",
     rating: 4.5,
-    price: "$19.99",
+    progress: 80,
     hours: 10,
     category: "Web Dev",
     image: require("../../assets/courses/html-css.png"),
@@ -16,7 +16,7 @@ const Courses = [
     title: "JavaScript Basics",
     constructor: "Author 1",
     rating: 4.5,
-    price: "$20.99",
+    progress: 40,
     hours: 12,
     category: "Web Dev",
     image: require("../../assets/courses/js.jpg"),
@@ -26,7 +26,7 @@ const Courses = [
     title: "Bootstrap Essentials",
     constructor: "Author 1",
     rating: 4.5,
-    price: "$19.99",
+    progress: 60,
     hours: 8,
     category: "Web Dev",
     image: require("../../assets/courses/html-css.png"),
@@ -36,7 +36,7 @@ const Courses = [
     title: "Adobe Photoshop",
     constructor: "Author 2",
     rating: 4.0,
-    price: "$29.99",
+    progress: 30,
     hours: 15,
     category: "Graphic Design",
     image: require("../../assets/courses/photoshop.png"),
@@ -46,7 +46,7 @@ const Courses = [
     title: "Adobe Illustrator",
     constructor: "Author 2",
     rating: 4.0,
-    price: "$29.99",
+    progress: 50,
     hours: 15,
     category: "Graphic Design",
     image: require("../../assets/courses/illustrator.png"),
@@ -56,7 +56,7 @@ const Courses = [
     title: " UX Design & Interaction (The `How`)",
     constructor: "Author 3",
     rating: 3.5,
-    price: "$19.99",
+    progress: 75,
     hours: 8,
     category: "UX UI",
     image: require("../../assets/courses/html-css.png"),
@@ -66,42 +66,40 @@ const Courses = [
     title: "Mathematical & Statistical Foundations",
     constructor: "Author 4",
     rating: 5.0,
-    price: "$49.99",
+    progress: 20,
     hours: 20,
     category: "Data Science",
     image: require("../../assets/courses/mathematic.png"),
   },
 ];
 
-export default function CourseList({ selectedCategory }) {
+export default function EnrolledCourses({ selectedCategory }) {
   const filteredCourses =
     selectedCategory === "All"
       ? Courses
       : Courses.filter((item) => item.category === selectedCategory);
   return (
     <View>
-      <Text style={styles.textHeader}>Courses List</Text>
-      {filteredCourses.length === 0 ? (
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          No courses found in this category.
-        </Text>
-        ): (
-        filteredCourses.map((course) => (
+      <Text style={styles.textHeader}>Courses Enrolled List</Text>
+
+      {filteredCourses.map((course) => (
         <TouchableOpacity style={styles.card} key={course.id}>
           <Image source={course.image} style={styles.cardImage} />
           <View style={styles.cardBody}>
             <Text style={styles.textTitle}>{course.title}</Text>
             <Text style={styles.textHours}>{course.hours} hours</Text>
             <View style={styles.row}>
-              <Text style={styles.textPrice}>{course.price}</Text>
-              <Text style={styles.textRating}>{course.rating} ⭐</Text>
+              <View style={styles.progressBarContainer}>
+                <Text
+                  style={[styles.progressBar, { width: `${course.progress}%` }]}
+                ></Text>
+              </View>
+              <Text style={styles.progressText}>{course.progress}% Completed</Text>
             </View>
+                
           </View>
         </TouchableOpacity>
-        ))
-      )}
-
-      
+      ))}
     </View>
   );
 }
@@ -151,11 +149,30 @@ const styles = StyleSheet.create({
   textRating: {
     fontSize: 14,
     color: "#8a8888ff",
+     
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 10,
+  },
+  progressBarContainer: {
+    flex: 1,
+    width: "100%",
+    height: 8,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 4,
+    marginRight: 10,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#25375aff",
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 12,
+    color: "#666",
   },
 });
