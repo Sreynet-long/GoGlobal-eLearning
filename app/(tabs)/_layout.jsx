@@ -1,64 +1,107 @@
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import Foundation from "@expo/vector-icons/Foundation";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Tabs } from "expo-router";
-import Octicons from '@expo/vector-icons/Octicons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'; // fontawesome5 for MyBook tab icon
 
 export default function TabLayout() {
   return (
     <Tabs
-        screenOptions={{
+      screenOptions={{
         tabBarActiveTintColor: "white",
         headerShown: false,
         tabBarStyle: {
-            backgroundColor: "#25375aff",
-            borderTopWidth: 0,
+          backgroundColor: "#25375aff",
+          borderTopWidth: 0,
         },
         tabBarLabelStyle: {
-            fontWeight:"600",
-            fontSize: 12,
-        }
-        }}
+          fontWeight: "600",
+          fontSize: 12,
+        },
+      }}
     >
-        <Tabs.Screen 
-            name="index"
-            options={{
-                title: "Home",
-                tabBarIcon: ({ focused }) => {
-                    return (
-                        <Octicons name="home-fill" size={24} color={focused ? "white" : "gray"} />
-                    );
-                },
-            }}
-        />
-        <Tabs.Screen 
-            name="course"
-            options={{
-                title: "Course",
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <MaterialCommunityIcons name="book-open-page-variant" size={24} color={focused ? "white" : "gray"} />
-                    );
-                },
-            }}
-        />
-        <Tabs
-            name="help"
-            options={{
-                title: "Help"
-            }}
-        />
-        <Tabs.Screen 
-            name="login"
-            options={{
-                title: "Login",
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <SimpleLineIcons name="login" size={24} color={focused ? "white" : "gray"} />
-                    );
-                },
-            }}
-        />
+      <Ionicons name="home" size={24} color="black" />
+      <Ionicons name="home-outline" size={24} color="black" />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home Page",
+          tabBarIcon: ({ color, focused }) => {
+            return focused ? (
+              <Ionicons name="home" size={24} color={color} />
+            ) : (
+              <Ionicons name="home-outline" size={24} color={color} />
+            );
+          },
+        }}
+      />
+      <MaterialIcons name="menu-book" size={24} color="black" />
+      <Foundation name="book-bookmark" size={24} color="black" />
+      <Tabs.Screen
+        name="course"
+        options={{
+          title: "Course",
+          tabBarIcon: ({ color, focused }) => {
+            return focused ? (
+              <MaterialIcons name="menu-book" size={24} color={color} />
+            ) : (
+              <Foundation name="book-bookmark" size={24} color={color} />
+            );
+          },
+        }}
+      />
+      <Tabs
+        name="help"
+        options={{
+          title: "Help",
+        }}
+      />
+      <Ionicons name="log-in-outline" size={24} color="black" />
+      <Ionicons name="log-in" size={24} color="black" />
+      <Tabs.Screen
+        name="login"
+        options={{
+          title: "Login",
+          tabBarIcon: ({ color, focused }) => {
+            return focused ? (
+              <Ionicons name="log-in" size={28} color={color} />
+            ) : (
+              <Ionicons name="log-in-outline" size={28} color={color} />
+            );
+          },
+        }}
+      />
+
+      <Ionicons name="bookmarks" size={24} color="black" />
+      <Ionicons name="bookmarks-outline" size={24} color="black" />
+      <Tabs.Screen
+        name="myBook"
+        options={{
+          title: "My courses",
+          tabBarIcon: ({ color, focused }) => {
+            return focused ? (
+              <Ionicons name="bookmarks" size={22} color={color} />
+            ) : (
+              <Ionicons name="bookmarks-outline" size={22} color={color} />
+            );
+          },
+        }}
+      />
+      <FontAwesome6 name="user-large" size={24} color="black" />
+      <FontAwesome6 name="user-graduate" size={24} color="black" />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "Account",
+          tabBarIcon: ({ color, focused }) => {
+            return focused ? (
+              <FontAwesome6 name="user-graduate" size={22} color={color} />
+            ) : (
+              <FontAwesome6 name="user-large" size={21} color={color} />
+            );
+          },
+        }}
+      />
     </Tabs>
-  )
+  );
 }

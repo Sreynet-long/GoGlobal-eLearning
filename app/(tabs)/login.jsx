@@ -1,10 +1,36 @@
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import {
+  Button,
+  Checkbox,
+  Text,
+  TextInput,
+  useTheme,
+} from "react-native-paper";
 import Topbar from "../../components/headers/Topbar";
 
 export default function login() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const theme = useTheme();
+
+  const handleAuth = async () => {
+    if (!email || !password) {
+      setError("Please fill in al fields.");
+      return;
+    }
+
+    if (password.length < 3) {
+      setError("Password must be atleast 3 characters long.");
+      return;
+    }
+
+    setError(null);
+  };
+
   const handleSwitchMode = () => {
     setIsSignUp((prev) => !prev);
   };
@@ -13,56 +39,92 @@ export default function login() {
       <Topbar />
       <View style={styles.contentContainer}>
         <View style={styles.Container}>
-          <Text style={styles.title} variant="headlineMedium">
-            {isSignUp ? "Sign Up" : "Log In"}
-          </Text>
-          {isSignUp && (
-            <TextInput
-              style={styles.input}
-              label="Fist Name"
-              autoCapitalize="none"
-              placeholder=""
-              mode="outlined"
-            />
-          )}
-          {isSignUp && (
-            <TextInput
-              style={styles.input}
-              label="Last Name"
-              autoCapitalize="none"
-              placeholder=""
-              mode="outlined"
-            />
-          )}
-          <TextInput
-            style={styles.input}
-            label="Email"
-            autoCaptilized="none"
-            keyboardType="email-address"
-            placeholder="example@gmail.com"
-            mode="outlined"
-          />
-          <TextInput
-            style={styles.input}
-            label="Password"
-            autoCapitalize="none"
-            secureTextEntry
-            mode="outlined"
-          />
+          <KeyboardAvoidingView>
+            <Text style={styles.title} variant="headlineMedium">
+              {isSignUp ? "Sign Up" : "Log In"}
+            </Text>
 
-          <Button style={styles.button} mode="contained">
-            {isSignUp ? "Sign Up" : "Log In"}
-          </Button>
-          <Button
-            style={styles.switchButton}
-            mode="text"
-            textColor="#fff"
-            onPress={handleSwitchMode}
-          >
-            {isSignUp
-              ? "Already have an account? Log in"
-              : "Don't have an acccount? Sign Up"}
-          </Button>
+            {/* FIRST + LAST NAME IN ONE ROW */}
+            {isSignUp && (
+              <View style={styles.rowContainer}>
+                <TextInput
+                  style={[styles.input, styles.halfInput]}
+                  label="First Name"
+                  autoCapitalize="none"
+                  mode="outlined"
+                />
+                <TextInput
+                  style={[styles.input, styles.halfInput]}
+                  label="Last Name"
+                  autoCapitalize="none"
+                  mode="outlined"
+                />
+              </View>
+            )}
+
+            {/* PHONE NUMBER FOR SIGN UP */}
+            {isSignUp && (
+              <TextInput
+                style={styles.input}
+                label="Phone Number"
+                keyboardType="phone-pad"
+                mode="outlined"
+              />
+            )}
+
+            <TextInput
+              style={styles.input}
+              label="Email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="example@gmail.com"
+              mode="outlined"
+            />
+
+            <TextInput
+              style={styles.input}
+              label="Password"
+              autoCapitalize="none"
+              secureTextEntry
+              mode="outlined"
+            />
+
+            {/* FORGOT PASSWORD FOR LOGIN */}
+            {!isSignUp && (
+              <Button
+                mode="text"
+                textColor="#fff"
+                style={styles.forgotPassword}
+              >
+                Forgot Password?
+              </Button>
+            )}
+
+            {/* TERMS & CONDITIONS FOR SIGN UP */}
+            {isSignUp && (
+              <View style={styles.checkboxContainer}>
+                <Checkbox status="unchecked" />
+                <Text style={styles.checkboxText}>
+                  I agree to the Terms & Conditions
+                </Text>
+              </View>
+            )}
+
+            <Button style={styles.button} mode="contained">
+              {isSignUp ? "Sign Up" : "Log In"}
+            </Button>
+
+            <Button
+              style={styles.switchButton}
+              mode="text"
+              textColor="#fff"
+              onPress={handleSwitchMode}
+            >
+              {isSignUp
+                ? "Already have an account? Log in"
+                : "Don't have an account? Sign Up"}
+            </Button>
+          </KeyboardAvoidingView>
         </View>
       </View>
     </View>
@@ -101,9 +163,9 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    padding: 12,
+    padding: 8,
     backgroundColor: "rgba(255, 255, 255, 1)",
-    borderRadius: 14,
+    borderRadius: 24,
     marginBottom: 16,
     color: "#ffffffff",
   },
@@ -119,5 +181,28 @@ const styles = StyleSheet.create({
     marginTop: 12,
     alignSelf: "center",
     fontSize: 20,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  halfInput: {
+    width: "48%",
+  },
+
+  forgotPassword: {
+    alignSelf: "flex-end",
+    marginBottom: 10,
+  },
+
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  checkboxText: {
+    color: "#fff",
   },
 });
