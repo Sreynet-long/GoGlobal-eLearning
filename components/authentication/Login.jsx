@@ -1,11 +1,11 @@
-import { View, Text, TextInput, TouchableOpacity, Image} from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { KeyboardAvoidingView, Text, View } from "react-native";
 
 export default function Login() {
   return (
-    <View>
-      <Text>Logi</Text>
-    </View> 
-  )
+    <KeyboardAvoidingView>
+      <View>
+        <Text>Login</Text>
+      </View>
+    </KeyboardAvoidingView>
+  );
 }
