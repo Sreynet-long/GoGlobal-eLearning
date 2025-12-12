@@ -69,7 +69,7 @@ export default function TabLayout() {
       <Ionicons name="bookmarks" size={24} color="black" />
       <Ionicons name="bookmarks-outline" size={24} color="black" />
       <Tabs.Screen
-        name="myBook"
+        name="myCourses"
         options={{
           title: "My courses",
           tabBarIcon: ({ color, focused }) => {
