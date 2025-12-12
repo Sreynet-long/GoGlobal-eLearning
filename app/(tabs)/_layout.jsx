@@ -50,12 +50,6 @@ export default function TabLayout() {
           },
         }}
       />
-      <Tabs
-        name="help"
-        options={{
-          title: "Help",
-        }}
-      />
       <Ionicons name="log-in-outline" size={24} color="black" />
       <Ionicons name="log-in" size={24} color="black" />
       <Tabs.Screen
