@@ -17,7 +17,7 @@ export default function TrendingCourse() {
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitleText}>Trending Certifications</Text>
+        <Text style={styles.sectionTitleText}>Trending Courses</Text>
         <TouchableOpacity>
           <Text style={styles.viewAllText}>View All </Text>
         </TouchableOpacity>
