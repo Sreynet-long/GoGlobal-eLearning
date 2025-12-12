@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import Octicons from '@expo/vector-icons/Octicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5'; // fontawesome5 for MyBook tab icon
 
 export default function TabLayout() {
   return (
