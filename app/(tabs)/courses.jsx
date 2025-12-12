@@ -6,7 +6,7 @@ import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
 
 export default function courses() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   return (
     <View style={styles.screenContainer}>
       <Topbar />

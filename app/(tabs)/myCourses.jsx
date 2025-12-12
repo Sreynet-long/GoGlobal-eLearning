@@ -6,7 +6,7 @@ import Topbar from "../../components/headers/Topbar";
 import EnrolledCourses from "../../components/courses/EnrolledCourses";
 
 export default function myCourses() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   return (
     <View style={styles.screenContainer}>
       <Topbar />

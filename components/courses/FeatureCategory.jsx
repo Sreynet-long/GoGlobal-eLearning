@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   ScrollView,
@@ -18,13 +19,20 @@ const Category = [
   { name: "Video Editing", icon: "film-outline" },
 ];
 
-const CategoryPill = ({ name, icon, onPress }) => (
-  <TouchableOpacity style={styles.categoryPill} onPress={() => onPress(name)}>
+const CategoryPill = ({ name, icon, active,onPress }) => (
+  <TouchableOpacity style={[styles.categoryPill, active && styles.activePill]} onPress={() => onPress(name)}>
     <Ionicons name={icon} size={18} color="#25375aff" />
-    <Text style={styles.categoryPillText}>{name}</Text>
+    <Text style={[styles.categoryPillText,active.categoryPillText && styles.activeText]}>{name}</Text>
   </TouchableOpacity>
 );
 export default function FeatureCategory({onSelectedCategory}) {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const handlePress = (name) =>  {
+    setSelectedCategory(name);
+    onSelectedCategory(name);
+  }
+
   return (
     <View>
       <Text style={styles.sectionTitle}>Course Categories</Text>
@@ -34,7 +42,7 @@ export default function FeatureCategory({onSelectedCategory}) {
         style={styles.categoryScroll}
       >
         {Category.map((cat, index) => (
-          <CategoryPill key={index} name={cat.name} icon={cat.icon} onPress={onSelectedCategory}/>
+          <CategoryPill key={index} name={cat.name} icon={cat.icon} active ={selectedCategory === cat.name} onPress={handlePress}/>
         ))}
       </ScrollView>
     </View>
@@ -51,6 +59,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#C8D0F5",
     backgroundColor: "#E6E9FC",
+  },
+  activePill: {
+    backgroundColor: "#dfdedeff",
+    borderColor: "#25375aff",
+  },
+  activeText: {
+    color: "#fff",
   },
   categoryPillText: {
     fontSize: 14,
