@@ -81,8 +81,13 @@ export default function EnrolledCourses({ selectedCategory }) {
   return (
     <View>
       <Text style={styles.textHeader}>Courses Enrolled List</Text>
+      {filteredCourses.length === 0 ? (
+        <View>
+          <Text style={{textAlign: "center" , marginTop: 20}}>No courses enrolled in this category.</Text>
+        </View>
+      ) : (
 
-      {filteredCourses.map((course) => (
+      filteredCourses.map((course) => (
         <TouchableOpacity style={styles.card} key={course.id}>
           <Image source={course.image} style={styles.cardImage} />
           <View style={styles.cardBody}>
@@ -92,14 +97,14 @@ export default function EnrolledCourses({ selectedCategory }) {
               <View style={styles.progressBarContainer}>
                 <Text
                   style={[styles.progressBar, { width: `${course.progress}%` }]}
-                ></Text>
+                />
               </View>
               <Text style={styles.progressText}>{course.progress}% Completed</Text>
             </View>
-                
           </View>
         </TouchableOpacity>
-      ))}
+      ))
+      )}
     </View>
   );
 }
@@ -160,7 +165,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     flex: 1,
     width: "100%",
-    height: 8,
+    height: 4,
     backgroundColor: "#e0e0e0",
     borderRadius: 4,
     marginRight: 10,
