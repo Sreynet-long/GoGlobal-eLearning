@@ -26,7 +26,7 @@ export const MOBILE_LOGIN = gql`
 `;
 
 export const MOBILE_REGISTER_ACCOUNT = gql`
-  mutation MobileRegisterAccount($input: MobileRegisterAccountInput!) {
+  mutation MobileRegisterAccount($input: MobileRegisterAccountInput) {
     mobileRegisterAccount(input: $input) {
       data {
         user {
@@ -46,6 +46,24 @@ export const MOBILE_REGISTER_ACCOUNT = gql`
         messageKh
         messageEn
       }
+    }
+  }
+`;
+export const GET_USER_BY_ID = gql`
+  query GetUserById {
+    getUserById {
+      _id
+      first_name
+      last_name
+      phone_number
+      email
+      gender
+      profile_image
+      is_enabled
+      role
+      remark
+      createdAt
+      updatedAt
     }
   }
 `;

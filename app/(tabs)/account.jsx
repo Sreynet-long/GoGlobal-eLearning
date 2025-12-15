@@ -1,5 +1,6 @@
-import { gql, useMutation } from "@apollo/client";
-import { useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -19,48 +20,11 @@ import {
 } from "react-native-paper";
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
-
-/* ===================== GRAPHQL ===================== */
-
-const LOGIN_MUTATION = gql`
-  mutation MobileLogin($email: String, $password: String) {
-    mobileLogin(email: $email, password: $password) {
-      status
-      message {
-        messageEn
-      }
-      data {
-        token
-        user {
-          first_name
-          last_name
-          email
-          phone_number
-        }
-      }
-    }
-  }
-`;
-
-const SIGNUP_MUTATION = gql`
-  mutation MobileRegisterAccount($input: MobileRegisterAccountInput) {
-    mobileRegisterAccount(input: $input) {
-      status
-      message {
-        messageEn
-      }
-      data {
-        token
-        user {
-          first_name
-          last_name
-          email
-          phone_number
-        }
-      }
-    }
-  }
-`;
+import {
+  GET_USER_BY_ID,
+  MOBILE_LOGIN,
+  MOBILE_REGISTER_ACCOUNT,
+} from "../../schema/login";
 
 /* ===================== COLORS ===================== */
 
@@ -74,12 +38,14 @@ const COLORS = {
   textLight: "#FFFFFF",
   grey300: "#E0E0E0",
   grey600: "#757575",
+  cardBackground: "#FFFFFF",
+  borderLight: "#e9ecef",
 };
 
 /* ===================== COMPONENT ===================== */
 
 export default function AccountScreen() {
-  const { isAuth, loading, login, logout, user } = useAuth();
+  const { isAuth, loading, login, logout, user: authUser } = useAuth();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -91,10 +57,12 @@ export default function AccountScreen() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
 
-  const [loginMutation] = useMutation(LOGIN_MUTATION, {
+  /* ===================== MUTATIONS ===================== */
+
+  const [loginMutation] = useMutation(MOBILE_LOGIN, {
     onCompleted: async (data) => {
       if (data?.mobileLogin?.status) {
-        await login(data.mobileLogin.data.token, data.mobileLogin.data.user);
+        await login(data.mobileLogin.data.token);
       } else {
         setError(data?.mobileLogin?.message?.messageEn);
       }
@@ -102,19 +70,34 @@ export default function AccountScreen() {
     onError: (err) => setError(err.message),
   });
 
-  const [signupMutation] = useMutation(SIGNUP_MUTATION, {
+  const [signupMutation] = useMutation(MOBILE_REGISTER_ACCOUNT, {
     onCompleted: async (data) => {
       if (data?.mobileRegisterAccount?.status) {
-        await login(
-          data.mobileRegisterAccount.data.token,
-          data.mobileRegisterAccount.data.user
-        );
+        await login(data.mobileRegisterAccount.data.token);
       } else {
         setError(data?.mobileRegisterAccount?.message?.messageEn);
       }
     },
     onError: (err) => setError(err.message),
   });
+
+  /* ===================== QUERY ===================== */
+
+  const {
+    data: userData,
+    refetch: refetchUser,
+    loading: userLoading,
+  } = useQuery(GET_USER_BY_ID, {
+    skip: !isAuth,
+  });
+
+  useEffect(() => {
+    if (isAuth) {
+      refetchUser();
+    }
+  }, [isAuth]);
+
+  /* ===================== HANDLE AUTH ===================== */
 
   const handleAuth = async () => {
     setError("");
@@ -137,7 +120,7 @@ export default function AccountScreen() {
             phone_number: phone,
             email,
             password,
-            gender: gender.toUpperCase(),
+            gender: gender.toLowerCase(),
           },
         },
       });
@@ -146,9 +129,26 @@ export default function AccountScreen() {
     }
   };
 
-  if (loading) return null;
+  if (loading || userLoading) return null;
 
-  /* ===================== SCREEN LAYOUT ===================== */
+  function InfoWithIcon({ label, value, iconName }) {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginVertical: 6,
+        }}
+      >
+        {iconName && (
+          <MaterialIcons name={iconName} size={20} style={{ marginRight: 8 }} />
+        )}
+        <Text style={{ color: "#757575", fontWeight: "600" }}>{label}: </Text>
+        <Text style={{ fontWeight: "600" }}>{value}</Text>
+      </View>
+    );
+  }
+  /* ===================== RENDER ===================== */
 
   return (
     <KeyboardAvoidingView
@@ -170,14 +170,14 @@ export default function AccountScreen() {
     </KeyboardAvoidingView>
   );
 
-  /* ===================== AUTH ===================== */
+  /* ===================== AUTH FORM ===================== */
 
   function renderAuth() {
     return (
       <Card style={styles.authCard}>
         <Card.Content>
           <Text style={styles.title}>
-            {isSignUp ? "Create Account" : "Welcome Back"}
+            {isSignUp ? "Create Account" : "Log In"}
           </Text>
 
           {error && <Text style={styles.error}>{error}</Text>}
@@ -275,12 +275,16 @@ export default function AccountScreen() {
   /* ===================== PROFILE ===================== */
 
   function renderProfile() {
+    const user = userData?.getUserById || authUser;
+
     return (
       <>
         <View style={styles.profileHeader}>
           <Image
             source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+              uri:
+                user?.profile_image ||
+                "https://cdn-icons-png.flaticon.com/512/847/847969.png",
             }}
             style={styles.avatar}
           />
@@ -288,22 +292,50 @@ export default function AccountScreen() {
             {user?.first_name} {user?.last_name}
           </Text>
           <Text style={styles.profileEmail}>{user?.email}</Text>
+          <Button
+            mode="text"
+            labelStyle={styles.editButtonLabel}
+            textColor={COLORS.primary}
+            onPress={() => {}}
+          >
+            Edit Profile
+          </Button>
         </View>
 
         <Card style={styles.infoCard}>
-          <Card.Title title="Account Information" />
+          <Card.Title
+            title="Account Information"
+            titleStyle={styles.cardTitle}
+          />
           <Card.Content>
-            <Info label="First Name" value={user?.first_name} />
-            <Info label="Last Name" value={user?.last_name} />
-            <Info label="Phone" value={user?.phone_number} />
+            <InfoWithIcon
+              label="First Name"
+              value={user?.first_name}
+              icon="account"
+            />
+            <InfoWithIcon
+              label="Last Name"
+              value={user?.last_name}
+              icon="account"
+            />
+            <InfoWithIcon
+              label="Phone"
+              value={user?.phone_number}
+              icon="phone"
+            />
+            <InfoWithIcon
+              label="Gender"
+              value={user?.gender}
+              icon="gender-male-female"
+            />
           </Card.Content>
         </Card>
 
         <Button
-          mode="outlined"
+          mode="contained"
           onPress={logout}
-          style={styles.logout}
-          textColor={COLORS.error}
+          style={styles.logoutButtonContained}
+          textColor={COLORS.white}
         >
           Log Out
         </Button>
@@ -389,40 +421,74 @@ const styles = StyleSheet.create({
 
   profileHeader: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 30,
+    paddingVertical: 10,
   },
   avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 3,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
     borderColor: COLORS.primary,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
+    marginTop: 4,
+    color: "#343a40",
   },
   profileEmail: {
     color: COLORS.grey600,
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  editButtonLabel: {
+    fontSize: 14,
+    fontWeight: "700",
   },
   infoCard: {
     borderRadius: 16,
-    marginBottom: 20,
+    marginBottom: 25,
+    backgroundColor: COLORS.cardBackground,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#212529",
   },
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 10,
+    alignItems: "center",
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+    paddingHorizontal: 5,
   },
   infoLabel: {
+    fontSize: 16,
     color: COLORS.grey600,
   },
   infoValue: {
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#212529",
   },
-  logout: {
-    borderColor: COLORS.error,
-    borderWidth: 2,
+
+  logoutButtonContained: {
+    backgroundColor: COLORS.error,
+    borderRadius: 12,
+    paddingVertical: 6,
+    shadowColor: COLORS.error,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
