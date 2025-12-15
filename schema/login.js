@@ -1,0 +1,51 @@
+import { gql } from "@apollo/client";
+
+export const MOBILE_LOGIN = gql`
+  mutation MobileLogin($email: String!, $password: String!) {
+    mobileLogin(email: $email, password: $password) {
+      data {
+        user {
+          _id
+          first_name
+          last_name
+          phone_number
+          email
+          gender
+          profile_image
+          role
+        }
+        token
+      }
+      status
+      message {
+        messageKh
+        messageEn
+      }
+    }
+  }
+`;
+
+export const MOBILE_REGISTER_ACCOUNT = gql`
+  mutation MobileRegisterAccount($input: MobileRegisterAccountInput!) {
+    mobileRegisterAccount(input: $input) {
+      data {
+        user {
+          _id
+          first_name
+          last_name
+          phone_number
+          email
+          gender
+          profile_image
+          role
+        }
+        token
+      }
+      status
+      message {
+        messageKh
+        messageEn
+      }
+    }
+  }
+`;

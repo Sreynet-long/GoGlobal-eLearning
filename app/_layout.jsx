@@ -1,10 +1,16 @@
-import { Header } from "@react-navigation/elements";
+import { ApolloProvider } from "@apollo/client";
 import { Stack } from "expo-router";
+import { AuthProvider } from "../context/AuthContext";
+import client from "../lib/apolloClient";
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-    </Stack>
-  )
+    <ApolloProvider client={client}>
+      <AuthProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </AuthProvider>
+    </ApolloProvider>
+  );
 }

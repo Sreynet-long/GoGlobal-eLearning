@@ -11,11 +11,13 @@ export default function Index() {
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <HeroBanner />
           <StatesRow />
           <VideoCard />
-          {/* <UtilityModules/> */}
           <TrendingCourse />
           <FreeCourse />
         </ScrollView>
@@ -25,10 +27,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    backgroundColor: "#25375aff",
-  },
+  screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {
     flex: 1,
     overflow: "hidden",
@@ -36,9 +35,5 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     backgroundColor: "white",
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 80,
-    paddingTop: 12,
-  },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 80, paddingTop: 12 },
 });

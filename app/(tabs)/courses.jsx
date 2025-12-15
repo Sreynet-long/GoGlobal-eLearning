@@ -5,28 +5,30 @@ import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
 
-export default function courses() {
+export default function Courses() {
   const [selectedCategory, setSelectedCategory] = useState(null);
+
   return (
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
         <Search />
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-        <FeatureCategory onSelectedCategory={setSelectedCategory} />
+          <FeatureCategory onSelectedCategory={setSelectedCategory} />
         </View>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <CourseList selectedCategory={selectedCategory} />
         </ScrollView>
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    backgroundColor: "#25375aff",
-  },
+  screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {
     flex: 1,
     overflow: "hidden",
@@ -34,8 +36,5 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     backgroundColor: "white",
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 80,
-  },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 80 },
 });
