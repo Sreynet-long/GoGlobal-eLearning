@@ -10,7 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function MyCourses() {
   const { isAuth, loading } = useAuth();
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
     if (!loading && !isAuth) router.replace("/account");

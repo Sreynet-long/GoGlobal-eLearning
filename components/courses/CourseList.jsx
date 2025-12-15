@@ -94,7 +94,12 @@ export default function CourseList({ selectedCategory }) {
             <Text style={styles.textHours}>{course.hours} hours</Text>
             <View style={styles.row}>
               <Text style={styles.textPrice}>{course.price}</Text>
-              <Text style={styles.textRating}>{course.rating} ⭐</Text>
+              <TouchableOpacity 
+              style={styles.enrollButton}
+              onPress={() => console.log(`Enrolled in ${course.title}`)}
+              >
+                <Text style={styles.textEnroll}>Enroll now</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableOpacity>
@@ -157,5 +162,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 10,
+  },
+  enrollButton: {
+    backgroundColor: "#3F51B5",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+  },
+  textEnroll: {
+    color: "white",
+    fontWeight: "500",
   },
 });
