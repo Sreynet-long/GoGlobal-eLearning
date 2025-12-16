@@ -1,3 +1,4 @@
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -16,7 +17,6 @@ export default function TabsLayout() {
         tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
       }}
     >
-      {/* Home */}
       <Tabs.Screen
         name="index"
         options={{
@@ -29,8 +29,19 @@ export default function TabsLayout() {
             ),
         }}
       />
+      {/* <Tabs.Screen
+        name="about"
+        options={{
+          title: "About Us",
+          tabBarIcon: ({ color, focused }) =>
+            focused ? (
+              
+            ) : (
+              
+            ),
+        }}
+      /> */}
 
-      {/* Courses */}
       <Tabs.Screen
         name="courses"
         options={{
@@ -51,14 +62,12 @@ export default function TabsLayout() {
             ),
         }}
       />
-
-      {/* My Courses (AUTH ONLY) */}
-      {isAuth && (
-        <Tabs.Screen
-          name="myCourses"
-          options={{
-            title: "My Courses",
-            tabBarIcon: ({ color, focused }) =>
+      <Tabs.Screen
+        name="myCourses&Login"
+        options={{
+          title: isAuth ? "My Courses" : "Login",
+          tabBarIcon: ({ color, focused }) =>
+            isAuth ? (
               focused ? (
                 <MaterialCommunityIcons
                   name="book-heart"
@@ -71,15 +80,19 @@ export default function TabsLayout() {
                   size={24}
                   color={color}
                 />
-              ),
-          }}
-        />
-      )}
+              )
+            ) : focused ? (
+              <Ionicons name="log-in" size={28} color={color} />
+            ) : (
+              <Ionicons name="log-in-outline" size={28} color={color} />
+            ),
+        }}
+      />
 
       <Tabs.Screen
-        name="account"
+        name="account&Aboutus"
         options={{
-          title: isAuth ? "Account" : "Login",
+          title: isAuth ? "Account" : "About Us",
           tabBarIcon: ({ color, focused }) =>
             isAuth ? (
               focused ? (
@@ -88,9 +101,9 @@ export default function TabsLayout() {
                 <FontAwesome6 name="user-large" size={21} color={color} />
               )
             ) : focused ? (
-              <Ionicons name="log-in" size={28} color={color} />
+              <FontAwesome name="question-circle" size={24} color={color} />
             ) : (
-              <Ionicons name="log-in-outline" size={28} color={color} />
+              <FontAwesome name="question-circle-o" size={24} color={color} />
             ),
         }}
       />
