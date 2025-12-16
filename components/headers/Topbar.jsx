@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Notification from "./Notification";
 import Flag_en from "../../assets/flags/en.png";
 import Flag_kh from "../../assets/flags/kh.png";
+import Notification from "./Notification";
 
 const STATUS_BAR_HEIGHT =
   Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 20;
@@ -26,13 +26,13 @@ export default function Topbar() {
 
   const changeFlag = () => {
     return currentLang === "en" ? Flag_en : Flag_kh;
-  }
+  };
   return (
-    <View style={styles.topContainer}> 
+    <View style={styles.topContainer}>
       <View style={styles.header}>
         <View style={styles.left}>
           <Image
-            source={require("../../assets/logos/logo.png")}
+            source={require("../../assets/images/Go_Global_IT_logo.png")}
             style={styles.logo}
           />
           <Text style={styles.text}>GO eLEARNING</Text>
@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   logo: {
-    width: 35,
-    height: 35,
+    width: 45,
+    height: 45,
     marginRight: 8,
     resizeMode: "contain",
   },

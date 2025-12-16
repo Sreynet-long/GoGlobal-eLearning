@@ -1,7 +1,8 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 import { Tabs } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
 
@@ -23,9 +24,9 @@ export default function TabsLayout() {
           title: "Home",
           tabBarIcon: ({ color, focused }) =>
             focused ? (
-              <Ionicons name="home" size={24} color={color} />
+              <FontAwesome6 name="house-chimney" size={20} color={color} />
             ) : (
-              <Ionicons name="home-outline" size={24} color={color} />
+              <FontAwesome6 name="house" size={20} color={color} />
             ),
         }}
       />
@@ -49,13 +50,13 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) =>
             focused ? (
               <MaterialCommunityIcons
-                name="book-education"
+                name="book-open-page-variant"
                 size={24}
                 color={color}
               />
             ) : (
               <MaterialCommunityIcons
-                name="book-education-outline"
+                name="book-education"
                 size={24}
                 color={color}
               />
@@ -70,21 +71,21 @@ export default function TabsLayout() {
             isAuth ? (
               focused ? (
                 <MaterialCommunityIcons
-                  name="book-heart"
+                  name="book-open-page-variant"
                   size={24}
                   color={color}
                 />
               ) : (
                 <MaterialCommunityIcons
-                  name="book-heart-outline"
+                  name="book-heart"
                   size={24}
                   color={color}
                 />
               )
             ) : focused ? (
-              <Ionicons name="log-in" size={28} color={color} />
+              <FontAwesome5 name="door-open" size={22} color={color} />
             ) : (
-              <Ionicons name="log-in-outline" size={28} color={color} />
+              <FontAwesome5 name="door-closed" size={22} color={color} />
             ),
         }}
       />

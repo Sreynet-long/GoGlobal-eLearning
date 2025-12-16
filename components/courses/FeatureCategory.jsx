@@ -26,7 +26,11 @@ const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
     style={[styles.categoryPill, active && styles.activePill]}
     onPress={() => onPress(category_name)}
   >
-    <Ionicons name={icon_src || "alert-circle-outline"} size={18} color="#25375aff" />
+    <Ionicons
+      name={icon_src || "alert-circle-outline"}
+      size={18}
+      color="#25375aff"
+    />
     <Text
       style={[
         styles.categoryPillText,
