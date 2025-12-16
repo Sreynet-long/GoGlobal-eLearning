@@ -1,5 +1,5 @@
 // app/_layout.jsx
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { Stack } from "expo-router"; // this is correct for Expo Router v6+
 import { AuthProvider } from "../context/AuthContext";
 import client from "../lib/apolloClient";
