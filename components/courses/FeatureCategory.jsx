@@ -10,48 +10,38 @@ import {
 } from "react-native";
 import { GET_COURSE_CATEGORY } from "../../schema/courseCategory";
 
-// const Category = [
-//   { name: "All", icon: "apps-outline" },
-//   { name: "Web Dev", icon: "logo-html5" },
-//   { name: "Graphic Design", icon: "color-palette-outline" },
-//   { name: "UX UI", icon: "layers-outline" },
-//   { name: "Computer Repair", icon: "build-outline" },
-//   { name: "Data Science", icon: "analytics-outline" },
-//   { name: "IT Support", icon: "headset-outline" },
-//   { name: "Video Editing", icon: "film-outline" },
-// ];
-
 const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
   <TouchableOpacity
     style={[styles.categoryPill, active && styles.activePill]}
     onPress={() => onPress(category_name)}
   >
-    <Ionicons name={icon_src || "alert-circle-outline"} size={18} color="#25375aff" />
-    <Text
-      style={[
-        styles.categoryPillText,
-        active.categoryPillText && styles.activeText,
-      ]}
-    >
+    <Ionicons
+      name={icon_src || "apps-outline"} 
+      size={18}
+      color={active ? "#fff" : "#25375aff"} 
+    />
+    <Text style={[styles.categoryPillText, active && styles.activeText]}>
       {category_name}
     </Text>
   </TouchableOpacity>
 );
+
 export default function FeatureCategory({ onSelectedCategory }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
-    variables: { page: 1, limit: 100, pagination: false },
+    variables: { page: 1, limit: 50, pagination: false, keyword: "" },
   });
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error: {error.message}</Text>;
+  if (loading) return <Text style={styles.loadingText}>Loading...</Text>;
+  if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
+  // Combine default "All" with fetched categories
   const Category = [
     { category_name: "All", icon_src: "apps-outline" },
     ...data.getCourseCategoryWithPagination.data.map((cat) => ({
       category_name: cat.category_name,
-      icon_src: cat.icon_src,
+      icon_src: cat.icon_src || "apps-outline",
     })),
   ];
 
@@ -81,6 +71,7 @@ export default function FeatureCategory({ onSelectedCategory }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   categoryPill: {
     flexDirection: "row",
@@ -94,7 +85,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E6E9FC",
   },
   activePill: {
-    backgroundColor: "#dfdedeff",
+    backgroundColor: "#25375aff",
     borderColor: "#25375aff",
   },
   activeText: {
@@ -115,5 +106,15 @@ const styles = StyleSheet.create({
   },
   categoryScroll: {
     marginBottom: 15,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#666",
+  },
+  errorText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "red",
   },
 });

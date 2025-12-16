@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import EmtyCourse from "./EmtyCourse";
 
 const Courses = [
   {
@@ -82,9 +83,7 @@ export default function EnrolledCourses({ selectedCategory }) {
     <View>
       <Text style={styles.textHeader}>Courses Enrolled List</Text>
       {filteredCourses.length === 0 ? (
-        <View>
-          <Text style={{textAlign: "center" , marginTop: 20}}>No courses enrolled in this category.</Text>
-        </View>
+        <EmtyCourse />
       ) : (
 
       filteredCourses.map((course) => (
