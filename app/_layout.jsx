@@ -1,10 +1,10 @@
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { Stack } from "expo-router";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import client from "../lib/apolloClient";
 
 function AppStack() {
-  const { loading } = useAuth();
+  const { isAuth, loading } = useAuth();
 
   if (loading) return null;
 

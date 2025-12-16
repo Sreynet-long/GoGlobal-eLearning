@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useQuery } from "@apollo/client/react";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -7,31 +8,57 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { GET_COURSE_CATEGORY } from "../../schema/courseCategory";
 
-const Category = [
-  { name: "All", icon: "apps-outline" },
-  { name: "Web Dev", icon: "logo-html5" },
-  { name: "Graphic Design", icon: "color-palette-outline" },
-  { name: "UX UI", icon: "layers-outline" },
-  { name: "Computer Repair", icon: "build-outline" },
-  { name: "Data Science", icon: "analytics-outline" },
-  { name: "IT Support", icon: "headset-outline" },
-  { name: "Video Editing", icon: "film-outline" },
-];
+// const Category = [
+//   { name: "All", icon: "apps-outline" },
+//   { name: "Web Dev", icon: "logo-html5" },
+//   { name: "Graphic Design", icon: "color-palette-outline" },
+//   { name: "UX UI", icon: "layers-outline" },
+//   { name: "Computer Repair", icon: "build-outline" },
+//   { name: "Data Science", icon: "analytics-outline" },
+//   { name: "IT Support", icon: "headset-outline" },
+//   { name: "Video Editing", icon: "film-outline" },
+// ];
 
-const CategoryPill = ({ name, icon, active,onPress }) => (
-  <TouchableOpacity style={[styles.categoryPill, active && styles.activePill]} onPress={() => onPress(name)}>
-    <Ionicons name={icon} size={18} color="#25375aff" />
-    <Text style={[styles.categoryPillText,active.categoryPillText && styles.activeText]}>{name}</Text>
+const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
+  <TouchableOpacity
+    style={[styles.categoryPill, active && styles.activePill]}
+    onPress={() => onPress(category_name)}
+  >
+    <Ionicons name={icon_src || "alert-circle-outline"} size={18} color="#25375aff" />
+    <Text
+      style={[
+        styles.categoryPillText,
+        active.categoryPillText && styles.activeText,
+      ]}
+    >
+      {category_name}
+    </Text>
   </TouchableOpacity>
 );
-export default function FeatureCategory({onSelectedCategory}) {
+export default function FeatureCategory({ onSelectedCategory }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const handlePress = (name) =>  {
-    setSelectedCategory(name);
-    onSelectedCategory(name);
-  }
+  const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
+    variables: { page: 1, limit: 100, pagination: false },
+  });
+
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>Error: {error.message}</Text>;
+
+  const Category = [
+    { category_name: "All", icon_src: "apps-outline" },
+    ...data.getCourseCategoryWithPagination.data.map((cat) => ({
+      category_name: cat.category_name,
+      icon_src: cat.icon_src,
+    })),
+  ];
+
+  const handlePress = (category_name) => {
+    setSelectedCategory(category_name);
+    onSelectedCategory(category_name);
+  };
 
   return (
     <View>
@@ -42,7 +69,13 @@ export default function FeatureCategory({onSelectedCategory}) {
         style={styles.categoryScroll}
       >
         {Category.map((cat, index) => (
-          <CategoryPill key={index} name={cat.name} icon={cat.icon} active ={selectedCategory === cat.name} onPress={handlePress}/>
+          <CategoryPill
+            key={index}
+            category_name={cat.category_name}
+            icon_src={cat.icon_src}
+            active={selectedCategory === cat.category_name}
+            onPress={handlePress}
+          />
         ))}
       </ScrollView>
     </View>
