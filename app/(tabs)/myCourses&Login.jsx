@@ -17,6 +17,7 @@ import {
   TextInput,
 } from "react-native-paper";
 
+import { useRouter } from "expo-router";
 import EnrolledCourses from "../../components/courses/EnrolledCourses";
 import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
@@ -39,6 +40,8 @@ export default function MyCoursesOrLogin() {
   const [password, setPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
+
+  const router = useRouter();
 
   // ===================== Reset Form =====================
   const resetForm = () => {
@@ -234,6 +237,14 @@ export default function MyCoursesOrLogin() {
             >
               {isSignUp ? "Sign Up" : "Log In"}
             </Button>
+            {!isSignUp && (
+              <Button
+                onPress={() => router.push("/auth/forgot-password")}
+                textColor="#25375A"
+              >
+                Forgot password?
+              </Button>
+            )}
 
             <Button onPress={toggleForm}>
               {isSignUp

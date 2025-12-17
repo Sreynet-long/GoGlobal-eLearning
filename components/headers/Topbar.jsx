@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Image,
@@ -15,13 +17,13 @@ import Notification from "./Notification";
 const STATUS_BAR_HEIGHT =
   Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 20;
 
-export default function Topbar() {
+export default function Topbar({ showBack = false }) {
+  const router = useRouter();
   const [currentLang, setCurrentLang] = useState("en");
 
   const toggleLanguage = () => {
     const newLang = currentLang === "en" ? "kh" : "en";
     setCurrentLang(newLang);
-    // console.log(`language change to: ${newLang}`);
   };
 
   const changeFlag = () => {
@@ -31,11 +33,22 @@ export default function Topbar() {
     <View style={styles.topContainer}>
       <View style={styles.header}>
         <View style={styles.left}>
-          <Image
-            source={require("../../assets/images/Go_Global_IT_logo.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.text}>GO eLEARNING</Text>
+          {showBack ? (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backBtn}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+          ) : (
+            <>
+              <Image
+                source={require("../../assets/images/Go_Global_IT_logo.png")}
+                style={styles.logo}
+              />
+              <Text style={styles.text}>GO eLEARNING</Text>
+            </>
+          )}
         </View>
         <View style={styles.right}>
           <TouchableOpacity
