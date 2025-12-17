@@ -141,6 +141,7 @@ export default function MyCoursesOrLogin() {
 
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+          showsVerticalScrollIndicator={false}
         >
           <EnrolledCourses selectedCategory={selectedCategory} />
         </ScrollView>
@@ -235,7 +236,9 @@ export default function MyCoursesOrLogin() {
             </Button>
 
             <Button onPress={toggleForm}>
-              {isSignUp ? "Already have an account?" : "Need an account?"}
+              {isSignUp
+                ? "Already have an account? Log in"
+                : "Don't have an account yet? Sign Up"}
             </Button>
           </Card.Content>
         </Card>

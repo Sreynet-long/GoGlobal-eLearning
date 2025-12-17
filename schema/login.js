@@ -49,6 +49,18 @@ export const MOBILE_REGISTER_ACCOUNT = gql`
     }
   }
 `;
+
+export const MOBILE_UPDATE_USER = gql`
+  mutation MobileUpdateUser($id: ID!, $input: MobileUserUpdateInput) {
+    mobileUpdateUser(_id: $id, input: $input) {
+      status
+      message {
+        messageKh
+        messageEn
+      }
+    }
+  }
+`;
 export const GET_USER_BY_ID = gql`
   query GetUserById {
     getUserById {
