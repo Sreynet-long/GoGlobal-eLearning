@@ -8,12 +8,12 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import {
   Button,
   Card,
-  IconButton,
   Paragraph,
   RadioButton,
   Text,
@@ -274,6 +274,47 @@ function InfoRow({ label, value, icon }) {
 
 // ------------------- About View -------------------
 function AboutView({ theme, handleCall, handleEmail }) {
+  const [openItem, setOpenItem] = useState(null);
+
+  const toggleItem = (key) => {
+    setOpenItem(openItem === key ? null : key);
+  };
+
+  const contactItems = [
+    {
+      key: "phone",
+      label: "Call Us",
+      value: "012 660 981",
+      icon: "phone",
+      onPress: () => Linking.openURL("tel:012660981"),
+    },
+    {
+      key: "email",
+      label: "Email",
+      value: "goglobalit2022@gmail.com",
+      icon: "email",
+      onPress: () => Linking.openURL("mailto:goglobalit2022@gmail.com"),
+    },
+    {
+      key: "website",
+      label: "Website",
+      value: "https://www.go-globalit.com/",
+      icon: "link",
+      onPress: () => Linking.openURL("https://www.go-globalit.com/"),
+    },
+    {
+      key: "facebook",
+      label: "Facebook",
+      value:
+        "https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d",
+      icon: "facebook",
+      onPress: () =>
+        Linking.openURL(
+          "https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d"
+        ),
+    },
+  ];
+
   return (
     <ScrollView
       style={[
@@ -291,6 +332,7 @@ function AboutView({ theme, handleCall, handleEmail }) {
           />
           <Title style={styles.mainTitle}>About Go eLEARNING</Title>
         </View>
+
         <Card style={styles.card}>
           <Card.Content>
             <Title style={styles.cardTitle}>Our Story</Title>
@@ -307,17 +349,29 @@ function AboutView({ theme, handleCall, handleEmail }) {
             </Paragraph>
           </Card.Content>
         </Card>
+
         <Card style={styles.card}>
           <Card.Content>
-            <View style={styles.missionVisionItem}>
+            <View style={[styles.missionVisionItem, styles.quoteContainer]}>
               <Title
                 style={[styles.cardTitle, { color: theme.colors.primary }]}
               >
                 Our Vision
               </Title>
-              <Text style={styles.missionVisionText}>
-                "Let's move to the digital area."
-              </Text>
+
+              <View style={styles.mottoWrapper}>
+                <View
+                  style={[
+                    styles.accentLine,
+                    { backgroundColor: theme.colors.primary },
+                  ]}
+                />
+                <Text
+                  style={[styles.missionVisionText, { fontStyle: "italic" }]}
+                >
+                  "Let's move to the digital area."
+                </Text>
+              </View>
             </View>
             <View style={styles.missionVisionItem}>
               <Title
@@ -332,37 +386,38 @@ function AboutView({ theme, handleCall, handleEmail }) {
             </View>
           </Card.Content>
         </Card>
+
         <Card style={[styles.card, styles.contactCard]}>
           <Card.Content>
-            <Title style={styles.cardTitle}>Talk to Us</Title>
-            <View style={styles.contactRow}>
-              <IconButton
-                icon="phone"
-                size={24}
-                color={theme.colors.primary}
-                onPress={handleCall}
-              />
-              <View>
-                <Text style={styles.contactLabel}>Call Us</Text>
-                <Text style={styles.contactValue} onPress={handleCall}>
-                  012 660 981
+            <Title style={styles.cardTitle}>Contact Us</Title>
+
+            <View style={styles.contactIconRow}>
+              {contactItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={styles.contactIconButton}
+                  onPress={() => toggleItem(item.key)}
+                >
+                  <MaterialIcons
+                    name={item.icon}
+                    size={32}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.contactLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {openItem && (
+              <View style={styles.contactValueContainer}>
+                <Text
+                  style={styles.contactValue}
+                  onPress={contactItems.find((i) => i.key === openItem).onPress}
+                >
+                  {contactItems.find((i) => i.key === openItem).value}
                 </Text>
               </View>
-            </View>
-            <View style={styles.contactRow}>
-              <IconButton
-                icon="email"
-                size={24}
-                color={theme.colors.primary}
-                onPress={handleEmail}
-              />
-              <View>
-                <Text style={styles.contactLabel}>Email</Text>
-                <Text style={styles.contactValue} onPress={handleEmail}>
-                  goglobalit2022@gmail.com
-                </Text>
-              </View>
-            </View>
+            )}
           </Card.Content>
         </Card>
       </View>
@@ -405,6 +460,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 10,
+    paddingTop: 20,
     textAlign: "center",
   },
   infoRow: {
@@ -434,13 +490,30 @@ const styles = StyleSheet.create({
   },
   missionVisionText: { fontSize: 16, fontStyle: "italic", paddingLeft: 10 },
   contactCard: { paddingVertical: 10 },
-  contactRow: {
+  contactIconRow: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
+    justifyContent: "space-around",
+    marginVertical: 10,
   },
-  contactLabel: { fontSize: 12, color: "gray" },
-  contactValue: { fontSize: 16, fontWeight: "600" },
+  contactIconButton: {
+    alignItems: "center",
+    width: 70,
+  },
+  contactValueContainer: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+  contactLabel: { fontSize: 12, textAlign: "center", marginTop: 4 },
+  contactValue: {
+    fontSize: 16,
+    color: COLORS.primary,
+    textDecorationLine: "none",
+    textAlign: "center",
+    backgroundColor: "white",
+    padding: 5,
+    borderRadius: 50,
+    fontWeight: "bold",
+  },
   inputField: { marginBottom: 10, backgroundColor: "transparent" },
   logoContainer: {
     alignItems: "center",

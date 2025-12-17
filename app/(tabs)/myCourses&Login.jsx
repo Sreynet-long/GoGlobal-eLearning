@@ -113,7 +113,7 @@ export default function MyCoursesOrLogin() {
   // ===================== Switch Form =====================
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
-    resetForm(); // Clear all fields when switching forms
+    resetForm();
   };
 
   if (loading) return null;
@@ -207,7 +207,7 @@ export default function MyCoursesOrLogin() {
                     status={agreeTerms ? "checked" : "unchecked"}
                     onPress={() => setAgreeTerms(!agreeTerms)}
                   />
-                  <Text>I agree to terms</Text>
+                  <Text>I agree to the terms & Conditions </Text>
                 </View>
 
                 <Divider style={{ marginVertical: 12 }} />
@@ -271,7 +271,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
   },
-  title: { fontSize: 22, fontWeight: "700", textAlign: "center" },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 20,
+  },
   error: { color: "red", textAlign: "center", marginBottom: 8 },
   authCard: { borderRadius: 16 },
   input: { marginBottom: 12 },
