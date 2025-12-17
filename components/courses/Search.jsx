@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
 
-export default function Search() {
+export default function Search({ value, onChange }) {
   return (
     <View style={styles.searchContainer}>
       <View style={styles.inputWrapper}>
@@ -15,7 +15,20 @@ export default function Search() {
           style={styles.searchInput}
           placeholder="Search courses or skills..."
           placeholderTextColor="#888"
+          value={value}
+          onChangeText={onChange}
+          autoCorrect={false}
         />
+        {value?.length > 0 && (
+          <TouchableOpacity onPress={() => onChange("")}>
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color="#888"
+              style={{ marginLeft: 8 }}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -31,13 +44,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 20,
     backgroundColor: "#F0F0F0",
-    height: 44
+    height: 44,
   },
   searchInput: {
     flex: 1,
     height: "100%",
     fontSize: 16,
-
   },
   filterButton: {
     justifyContent: "center",
