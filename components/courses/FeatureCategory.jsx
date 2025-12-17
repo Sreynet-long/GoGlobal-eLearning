@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client/react";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,9 +17,9 @@ const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
     onPress={() => onPress(category_name)}
   >
     <Ionicons
-      name={icon_src || "apps-outline"} 
+      name={icon_src || "apps-outline"}
       size={18}
-      color={active ? "#fff" : "#25375aff"} 
+      color={active ? "#fff" : "#25375aff"}
     />
     <Text style={[styles.categoryPillText, active && styles.activeText]}>
       {category_name}
@@ -33,8 +34,17 @@ export default function FeatureCategory({ onSelectedCategory }) {
     variables: { page: 1, limit: 50, pagination: false, keyword: "" },
   });
 
-  if (loading) return <Text style={styles.loadingText}>Loading...</Text>;
-  if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
+  if (loading) return;
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator
+      size="small"
+      color="#58589bff"
+      alignItems="center"
+      marginTop={20}
+    />
+  </View>;
+  if (error)
+    return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
   // Combine default "All" with fetched categories
   const Category = [
@@ -116,5 +126,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     color: "red",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

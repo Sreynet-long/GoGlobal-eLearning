@@ -1,20 +1,37 @@
 import { useQuery } from "@apollo/client/react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { IMAGE_BASE_URL } from "../../config/env.js";
+import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 
-export default function CourseList({ selectedCategory }) {
+export default function CourseList({ selectedCategory, searchText }) {
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
       limit: 50,
       pagination: false,
-      keyword: "",
-      categoryId: "All",
+      keyword: searchText || "",
+      categoryId: selectedCategory === "All" ? "All" : selectedCategory,
     },
   });
   console.log("data", data?.getCourseWithPagination?.data);
-  if (loading) return <Text style={styles.textHeader}>Loading...</Text>;
+  if (loading)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="small"
+          color="#58589bff"
+          alignItems="center"
+          marginTop={20}
+        />
+      </View>
+    );
   if (error)
     return <Text style={styles.textHeader}>Error: {error.message}</Text>;
   const Courses = data?.getCourseWithPagination?.data || [];
@@ -54,14 +71,18 @@ export default function CourseList({ selectedCategory }) {
               {/* <Text style={styles.textHours}>{course.hours} hours</Text> */}
               <View style={styles.row}>
                 <View style={styles.priceBox}>
-                  <Text style={styles.textPrice}>${course.original_price?.toFixed(2) ?? "0.00"}</Text>
-                  <Text style={styles.textSellPrice}>${course.sell_price?.toFixed(2) ?? "0.00"}</Text>
+                  <Text style={styles.textPrice}>
+                    ${course.original_price?.toFixed(2) ?? "0.00"}
+                  </Text>
+                  <Text style={styles.textSellPrice}>
+                    ${course.sell_price?.toFixed(2) ?? "0.00"}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.enrollButton}
                   onPress={() => console.log(`Enrolled in ${course.title}`)}
                 >
-                  <Text style={styles.textEnroll}>Enroll now</Text>
+                  <Text style={styles.textEnroll}>Enroll</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -148,5 +169,11 @@ const styles = StyleSheet.create({
   },
   priceBox: {
     flexDirection: "column",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
   },
 });
