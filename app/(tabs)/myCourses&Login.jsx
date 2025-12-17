@@ -27,7 +27,7 @@ import { MOBILE_LOGIN, MOBILE_REGISTER_ACCOUNT } from "../../schema/login";
 export default function MyCoursesOrLogin() {
   const { isAuth, loading, login } = useAuth();
 
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
   // ===================== Auth States =====================
   const [isSignUp, setIsSignUp] = useState(false);
@@ -136,14 +136,14 @@ export default function MyCoursesOrLogin() {
         <Search />
 
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory onSelectedCategory={setSelectedCategory} />
+          <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
         >
-          <EnrolledCourses selectedCategory={selectedCategory} />
+          <EnrolledCourses selectedCategoryId={selectedCategoryId} />
         </ScrollView>
       </>
     );

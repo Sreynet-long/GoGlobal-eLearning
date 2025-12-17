@@ -10,14 +10,14 @@ import {
 import { IMAGE_BASE_URL } from "../../config/env.js";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 
-export default function CourseList({ selectedCategory, searchText }) {
+export default function CourseList({ selectedCategoryId, searchText }) {
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
       limit: 50,
       pagination: false,
       keyword: searchText || "",
-      categoryId: selectedCategory === "All" ? "All" : selectedCategory,
+      categoryId: selectedCategoryId === "All" ? "All" : selectedCategoryId,
     },
   });
   console.log("data", data?.getCourseWithPagination?.data);
@@ -37,11 +37,9 @@ export default function CourseList({ selectedCategory, searchText }) {
   const Courses = data?.getCourseWithPagination?.data || [];
 
   const filteredCourses =
-    selectedCategory === "All"
+    selectedCategoryId === "All"
       ? Courses
-      : Courses.filter(
-          (item) => item.category_id?.category_name === selectedCategory
-        );
+      : Courses.filter((item) => item.category_id?._id === selectedCategoryId);
 
   console.log("IMAGE_BASE_URL", IMAGE_BASE_URL);
   return (

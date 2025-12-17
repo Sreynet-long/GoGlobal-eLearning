@@ -14,7 +14,7 @@ import { GET_COURSE_CATEGORY } from "../../schema/courseCategory";
 const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
   <TouchableOpacity
     style={[styles.categoryPill, active && styles.activePill]}
-    onPress={() => onPress(category_name)}
+    onPress={() => onPress()}
   >
     <Ionicons
       name={icon_src || "apps-outline"}
@@ -28,36 +28,40 @@ const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
 );
 
 export default function FeatureCategory({ onSelectedCategory }) {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
   const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
     variables: { page: 1, limit: 50, pagination: false, keyword: "" },
   });
 
-  if (loading) return;
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator
-      size="small"
-      color="#58589bff"
-      alignItems="center"
-      marginTop={20}
-    />
-  </View>;
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="small"
+          color="#58589bff"
+          alignItems="center"
+          marginTop={20}
+        />
+      </View>
+    );
+  }
   if (error)
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
   // Combine default "All" with fetched categories
   const Category = [
-    { category_name: "All", icon_src: "apps-outline" },
+    { _id: "All", category_name: "All", icon_src: "apps-outline" },
     ...data.getCourseCategoryWithPagination.data.map((cat) => ({
+      _id: cat._id,
       category_name: cat.category_name,
       icon_src: cat.icon_src || "apps-outline",
     })),
   ];
 
-  const handlePress = (category_name) => {
-    setSelectedCategory(category_name);
-    onSelectedCategory(category_name);
+  const handlePress = (id) => {
+    setSelectedCategoryId(id);
+    onSelectedCategory(id);
   };
 
   return (
@@ -70,11 +74,11 @@ export default function FeatureCategory({ onSelectedCategory }) {
       >
         {Category.map((cat, index) => (
           <CategoryPill
-            key={index}
+            key={cat._id || index}
             category_name={cat.category_name}
             icon_src={cat.icon_src}
-            active={selectedCategory === cat.category_name}
-            onPress={handlePress}
+            active={selectedCategoryId === cat._id}
+            onPress={() => handlePress(cat._id)}
           />
         ))}
       </ScrollView>

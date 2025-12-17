@@ -8,20 +8,23 @@ import Topbar from "../../components/headers/Topbar";
 export default function courses() {
   const [searchText, setSearchText] = useState("");
   console.log("searchText", searchText);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
   return (
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
         <Search value={searchText} onChange={setSearchText} />
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory onSelectedCategory={setSelectedCategory} />
+          <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <CourseList selectedCategory={selectedCategory} searchText={searchText} />
+          <CourseList
+            selectedCategoryId={selectedCategoryId}
+            searchText={searchText}
+          />
         </ScrollView>
       </View>
     </View>
