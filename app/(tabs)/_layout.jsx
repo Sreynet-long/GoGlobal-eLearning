@@ -5,23 +5,37 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { Tabs } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 export default function TabsLayout() {
   const { isAuth } = useAuth();
+  const { language } = useLanguage();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "white",
-        tabBarStyle: { backgroundColor: "#25375aff", borderTopWidth: 0 },
+        tabBarStyle: {
+          backgroundColor: "#25375aff",
+          marginBottom: 15,
+          height: 60,
+          marginLeft: 15,
+          marginRight: 15,
+          borderRadius: 50,
+        },
         tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
+        tabBarItemStyle: {
+          justifyContent: "center",
+          alignItems: "center",
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t("home", language),
           tabBarIcon: ({ color, focused }) =>
             focused ? (
               <FontAwesome6 name="house-chimney" size={20} color={color} />
@@ -30,23 +44,11 @@ export default function TabsLayout() {
             ),
         }}
       />
-      {/* <Tabs.Screen
-        name="about"
-        options={{
-          title: "About Us",
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              
-            ) : (
-              
-            ),
-        }}
-      /> */}
 
       <Tabs.Screen
         name="courses"
         options={{
-          title: "Courses",
+          title: t("courses", language),
           tabBarIcon: ({ color, focused }) =>
             focused ? (
               <MaterialCommunityIcons
@@ -63,10 +65,11 @@ export default function TabsLayout() {
             ),
         }}
       />
+
       <Tabs.Screen
         name="myCourses&Login"
         options={{
-          title: isAuth ? "My Courses" : "Login",
+          title: isAuth ? t("my_courses", language) : t("login", language),
           tabBarIcon: ({ color, focused }) =>
             isAuth ? (
               focused ? (
@@ -93,7 +96,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="account&Aboutus"
         options={{
-          title: isAuth ? "Account" : "About Us",
+          title: isAuth ? t("account", language) : t("about_us", language),
           tabBarIcon: ({ color, focused }) =>
             isAuth ? (
               focused ? (

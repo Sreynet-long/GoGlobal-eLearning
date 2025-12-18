@@ -2,11 +2,14 @@ import { useMutation } from "@apollo/client";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Card, Text, TextInput } from "react-native-paper";
+import { Button, Card, Paragraph, Text, TextInput } from "react-native-paper";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { FORGOT_PASSWORD } from "../../schema/login";
 
 export default function ForgotPassword() {
   const router = useRouter();
+  const { language } = useLanguage();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
@@ -18,7 +21,11 @@ export default function ForgotPassword() {
           params: { token: data.forgotPassword.data.token },
         });
       } else {
-        setError(data?.forgotPassword?.message?.messageEn);
+        setError(
+          language === "kh"
+            ? data?.forgotPassword?.message?.messageKh
+            : data?.forgotPassword?.message?.messageEn
+        );
       }
     },
     onError: (err) => setError(err.message),
@@ -28,12 +35,14 @@ export default function ForgotPassword() {
     <View style={styles.container}>
       <Card>
         <Card.Content>
-          <Text style={styles.title}>Forgot Password?</Text>
-
+          <Text style={styles.title}>{t("forgot_password", language)}</Text>
+          <Paragraph style={styles.paragraph}>
+            {t("enter_email_for_reset", language)}
+          </Paragraph>
           {error && <Text style={styles.error}>{error}</Text>}
 
           <TextInput
-            label="Email"
+            label={t("email", language)}
             mode="outlined"
             value={email}
             onChangeText={setEmail}
@@ -47,7 +56,7 @@ export default function ForgotPassword() {
             textColor="#fff"
             onPress={() => forgotPassword({ variables: { email } })}
           >
-            Send OTP
+            {t("send_code", language)}
           </Button>
         </Card.Content>
       </Card>
@@ -55,8 +64,9 @@ export default function ForgotPassword() {
   );
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 16 },
+  container: { flex: 1, justifyContent: "center", padding: 30 },
   title: {
     fontSize: 20,
     fontWeight: "700",
@@ -65,4 +75,8 @@ const styles = StyleSheet.create({
   },
   input: { marginBottom: 12 },
   error: { color: "red", textAlign: "center", marginBottom: 8 },
+  paragraph: {
+    textAlign: "center",
+    fontSize: 14,
+  },
 });

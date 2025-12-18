@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 const AuthContext = createContext();
@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   const setToken = async (token) => {
     if (Platform.OS === "web") localStorage.setItem("token", token);
@@ -23,27 +24,43 @@ export const AuthProvider = ({ children }) => {
     else await AsyncStorage.removeItem("token");
   };
 
+  // ------------------- Initialize Auth -------------------
   useEffect(() => {
     const initAuth = async () => {
       const token = await getToken();
       setIsAuth(!!token);
+
+      if (token) {
+        try {
+          const response = await fetchUserFromApi(token);
+          setUser(response);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
       setLoading(false);
     };
     initAuth();
   }, []);
 
-  const login = async (token) => {
+  const login = async (token, fetchedUser = null) => {
     await setToken(token);
-    setIsAuth(true); // immediately update tabs
+    setIsAuth(true);
+
+    if (fetchedUser) setUser(fetchedUser);
   };
 
   const logout = async () => {
     await removeToken();
     setIsAuth(false);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuth, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuth, loading, login, logout, user, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

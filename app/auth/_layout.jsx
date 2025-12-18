@@ -16,7 +16,7 @@ export default function AuthLayout() {
     </View>
   );
 }
-
+//==================== Styles ====================
 const styles = StyleSheet.create({
   container: {
     flex: 1,

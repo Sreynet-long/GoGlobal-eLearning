@@ -4,30 +4,50 @@ import CourseList from "../../components/courses/CourseList";
 import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
-export default function courses() {
+export default function Courses() {
+  const { language } = useLanguage(); // get current language
   const [searchText, setSearchText] = useState("");
-  console.log("searchText", searchText);
   const [selectedCategory, setSelectedCategory] = useState("All");
+
   return (
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
-        <Search value={searchText} onChange={setSearchText} />
+        {/* Search Component */}
+        <Search
+          value={searchText}
+          onChange={setSearchText}
+          placeholder={t("search_courses", language)} // translated placeholder
+        />
+
+        {/* Feature Categories */}
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory onSelectedCategory={setSelectedCategory} />
+          <FeatureCategory
+            onSelectedCategory={setSelectedCategory}
+            language={language} // pass language if needed inside FeatureCategory
+          />
         </View>
+
+        {/* Course List */}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <CourseList selectedCategory={selectedCategory} searchText={searchText} />
+          <CourseList
+            selectedCategory={selectedCategory}
+            searchText={searchText}
+            language={language}
+          />
         </ScrollView>
       </View>
     </View>
   );
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {

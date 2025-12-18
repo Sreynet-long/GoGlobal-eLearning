@@ -8,9 +8,12 @@ import {
   View,
 } from "react-native";
 import { IMAGE_BASE_URL } from "../../config/env.js";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 
 export default function CourseList({ selectedCategory, searchText }) {
+  const { language } = useLanguage();
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
@@ -20,7 +23,7 @@ export default function CourseList({ selectedCategory, searchText }) {
       categoryId: selectedCategory === "All" ? "All" : selectedCategory,
     },
   });
-  console.log("data", data?.getCourseWithPagination?.data);
+
   if (loading)
     return (
       <View style={styles.loadingContainer}>
@@ -32,8 +35,14 @@ export default function CourseList({ selectedCategory, searchText }) {
         />
       </View>
     );
+
   if (error)
-    return <Text style={styles.textHeader}>Error: {error.message}</Text>;
+    return (
+      <Text style={styles.textHeader}>
+        {t("error_loading", language)}: {error.message}
+      </Text>
+    );
+
   const Courses = data?.getCourseWithPagination?.data || [];
 
   const filteredCourses =
@@ -43,10 +52,9 @@ export default function CourseList({ selectedCategory, searchText }) {
           (item) => item.category_id?.category_name === selectedCategory
         );
 
-  console.log("IMAGE_BASE_URL", IMAGE_BASE_URL);
   return (
     <View>
-      <Text style={styles.textHeader}>Courses List</Text>
+      <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
       {filteredCourses.length === 0 ? (
         <View>
           <Image
@@ -54,21 +62,18 @@ export default function CourseList({ selectedCategory, searchText }) {
             style={styles.emptyImage}
           />
           <Text style={{ textAlign: "center", marginTop: 20 }}>
-            No courses found in this category.
+            {t("no_courses_found", language)}
           </Text>
         </View>
       ) : (
         filteredCourses.map((course) => (
           <TouchableOpacity style={styles.card} key={course._id}>
             <Image
-              source={{
-                uri: `${IMAGE_BASE_URL}${course.thumbnail}`,
-              }}
+              source={{ uri: `${IMAGE_BASE_URL}${course.thumbnail}` }}
               style={styles.cardImage}
             />
             <View style={styles.cardBody}>
               <Text style={styles.textTitle}>{course.title}</Text>
-              {/* <Text style={styles.textHours}>{course.hours} hours</Text> */}
               <View style={styles.row}>
                 <View style={styles.priceBox}>
                   <Text style={styles.textPrice}>
@@ -82,7 +87,7 @@ export default function CourseList({ selectedCategory, searchText }) {
                   style={styles.enrollButton}
                   onPress={() => console.log(`Enrolled in ${course.title}`)}
                 >
-                  <Text style={styles.textEnroll}>Enroll</Text>
+                  <Text style={styles.textEnroll}>{t("enroll", language)}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -92,19 +97,11 @@ export default function CourseList({ selectedCategory, searchText }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  textHeader: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginVertical: 10,
-  },
-  textTitle: {
-    paddingVertical: 5,
-    fontSize: 16,
-  },
+  container: { padding: 16 },
+  textHeader: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
+  textTitle: { paddingVertical: 5, fontSize: 16 },
   card: {
     flexDirection: "row",
     marginBottom: 15,
@@ -116,29 +113,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     elevation: 2,
   },
-  cardImage: {
-    width: "40%",
-    height: 120,
-    resizeMode: "cover",
-  },
-  cardBody: {
-    flex: 1,
-    padding: 10,
-    justifyContent: "center",
-  },
-  textHours: {
-    fontSize: 14,
-    color: "#666",
-  },
+  cardImage: { width: "40%", height: 120, resizeMode: "cover" },
+  cardBody: { flex: 1, padding: 10, justifyContent: "center" },
+  textHours: { fontSize: 14, color: "#666" },
   textPrice: {
     fontSize: 13,
     color: "#8a8888ff",
     textDecorationLine: "line-through",
   },
-  textRating: {
-    fontSize: 14,
-    color: "#8a8888ff",
-  },
+  textRating: { fontSize: 14, color: "#8a8888ff" },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -151,25 +134,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 15,
   },
-  textEnroll: {
-    color: "white",
-    fontWeight: "500",
-  },
-  emptyImage: {
-    marginTop: 100,
-    width: 60,
-    height: 60,
-    alignSelf: "center",
-  },
+  textEnroll: { color: "white", fontWeight: "500" },
+  emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
   textSellPrice: {
     fontSize: 16,
     fontWeight: "600",
     color: "#25375aff",
     marginTop: 2,
   },
-  priceBox: {
-    flexDirection: "column",
-  },
+  priceBox: { flexDirection: "column" },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

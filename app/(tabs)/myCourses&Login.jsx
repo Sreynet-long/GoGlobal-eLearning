@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client/react";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -23,14 +23,20 @@ import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
-import { MOBILE_LOGIN, MOBILE_REGISTER_ACCOUNT } from "../../schema/login";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
+import {
+  GET_USER_BY_ID,
+  MOBILE_LOGIN,
+  MOBILE_REGISTER_ACCOUNT,
+} from "../../schema/login";
 
 export default function MyCoursesOrLogin() {
-  const { isAuth, loading, login } = useAuth();
-
+  const { language } = useLanguage();
+  const { isAuth, loading, login, setUser } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // ===================== Auth States =====================
+  //===================== Auth States =====================
   const [isSignUp, setIsSignUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -43,7 +49,17 @@ export default function MyCoursesOrLogin() {
 
   const router = useRouter();
 
-  // ===================== Reset Form =====================
+  //===================== Get User After Login =====================
+  const [fetchUser] = useLazyQuery(GET_USER_BY_ID, {
+    fetchPolicy: "network-only",
+    onCompleted: (data) => {
+      if (data?.getUserById) {
+        setUser(data.getUserById);
+      }
+    },
+  });
+
+  //===================== Reset Form =====================
   const resetForm = () => {
     setFirstName("");
     setLastName("");
@@ -55,44 +71,52 @@ export default function MyCoursesOrLogin() {
     setError("");
   };
 
-  // ===================== Mutations =====================
+  //===================== Login Mutation =====================
   const [loginMutation] = useMutation(MOBILE_LOGIN, {
     onCompleted: async (data) => {
       if (data?.mobileLogin?.status) {
         await login(data.mobileLogin.data.token);
+        await fetchUser();
         resetForm();
       } else {
-        setError(data?.mobileLogin?.message?.messageEn);
+        setError(
+          data?.mobileLogin?.message?.[`message${language.toUpperCase()}`]
+        );
       }
     },
     onError: (err) => setError(err.message),
   });
 
+  //===================== Signup Mutation =====================
   const [signupMutation] = useMutation(MOBILE_REGISTER_ACCOUNT, {
     onCompleted: async (data) => {
       if (data?.mobileRegisterAccount?.status) {
         await login(data.mobileRegisterAccount.data.token);
+        await fetchUser();
         resetForm();
       } else {
-        setError(data?.mobileRegisterAccount?.message?.messageEn);
+        setError(
+          data?.mobileRegisterAccount?.message?.[
+            `message${language.toUpperCase()}`
+          ]
+        );
       }
     },
     onError: (err) => setError(err.message),
   });
 
-  // ===================== Handle Auth =====================
+  //===================== Handle Auth =====================
   const handleAuth = () => {
     setError("");
 
-    if (!email || !password) return setError("Email and password are required");
+    if (!email || !password)
+      return setError(t("email_password_required", language));
 
     if (isSignUp) {
       if (!firstName || !lastName || !phone || !gender)
-        return setError("Please complete all fields");
-      if (!agreeTerms) return setError("You must agree to the terms");
-    }
+        return setError(t("complete_all_fields", language));
+      if (!agreeTerms) return setError(t("agree_terms_required", language));
 
-    if (isSignUp) {
       signupMutation({
         variables: {
           input: {
@@ -110,7 +134,6 @@ export default function MyCoursesOrLogin() {
     }
   };
 
-  // ===================== Switch Form =====================
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
     resetForm();
@@ -118,7 +141,6 @@ export default function MyCoursesOrLogin() {
 
   if (loading) return null;
 
-  // ===================== Render =====================
   return (
     <KeyboardAvoidingView
       style={styles.screenContainer}
@@ -132,34 +154,40 @@ export default function MyCoursesOrLogin() {
     </KeyboardAvoidingView>
   );
 
-  // ===================== MY COURSES =====================
+  //===================== MY COURSES =====================
   function renderMyCourses() {
     return (
       <>
-        <Search />
+        <Search placeholder={t("search_courses", language)} />
 
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory onSelectedCategory={setSelectedCategory} />
+          <FeatureCategory
+            onSelectedCategory={setSelectedCategory}
+            language={language}
+          />
         </View>
 
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
         >
-          <EnrolledCourses selectedCategory={selectedCategory} />
+          <EnrolledCourses
+            selectedCategory={selectedCategory}
+            language={language}
+          />
         </ScrollView>
       </>
     );
   }
 
-  // ===================== LOGIN / SIGNUP =====================
+  //===================== LOGIN / SIGNUP =====================
   function renderLogin() {
     return (
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Card style={styles.authCard}>
           <Card.Content>
             <Text style={styles.title}>
-              {isSignUp ? "Create Account" : "Log In"}
+              {isSignUp ? t("create_account", language) : t("log_in", language)}
             </Text>
 
             {error && <Text style={styles.error}>{error}</Text>}
@@ -168,14 +196,14 @@ export default function MyCoursesOrLogin() {
               <>
                 <View style={styles.row}>
                   <TextInput
-                    label="First Name"
+                    label={t("first_name", language)}
                     mode="outlined"
                     value={firstName}
                     onChangeText={setFirstName}
                     style={styles.flex}
                   />
                   <TextInput
-                    label="Last Name"
+                    label={t("last_name", language)}
                     mode="outlined"
                     value={lastName}
                     onChangeText={setLastName}
@@ -184,7 +212,7 @@ export default function MyCoursesOrLogin() {
                 </View>
 
                 <TextInput
-                  label="Phone"
+                  label={t("phone", language)}
                   mode="outlined"
                   value={phone}
                   onChangeText={setPhone}
@@ -196,7 +224,7 @@ export default function MyCoursesOrLogin() {
                     {["MALE", "FEMALE", "OTHER"].map((g) => (
                       <View key={g} style={styles.radioItem}>
                         <RadioButton value={g} />
-                        <Text>{g}</Text>
+                        <Text>{t(g.toLowerCase(), language)}</Text>
                       </View>
                     ))}
                   </View>
@@ -207,7 +235,7 @@ export default function MyCoursesOrLogin() {
                     status={agreeTerms ? "checked" : "unchecked"}
                     onPress={() => setAgreeTerms(!agreeTerms)}
                   />
-                  <Text>I agree to the terms & Conditions </Text>
+                  <Text>{t("agree_terms", language)}</Text>
                 </View>
 
                 <Divider style={{ marginVertical: 12 }} />
@@ -215,14 +243,14 @@ export default function MyCoursesOrLogin() {
             )}
 
             <TextInput
-              label="Email"
+              label={t("email", language)}
               mode="outlined"
               value={email}
               onChangeText={setEmail}
               style={styles.input}
             />
             <TextInput
-              label="Password"
+              label={t("password", language)}
               mode="outlined"
               secureTextEntry
               value={password}
@@ -235,21 +263,22 @@ export default function MyCoursesOrLogin() {
               onPress={handleAuth}
               style={{ backgroundColor: "#25375A" }}
             >
-              {isSignUp ? "Sign Up" : "Log In"}
+              {isSignUp ? t("sign_up", language) : t("log_in", language)}
             </Button>
+
             {!isSignUp && (
               <Button
                 onPress={() => router.push("/auth/forgot-password")}
                 textColor="#25375A"
               >
-                Forgot password?
+                {t("forgot_password", language)}
               </Button>
             )}
 
             <Button onPress={toggleForm}>
               {isSignUp
-                ? "Already have an account? Log in"
-                : "Don't have an account yet? Sign Up"}
+                ? t("already_have_account", language)
+                : t("dont_have_account", language)}
             </Button>
           </Card.Content>
         </Card>
@@ -258,6 +287,7 @@ export default function MyCoursesOrLogin() {
   }
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375A" },
   contentContainer: {

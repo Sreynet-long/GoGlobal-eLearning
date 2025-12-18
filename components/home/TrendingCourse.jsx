@@ -1,25 +1,33 @@
 import {
-  Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ImageBackground,
 } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 const CourseCard = ({ title, image }) => (
-  <ImageBackground source={image} style={styles.courseCard} imageStyle={{borderRadius: 10}}>
+  <ImageBackground
+    source={image}
+    style={styles.courseCard}
+    imageStyle={{ borderRadius: 10 }}
+  >
     <Text style={styles.courseCardTitle}>{title}</Text>
   </ImageBackground>
 );
 export default function TrendingCourse() {
+  const { language } = useLanguage();
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitleText}>Trending Courses</Text>
+        <Text style={styles.sectionTitleText}>
+          {t("trending_courses", language)}
+        </Text>
         <TouchableOpacity>
-          <Text style={styles.viewAllText}>View All </Text>
+          <Text style={styles.viewAllText}>{t("view_all", language)} </Text>
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -28,19 +36,19 @@ export default function TrendingCourse() {
         style={styles.horizontalCourseScroll}
       >
         <CourseCard
-          title="Python for Data Science"
+          title={t("python_for_data_science", language)}
           image={require("../../assets/courses/python.png")}
         />
         <CourseCard
-          title="CompTIA Security+"
+          title={t("CompTIA_Security", language)}
           image={require("../../assets/courses/security.png")}
         />
         <CourseCard
-          title="React Native Mobile"
+          title={t("React_Native_Mobile", language)}
           image={require("../../assets/courses/react-native.png")}
         />
         <CourseCard
-          title="DevOps with Docker"
+          title={t("DevOps_with_Docker", language)}
           image={require("../../assets/courses/security.png")}
         />
       </ScrollView>
@@ -87,6 +95,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 60,
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
 });

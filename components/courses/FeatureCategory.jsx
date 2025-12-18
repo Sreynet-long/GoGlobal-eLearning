@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { GET_COURSE_CATEGORY } from "../../schema/courseCategory";
 
 const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
@@ -28,28 +30,35 @@ const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
 );
 
 export default function FeatureCategory({ onSelectedCategory }) {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const { language } = useLanguage();
+  const [selectedCategory, setSelectedCategory] = useState(t("all", language));
 
   const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
     variables: { page: 1, limit: 50, pagination: false, keyword: "" },
   });
 
-  if (loading) return;
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator
-      size="small"
-      color="#58589bff"
-      alignItems="center"
-      marginTop={20}
-    />
-  </View>;
-  if (error)
-    return <Text style={styles.errorText}>Error: {error.message}</Text>;
+  if (loading)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="small"
+          color="#58589bff"
+          alignItems="center"
+          marginTop={20}
+        />
+      </View>
+    );
 
-  // Combine default "All" with fetched categories
+  if (error)
+    return (
+      <Text style={styles.errorText}>
+        {t("error_loading", language)}: {error.message}
+      </Text>
+    );
+
   const Category = [
-    { category_name: "All", icon_src: "apps-outline" },
-    ...data.getCourseCategoryWithPagination.data.map((cat) => ({
+    { category_name: t("all", language), icon_src: "apps-outline" },
+    ...(data.getCourseCategoryWithPagination?.data || []).map((cat) => ({
       category_name: cat.category_name,
       icon_src: cat.icon_src || "apps-outline",
     })),
@@ -62,7 +71,9 @@ export default function FeatureCategory({ onSelectedCategory }) {
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>Course Categories</Text>
+      <Text style={styles.sectionTitle}>
+        {t("course_categories", language)}
+      </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -98,9 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#25375aff",
     borderColor: "#25375aff",
   },
-  activeText: {
-    color: "#fff",
-  },
+  activeText: { color: "#fff" },
   categoryPillText: {
     fontSize: 14,
     fontWeight: "600",
@@ -114,22 +123,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333",
   },
-  categoryScroll: {
-    marginBottom: 15,
-  },
-  loadingText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#666",
-  },
-  errorText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "red",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  categoryScroll: { marginBottom: 15 },
+  loadingText: { textAlign: "center", marginTop: 20, color: "#666" },
+  errorText: { textAlign: "center", marginTop: 20, color: "red" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

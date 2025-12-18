@@ -2,7 +2,9 @@ import { gql, useMutation } from "@apollo/client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { TextInput as RNTextInput, StyleSheet, View } from "react-native";
-import { Button, Card, Text } from "react-native-paper";
+import { Button, Card, Paragraph, Text } from "react-native-paper";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 const VERIFY_OTP = gql`
   mutation VerifyOTP($otp: String!, $token: String!) {
@@ -22,9 +24,10 @@ const VERIFY_OTP = gql`
 export default function VerifyOTP() {
   const router = useRouter();
   const { token } = useLocalSearchParams();
+  const { language } = useLanguage();
+
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
-
   const inputs = useRef([]);
 
   const [verifyOtp, { loading }] = useMutation(VERIFY_OTP, {
@@ -36,8 +39,10 @@ export default function VerifyOTP() {
         });
       } else {
         showError(
-          data?.verifyOTP?.message?.messageEn ||
-            "Incorrect code. Please try again!"
+          language === "kh"
+            ? data?.verifyOTP?.message?.messageKh
+            : data?.verifyOTP?.message?.messageEn ||
+                t("incorrect_code", language)
         );
       }
     },
@@ -55,7 +60,6 @@ export default function VerifyOTP() {
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Move focus
     if (text && index < 5) inputs.current[index + 1]?.focus();
     if (!text && index > 0) inputs.current[index - 1]?.focus();
   };
@@ -63,7 +67,7 @@ export default function VerifyOTP() {
   const handleVerify = () => {
     const otpCode = otp.join("");
     if (otpCode.length < 6) {
-      showError("Please enter all 6 digits.");
+      showError(t("enter_all_digits", language));
       return;
     }
     verifyOtp({ variables: { otp: otpCode, token } });
@@ -74,8 +78,10 @@ export default function VerifyOTP() {
       <Card>
         <Card.Content>
           <View style={styles.cardInner}>
-            <Text style={styles.title}>Code Verification</Text>
-
+            <Text style={styles.title}>{t("code_verification", language)}</Text>
+            <Paragraph style={styles.paragraph}>
+              {t("type_verification_code", language)}
+            </Paragraph>
             {error && <Text style={styles.error}>{error}</Text>}
 
             <View style={styles.otpContainer}>
@@ -100,7 +106,7 @@ export default function VerifyOTP() {
               onPress={handleVerify}
               style={{ marginTop: 12 }}
             >
-              Verify
+              {t("verify", language)}
             </Button>
           </View>
         </Card.Content>
@@ -109,11 +115,12 @@ export default function VerifyOTP() {
   );
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: "center",
-    padding: 16,
+    padding: 30,
     backgroundColor: "white",
   },
   cardInner: {
@@ -143,5 +150,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "center",
     marginHorizontal: 5,
+  },
+  paragraph: {
+    textAlign: "center",
+    fontSize: 14,
   },
 });

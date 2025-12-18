@@ -2,12 +2,16 @@ import { useMutation } from "@apollo/client";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Card, Text, TextInput } from "react-native-paper";
+import { Button, Card, Paragraph, Text, TextInput } from "react-native-paper";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { UPDATE_NEW_PASSWORD } from "../../schema/login";
 
 export default function UpdatePassword() {
   const router = useRouter();
   const { token } = useLocalSearchParams();
+  const { language } = useLanguage();
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,25 +19,28 @@ export default function UpdatePassword() {
   const [updatePassword, { loading }] = useMutation(UPDATE_NEW_PASSWORD, {
     onCompleted: (data) => {
       if (data?.updateNewPassword?.status) {
-        router.replace("/"); // back to login
+        router.replace("/myCourses&Login");
       } else {
-        setError(data?.updateNewPassword?.message?.messageEn);
+        setError(
+          language === "kh"
+            ? data?.updateNewPassword?.message?.messageKh
+            : data?.updateNewPassword?.message?.messageEn
+        );
       }
     },
     onError: (err) => setError(err.message),
   });
 
   const handleUpdate = () => {
-    // Validate passwords
     if (!password || !confirmPassword) {
-      setError("Please fill out both fields.");
+      setError(t("fill_both_fields", language));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("passwords_do_not_match", language));
       return;
     }
-    setError(""); // Clear any previous errors
+    setError("");
     updatePassword({ variables: { password, token } });
   };
 
@@ -41,12 +48,14 @@ export default function UpdatePassword() {
     <View style={styles.container}>
       <Card>
         <Card.Content>
-          <Text style={styles.title}>New Password</Text>
-
+          <Text style={styles.title}>{t("new_password", language)}</Text>
+          <Paragraph style={styles.paragraph}>
+            {t("set_new_password", language)}
+          </Paragraph>
           {error && <Text style={styles.error}>{error}</Text>}
 
           <TextInput
-            label="New Password"
+            label={t("new_password", language)}
             mode="outlined"
             secureTextEntry
             value={password}
@@ -55,7 +64,7 @@ export default function UpdatePassword() {
           />
 
           <TextInput
-            label="Confirm Password"
+            label={t("confirm_password", language)}
             mode="outlined"
             secureTextEntry
             value={confirmPassword}
@@ -70,7 +79,7 @@ export default function UpdatePassword() {
             loading={loading}
             onPress={handleUpdate}
           >
-            Update Password
+            {t("update_password", language)}
           </Button>
         </Card.Content>
       </Card>
@@ -78,6 +87,7 @@ export default function UpdatePassword() {
   );
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 16 },
   title: {
@@ -88,4 +98,8 @@ const styles = StyleSheet.create({
   },
   input: { marginBottom: 12 },
   error: { color: "red", textAlign: "center", marginBottom: 8 },
+  paragraph: {
+    textAlign: "center",
+    fontSize: 14,
+  },
 });

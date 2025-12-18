@@ -1,18 +1,34 @@
-import { Text, View, TouchableOpacity, ScrollView, StyleSheet, ImageBackground } from "react-native";
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
-
-const CourseCard = ({ title , image}) => (
-  <ImageBackground  source={image} style={styles.courseCard} imageStyle={{borderRadius: 10}}>
+const CourseCard = ({ title, image }) => (
+  <ImageBackground
+    source={image}
+    style={styles.courseCard}
+    imageStyle={{ borderRadius: 10 }}
+  >
     <Text style={styles.courseCardTitle}>{title}</Text>
   </ImageBackground>
 );
+
 export default function FreeCourse() {
+  const { language } = useLanguage();
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitleText}>Start Learning for Free</Text>
+        <Text style={styles.sectionTitleText}>
+          {t("start_learning_for_free", language)}
+        </Text>
         <TouchableOpacity>
-          <Text style={styles.viewAllText}>View All</Text>
+          <Text style={styles.viewAllText}>{t("view_all", language)}</Text>
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -20,16 +36,28 @@ export default function FreeCourse() {
         showsHorizontalScrollIndicator={false}
         style={styles.horizontalCourseScroll}
       >
-        <CourseCard title="Introduction to HTML" image={require("../../assets/courses/html.png")} />
-        <CourseCard title="C++ Variables & Types" image={require("../../assets/courses/cpp-var.png")}/>
-        <CourseCard title="Excel 101" image={require("../../assets/courses/excel.png")} />
-        <CourseCard title="JavaScript Fundamentals" image={require("../../assets/courses/js.jpg")} />
+        <CourseCard
+          title={t("introduction_to_html", language)}
+          image={require("../../assets/courses/html.png")}
+        />
+        <CourseCard
+          title={t("C_variables_and_types", language)}
+          image={require("../../assets/courses/cpp-var.png")}
+        />
+        <CourseCard
+          title={t("excel_101", language)}
+          image={require("../../assets/courses/excel.png")}
+        />
+        <CourseCard
+          title={t("javascript_fundamentals", language)}
+          image={require("../../assets/courses/js.jpg")}
+        />
       </ScrollView>
     </View>
   );
 }
 const styles = StyleSheet.create({
-      sectionHeader: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -46,10 +74,10 @@ const styles = StyleSheet.create({
     color: "#3F51B5",
     fontWeight: "500",
   },
-    horizontalCourseScroll: {
+  horizontalCourseScroll: {
     paddingBottom: 10,
   },
-   courseCard: {
+  courseCard: {
     width: 180,
     height: 100,
     backgroundColor: "#FFFFFF",
@@ -72,7 +100,5 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0, 0, 0, 0.56)",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
-
-
   },
-})
+});

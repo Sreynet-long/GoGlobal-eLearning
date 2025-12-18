@@ -1,5 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import EmtyCourse from "./EmtyCourse";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
+import EmptyCourse from "./EmtyCourse";
 
 const Courses = [
   {
@@ -54,7 +56,7 @@ const Courses = [
   },
   {
     id: "6",
-    title: " UX Design & Interaction (The `How`)",
+    title: "UX Design & Interaction (The `How`)",
     constructor: "Author 3",
     rating: 3.5,
     progress: 75,
@@ -75,51 +77,54 @@ const Courses = [
 ];
 
 export default function EnrolledCourses({ selectedCategory }) {
+  const { language } = useLanguage();
+
   const filteredCourses =
     selectedCategory === "All"
       ? Courses
       : Courses.filter((item) => item.category === selectedCategory);
+
   return (
     <View>
-      <Text style={styles.textHeader}>Courses Enrolled List</Text>
+      <Text style={styles.textHeader}>
+        {t("courses_enrolled_list", language)}
+      </Text>
       {filteredCourses.length === 0 ? (
-        <EmtyCourse />
+        <EmptyCourse />
       ) : (
-
-      filteredCourses.map((course) => (
-        <TouchableOpacity style={styles.card} key={course.id}>
-          <Image source={course.image} style={styles.cardImage} />
-          <View style={styles.cardBody}>
-            <Text style={styles.textTitle}>{course.title}</Text>
-            <Text style={styles.textHours}>{course.hours} hours</Text>
-            <View style={styles.row}>
-              <View style={styles.progressBarContainer}>
-                <Text
-                  style={[styles.progressBar, { width: `${course.progress}%` }]}
-                />
+        filteredCourses.map((course) => (
+          <TouchableOpacity style={styles.card} key={course.id}>
+            <Image source={course.image} style={styles.cardImage} />
+            <View style={styles.cardBody}>
+              <Text style={styles.textTitle}>{course.title}</Text>
+              <Text style={styles.textHours}>
+                {course.hours} {t("hours", language)}
+              </Text>
+              <View style={styles.row}>
+                <View style={styles.progressBarContainer}>
+                  <Text
+                    style={[
+                      styles.progressBar,
+                      { width: `${course.progress}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressText}>
+                  {course.progress}% {t("completed", language)}
+                </Text>
               </View>
-              <Text style={styles.progressText}>{course.progress}% Completed</Text>
             </View>
-          </View>
-        </TouchableOpacity>
-      ))
+          </TouchableOpacity>
+        ))
       )}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  textHeader: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginVertical: 10,
-  },
-  textTitle: {
-    paddingVertical: 5,
-    fontSize: 16,
-  },
+  container: { padding: 16 },
+  textHeader: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
+  textTitle: { paddingVertical: 5, fontSize: 16 },
   card: {
     flexDirection: "row",
     marginBottom: 15,
@@ -131,30 +136,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     elevation: 2,
   },
-  cardImage: {
-    width: "40%",
-    height: 120,
-    resizeMode: "cover",
-  },
-  cardBody: {
-    flex: 1,
-    padding: 10,
-    justifyContent: "center",
-  },
-  textHours: {
-    fontSize: 14,
-    color: "#666",
-  },
-  textPrice: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#25375aff",
-  },
-  textRating: {
-    fontSize: 14,
-    color: "#8a8888ff",
-     
-  },
+  cardImage: { width: "40%", height: 120, resizeMode: "cover" },
+  cardBody: { flex: 1, padding: 10, justifyContent: "center" },
+  textHours: { fontSize: 14, color: "#666" },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -175,8 +159,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#25375aff",
     borderRadius: 4,
   },
-  progressText: {
-    fontSize: 12,
-    color: "#666",
-  },
+  progressText: { fontSize: 12, color: "#666" },
 });

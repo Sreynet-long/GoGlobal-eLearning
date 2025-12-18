@@ -1,7 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 export default function Search({ value, onChange }) {
+  const { language } = useLanguage();
+
   return (
     <View style={styles.searchContainer}>
       <View style={styles.inputWrapper}>
@@ -13,7 +17,7 @@ export default function Search({ value, onChange }) {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search courses or skills..."
+          placeholder={t("search_placeholder", language)}
           placeholderTextColor="#888"
           value={value}
           onChangeText={onChange}
@@ -33,6 +37,7 @@ export default function Search({ value, onChange }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
