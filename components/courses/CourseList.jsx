@@ -6,13 +6,18 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 import { IMAGE_BASE_URL } from "../../config/env.js";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
+import { useState } from "react";
 
 export default function CourseList({ selectedCategoryId, searchText }) {
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
-    variables: {
+    variables: {  
       page: 1,
       limit: 50,
       pagination: false,
@@ -78,7 +83,10 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                 </View>
                 <TouchableOpacity
                   style={styles.enrollButton}
-                  onPress={() => console.log(`Enrolled in ${course.title}`)}
+                  onPress={() => {
+                    setSelectedCourse(course);
+                    setModalVisible(true);
+                  }}
                 >
                   <Text style={styles.textEnroll}>Enroll</Text>
                 </TouchableOpacity>

@@ -78,7 +78,7 @@ export default function EnrolledCourses({ selectedCategoryId }) {
   const filteredCourses =
     selectedCategoryId === "All"
       ? Courses
-      : Courses.filter((item) => item.category === selectedCategoryId);
+      : Courses.filter((item) => item.category_name === selectedCategoryId);
   return (
     <View>
       <Text style={styles.textHeader}>Courses Enrolled List</Text>
