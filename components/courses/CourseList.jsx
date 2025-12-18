@@ -1,23 +1,25 @@
 import { useQuery } from "@apollo/client/react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Modal,
+  ScrollView,
 } from "react-native";
+import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env.js";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
-import { useState } from "react";
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
-    variables: {  
+    variables: {
       page: 1,
       limit: 50,
       pagination: false,
@@ -30,7 +32,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator
-          size="small"
+          size="large"
           color="#58589bff"
           alignItems="center"
           marginTop={20}
@@ -65,7 +67,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           <TouchableOpacity style={styles.card} key={course._id}>
             <Image
               source={{
-                uri: `${IMAGE_BASE_URL}${course.thumbnail}`,
+                uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}`,
               }}
               style={styles.cardImage}
             />
@@ -95,6 +97,85 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           </TouchableOpacity>
         ))
       )}
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ fontSize: 20 }}>✕</Text>
+            </TouchableOpacity>
+            <Divider />
+            {selectedCourse && (
+              <>
+                <Image
+                  source={{
+                    uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
+                  }}
+                  style={styles.modalImage}
+                />
+                <Divider style={{ marginVertical: 12 }} />
+                <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
+
+                <View style={styles.modalPriceRow}>
+                  <Text style={styles.oldPrice}>
+                    ${selectedCourse.original_price?.toFixed(2) ?? "0.00"}
+                  </Text>
+                  <Text style={styles.sellPrice}>
+                    ${selectedCourse.sell_price?.toFixed(2) ?? "0.00"}
+                  </Text>
+                </View>
+                <TouchableOpacity style={styles.cartButton}>
+                  <Text style={styles.cartText}>Confirm Enroll</Text>
+                </TouchableOpacity>
+                <Divider style={{ marginVertical: 12 }} />
+                <Text style={styles.includesTitle}>This Course includes:</Text>
+                {() => {
+                  const includes = selectedCourse?.course_includes?.[0];
+                  if (!includes) return null;
+                  return (
+                    <>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_of_downloadable_resources} downloadable
+                        resources
+                      </Text>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_of_hours} hours
+                      </Text>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_of_lessons} lessons
+                      </Text>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_of_projects_practices} projects & practices
+                      </Text>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_of_video} videos
+                      </Text>
+                      <Text style={styles.includeItem}>
+                        • {includes.number_quizzes} quizzes
+                      </Text>
+                      {includes.has_certificate_of_completion && (
+                        <Text style={styles.includeItem}>
+                          • Certificate of completion
+                        </Text>
+                      )}
+                      {includes.is_full_lifetime_access && (
+                        <Text style={styles.includeItem}>
+                          • Full lifetime access
+                        </Text>
+                      )}
+                    </>
+                  );
+                }}
+              </>
+            )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -181,5 +262,83 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 140,
+  },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 29,
+    borderTopRightRadius: 29,
+    padding: 16,
+    height: "95%",
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    padding: 5,
+    marginBottom: 5,
+  },
+  modalImage: {
+    width: "100%",
+    height: 180,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginVertical: 10,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  sellPrice: {
+    fontSize: 24,
+    fontWeight: "700",
+  },
+  oldPrice: {
+    marginLeft: 6,
+    color: "#888",
+    textDecorationLine: "line-through",
+    fontSize: 20,
+  },
+  timeText: {
+    color: "red",
+    marginTop: 5,
+  },
+  cartButton: {
+    backgroundColor: "#6a2bd9",
+    marginTop: 15,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  cartText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  buyButton: {
+    borderWidth: 1,
+    borderColor: "#6a2bd9",
+    marginTop: 10,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
+  includesTitle: {
+    marginTop: 15,
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  includeItem: {
+    marginTop: 5,
+    color: "#3a3a3aff",
+    fontSize: 14,
   },
 });

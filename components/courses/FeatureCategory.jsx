@@ -38,7 +38,7 @@ export default function FeatureCategory({ onSelectedCategory }) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator
-          size="small"
+          size="large"
           color="#58589bff"
           alignItems="center"
           marginTop={20}

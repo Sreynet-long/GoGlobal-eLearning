@@ -16,6 +16,18 @@ query GetCourseWithPagination($page: Int, $limit: Int, $keyword: String, $pagina
       sell_price
       title
       thumbnail
+      course_includes {
+        _id
+        has_certificate_of_completion
+        is_full_lifetime_access
+        number_of_downloadable_resources
+        number_of_hours
+        number_of_lessons
+        number_of_projects_practices
+        number_of_video
+        number_quizzes
+        period_of_access_as_month
+      }
     }
     paginator {
       slNo
