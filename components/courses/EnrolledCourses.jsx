@@ -76,13 +76,12 @@ const Courses = [
   },
 ];
 
-export default function EnrolledCourses({ selectedCategory }) {
-  const { language } = useLanguage();
-
+export default function EnrolledCourses({ selectedCategoryId }) {
+  const { language } = useLanguage(); // <-- Fix: import language
   const filteredCourses =
-    selectedCategory === "All"
+    selectedCategoryId === "All"
       ? Courses
-      : Courses.filter((item) => item.category === selectedCategory);
+      : Courses.filter((item) => item.category === selectedCategoryId);
 
   return (
     <View>

@@ -287,7 +287,7 @@ export default function MyCoursesOrLogin() {
   }
 }
 
-//==================== Styles ====================
+//==================== Styles =====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375A" },
   contentContainer: {

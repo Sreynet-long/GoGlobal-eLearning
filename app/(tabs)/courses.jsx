@@ -8,9 +8,9 @@ import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
 export default function Courses() {
-  const { language } = useLanguage(); // get current language
+  const { language } = useLanguage();
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
   return (
     <View style={styles.screenContainer}>
@@ -20,15 +20,12 @@ export default function Courses() {
         <Search
           value={searchText}
           onChange={setSearchText}
-          placeholder={t("search_courses", language)} // translated placeholder
+          placeholder={t("search_courses", language)}
         />
 
         {/* Feature Categories */}
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory
-            onSelectedCategory={setSelectedCategory}
-            language={language} // pass language if needed inside FeatureCategory
-          />
+          <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 
         {/* Course List */}
@@ -37,9 +34,9 @@ export default function Courses() {
           showsVerticalScrollIndicator={false}
         >
           <CourseList
-            selectedCategory={selectedCategory}
+            selectedCategoryId={selectedCategoryId} // ✅ pass this instead
             searchText={searchText}
-            language={language}
+            language={language} // optional if CourseList uses language
           />
         </ScrollView>
       </View>
