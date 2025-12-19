@@ -99,7 +99,7 @@ export default {
   agree_terms_required: "You must agree to the terms",
   password: "Password",
   log_in: "Login",
-  change_profile_image: "Change profile picture",
+  change_profile: "Change profile",
   change_password:"Change Password",
   terms_conditions:"Terms & Conditions",
    security:"Security"

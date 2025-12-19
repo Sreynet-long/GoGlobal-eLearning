@@ -16,27 +16,24 @@ export default function Courses() {
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
-        {/* Search Component */}
         <Search
           value={searchText}
           onChange={setSearchText}
           placeholder={t("search_courses", language)}
         />
 
-        {/* Feature Categories */}
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 
-        {/* Course List */}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <CourseList
-            selectedCategoryId={selectedCategoryId} // ✅ pass this instead
+            selectedCategoryId={selectedCategoryId}
             searchText={searchText}
-            language={language} // optional if CourseList uses language
+            language={language} 
           />
         </ScrollView>
       </View>
