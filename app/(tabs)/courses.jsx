@@ -16,14 +16,14 @@ export default function Courses() {
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
-        {/* Search Component */}
+        {/* Search */}
         <Search
           value={searchText}
           onChange={setSearchText}
           placeholder={t("search_courses", language)}
         />
 
-        {/* Feature Categories */}
+        {/* Categories */}
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
@@ -34,9 +34,8 @@ export default function Courses() {
           showsVerticalScrollIndicator={false}
         >
           <CourseList
-            selectedCategoryId={selectedCategoryId} // ✅ pass this instead
+            selectedCategoryId={selectedCategoryId}
             searchText={searchText}
-            language={language} // optional if CourseList uses language
           />
         </ScrollView>
       </View>
@@ -44,7 +43,6 @@ export default function Courses() {
   );
 }
 
-//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {

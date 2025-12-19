@@ -102,5 +102,10 @@ export default {
   change_profile_image: "ផ្លាស់ប្តូររូបភាព",
   change_password:"ផ្លាស់ប្តូរពាក្យសម្ងាត់",
   terms_conditions:"លក្ខខណ្ឌ",
-  security:"សុវត្ថិភាព"
+  security:"សុវត្ថិភាព",
+  confirm_enroll: "បញ្ជាក់ការចុះឈ្មោះ",
+  please_login_first: "សូមចូលគណនីដើម្បីចុះឈ្មោះវគ្គសិក្សា។",
+  enroll_successful: "ចុះឈ្មោះជោគជ័យ!",
+  already_enrolled: "អ្នកបានចុះឈ្មោះរបស់វគ្គសិក្សានេះរួចហើយ។",
+  enroll_failed: "ការចុះឈ្មោះបានបរាជ័យ​។ សូមព្យាយាមម្តងទៀត!"
 };

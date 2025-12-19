@@ -11,61 +11,64 @@ import {
   View,
 } from "react-native";
 import { Divider } from "react-native-paper";
-import { IMAGE_BASE_URL } from "../../config/env.js";
-import { useLanguage } from "../../context/LanguageContext"; // <-- Import useLanguage
+import { IMAGE_BASE_URL } from "../../config/env";
+import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
-import CourseIncludes from "./CourseInclude.jsx";
-import { useAuth } from "../../context/AuthContext.js";
+import CourseIncludes from "./CourseInclude";
+import EnrolledButton from "./EnrolledButton";
 
 export default function CourseList({ selectedCategoryId, searchText }) {
-  const { isAuth } = useAuth();
+  const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const { language } = useLanguage();
+  const { isAuth } = useAuth();
 
-  const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
-    variables: {
-      page: 1,
-      limit: 50,
-      pagination: false,
-      keyword: searchText || "",
-      categoryId: selectedCategoryId === "All" ? "All" : selectedCategoryId,
-    },
-  });
+  const categoryId = selectedCategoryId === "All" ? "All" : selectedCategoryId;
 
-  if (loading)
+  const { data, loading, error, networkStatus } = useQuery(
+    GET_COURSE_WITH_PAGINATION,
+    {
+      variables: {
+        page: 1,
+        limit: 50,
+        pagination: false,
+        keyword: searchText?.trim() || "",
+        categoryId,
+      },
+      fetchPolicy: "cache-and-network",
+      notifyOnNetworkStatusChange: true,
+    }
+  );
+
+  const isInitialLoading = loading && !data;
+  const isRefetching = networkStatus === 4;
+  const courses = data?.getCourseWithPagination?.data ?? [];
+
+  if (isInitialLoading)
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#58589bff"
-          alignItems="center"
-          marginTop={20}
-        />
+        <ActivityIndicator size="large" color="#58589bff" />
       </View>
     );
 
   if (error)
     return (
-      <Text style={styles.textHeader}>
-        {t("error_loading", language)}: {error.message}
-      </Text>
+      <View style={{alignItems: "center" , marginTop: 250}}>
+        <Text style={{ color: "red" }}>Error: {error.message}</Text>
+      </View>
     );
-
-  const Courses = data?.getCourseWithPagination?.data || [];
-
-  const filteredCourses =
-    selectedCategoryId === "All"
-      ? Courses
-      : Courses.filter((item) => item.category_id?._id === selectedCategoryId);
-
-  const includes = selectedCourse?.course_includes?.[0];
 
   return (
     <View>
       <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
-      {filteredCourses.length === 0 ? (
+
+      {isRefetching && (
+        <ActivityIndicator size="small" style={{ marginVertical: 10 }} />
+      )}
+
+      {courses.length === 0 ? (
         <View>
           <Image
             source={require("../../assets/images/find-course.png")}
@@ -76,12 +79,17 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           </Text>
         </View>
       ) : (
-        filteredCourses.map((course) => (
-          <TouchableOpacity style={styles.card} key={course._id}>
+        courses.map((course) => (
+          <TouchableOpacity
+            style={styles.card}
+            key={course._id}
+            onPress={() => {
+              setSelectedCourse(course);
+              setModalVisible(true);
+            }}
+          >
             <Image
-              source={{
-                uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}`,
-              }}
+              source={{ uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}` }}
               style={styles.cardImage}
             />
             <View style={styles.cardBody}>
@@ -110,6 +118,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ))
       )}
 
+      {/* Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -131,24 +140,21 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                   />
                   <Divider style={{ marginVertical: 12 }} />
                   <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
-
                   <View style={styles.modalPriceRow}>
                     <Text style={styles.oldPrice}>
                       ${selectedCourse.original_price?.toFixed(2) ?? "0.00"}
                     </Text>
+                    <Text style={{ marginHorizontal: 5, fontSize: 18, color: "#888" }}>|</Text>
                     <Text style={styles.sellPrice}>
                       ${selectedCourse.sell_price?.toFixed(2) ?? "0.00"}
                     </Text>
                   </View>
-                  <TouchableOpacity style={styles.cartButton}>
-                    <Text style={styles.cartText}>Confirm Enroll</Text>
-                  </TouchableOpacity>
+                  <EnrolledButton course={selectedCourse} onSuccess={() => setModalVisible(false)} />
                   <Divider style={{ marginVertical: 12 }} />
                   <Text style={styles.includesTitle}>
                     This Course includes:
                   </Text>
                   <CourseIncludes course={selectedCourse} />
-                  
                 </>
               )}
             </ScrollView>
@@ -176,13 +182,6 @@ const styles = StyleSheet.create({
   },
   cardImage: { width: "40%", height: 120, resizeMode: "cover" },
   cardBody: { flex: 1, padding: 10, justifyContent: "center" },
-  textHours: { fontSize: 14, color: "#666" },
-  textPrice: {
-    fontSize: 13,
-    color: "#8a8888ff",
-    textDecorationLine: "line-through",
-  },
-  textRating: { fontSize: 14, color: "#8a8888ff" },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -196,22 +195,25 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   textEnroll: { color: "white", fontWeight: "500" },
-  emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
+  priceBox: { flexDirection: "column" },
+  textPrice: {
+    fontSize: 13,
+    color: "#8a8888ff",
+    textDecorationLine: "line-through",
+  },
   textSellPrice: {
     fontSize: 16,
     fontWeight: "600",
     color: "#25375aff",
     marginTop: 2,
   },
-  priceBox: { flexDirection: "column" },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 140,
+    marginTop: 250,
   },
-
-  // Modal
+  emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -224,39 +226,16 @@ const styles = StyleSheet.create({
     padding: 16,
     height: "87%",
   },
-  closeButton: {
-    alignSelf: "flex-end",
-    padding: 5,
-    marginBottom: 5,
-  },
-  modalImage: {
-    width: "100%",
-    height: 180,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginVertical: 10,
-  },
-  priceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  sellPrice: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
+  closeButton: { alignSelf: "flex-end", padding: 5, marginBottom: 5 },
+  modalImage: { width: "100%", height: 180, borderRadius: 10, marginTop: 10 },
+  modalTitle: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
+  modalPriceRow: { flexDirection: "row", alignItems: "center" },
+  sellPrice: { fontSize: 24, fontWeight: "700" },
   oldPrice: {
     marginLeft: 6,
     color: "#888",
     textDecorationLine: "line-through",
     fontSize: 20,
-  },
-  timeText: {
-    color: "red",
-    marginTop: 5,
   },
   cartButton: {
     backgroundColor: "#6a2bd9",
@@ -265,27 +244,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  cartText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  buyButton: {
-    borderWidth: 1,
-    borderColor: "#6a2bd9",
-    marginTop: 10,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-
-  includesTitle: {
-    marginTop: 15,
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  includeItem: {
-    marginTop: 5,
-    color: "#3a3a3aff",
-    fontSize: 14,
-  },
+  cartText: { color: "#fff", fontWeight: "600" },
+  includesTitle: { marginTop: 15, fontWeight: "700", fontSize: 16 },
 });

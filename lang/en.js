@@ -102,5 +102,10 @@ export default {
   change_profile_image: "Change profile picture",
   change_password:"Change Password",
   terms_conditions:"Terms & Conditions",
-   security:"Security"
+   security:"Security",
+  confirm_enroll: "Confirm Enroll",
+  please_login_first: "Please login first to enroll in the course.",
+  enroll_successful: "Enroll successful!",
+  already_enrolled: "You are already enrolled in this course.",
+  enroll_failed: "Enroll failed. Please try again later.",
 };

@@ -14,11 +14,6 @@ export default function CourseIncludes({ course }) {
           • {includes.number_of_downloadable_resources} downloadable resources
         </Text>
       )}
-      {includes.number_of_downloadable_resources !== null && (
-        <Text style={styles.item}>
-          • {includes.number_of_downloadable_resources} downloadable resources
-        </Text>
-      )}
       {includes.number_of_hours !== null && (
         <Text style={styles.item}>• {includes.number_of_hours} hours</Text>
       )}
@@ -51,12 +46,12 @@ export default function CourseIncludes({ course }) {
 const styles = StyleSheet.create({
   item: {
     marginTop: 5,
-    fontSize: 14,
+    fontSize: 15,
     color: "#3a3a3a",
   },
   emptyText: {
     marginTop: 5,
-    fontSize: 14,
+    fontSize: 15,
     color: "#999",
     fontStyle: "italic",
   },
