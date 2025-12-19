@@ -35,7 +35,13 @@ export default function Topbar({ showBack = false }) {
         <View style={styles.left}>
           {showBack ? (
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace("/"); // fallback route
+                }
+              }}
               style={styles.backBtn}
             >
               <Ionicons name="arrow-back" size={24} color="#fff" />

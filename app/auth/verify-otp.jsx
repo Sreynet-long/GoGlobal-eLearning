@@ -101,7 +101,7 @@ export default function VerifyOTP() {
             <Button
               mode="contained"
               loading={loading}
-              buttonColor="#25375A"
+  
               textColor="#fff"
               onPress={handleVerify}
               style={{ marginTop: 12 }}

@@ -15,8 +15,11 @@ import { IMAGE_BASE_URL } from "../../config/env.js";
 import { useLanguage } from "../../context/LanguageContext"; // <-- Import useLanguage
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
+import CourseIncludes from "./CourseInclude.jsx";
+import { useAuth } from "../../context/AuthContext.js";
 
 export default function CourseList({ selectedCategoryId, searchText }) {
+  const { isAuth } = useAuth();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const { language } = useLanguage();
@@ -56,6 +59,8 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     selectedCategoryId === "All"
       ? Courses
       : Courses.filter((item) => item.category_id?._id === selectedCategoryId);
+
+  const includes = selectedCourse?.course_includes?.[0];
 
   return (
     <View>
@@ -142,44 +147,8 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                   <Text style={styles.includesTitle}>
                     This Course includes:
                   </Text>
-                  {() => {
-                    const includes = selectedCourse?.course_includes?.[0];
-                    if (!includes) return null;
-                    return (
-                      <>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_of_downloadable_resources}{" "}
-                          downloadable resources
-                        </Text>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_of_hours} hours
-                        </Text>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_of_lessons} lessons
-                        </Text>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_of_projects_practices} projects &
-                          practices
-                        </Text>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_of_video} videos
-                        </Text>
-                        <Text style={styles.includeItem}>
-                          • {includes.number_quizzes} quizzes
-                        </Text>
-                        {includes.has_certificate_of_completion && (
-                          <Text style={styles.includeItem}>
-                            • Certificate of completion
-                          </Text>
-                        )}
-                        {includes.is_full_lifetime_access && (
-                          <Text style={styles.includeItem}>
-                            • Full lifetime access
-                          </Text>
-                        )}
-                      </>
-                    );
-                  }}
+                  <CourseIncludes course={selectedCourse} />
+                  
                 </>
               )}
             </ScrollView>
@@ -253,7 +222,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 29,
     borderTopRightRadius: 29,
     padding: 16,
-    height: "95%",
+    height: "87%",
   },
   closeButton: {
     alignSelf: "flex-end",
