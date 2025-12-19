@@ -1,6 +1,7 @@
-import { View,TouchableOpacity,Text, StyleSheet} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 const ModuleTile = ({ title, iconName, color }) => (
   <TouchableOpacity style={styles.moduleTile}>
@@ -10,43 +11,44 @@ const ModuleTile = ({ title, iconName, color }) => (
 );
 
 export default function UtilityModules() {
+  const { language } = useLanguage();
+  const modules = [
+    { titleKey: "my_enrollments", iconName: "book-outline", color: "#3F51B5" },
+    {
+      titleKey: "cert_tracks",
+      iconName: "clipboard-outline",
+      color: "#FF5722",
+    },
+    { titleKey: "community", iconName: "people-outline", color: "#4CAF50" },
+    {
+      titleKey: "live_sessions",
+      iconName: "calendar-outline",
+      color: "#00BCD4",
+    },
+    { titleKey: "knowledge_base", iconName: "bulb-outline", color: "#FFC107" },
+    {
+      titleKey: "skill_quizzes",
+      iconName: "bar-chart-outline",
+      color: "#E91E63",
+    },
+  ];
+
   return (
     <View>
       <View style={styles.moduleGrid}>
-        <ModuleTile
-          title="MY ENROLLMENTS"
-          iconName="book-outline"
-          color="#3F51B5"
-        />
-        <ModuleTile
-          title="CERT TRACKS"
-          iconName="clipboard-outline"
-          color="#FF5722"
-        />
-        <ModuleTile
-          title="COMMUNITY"
-          iconName="people-outline"
-          color="#4CAF50"
-        />
-        <ModuleTile
-          title="LIVE SESSIONS"
-          iconName="calendar-outline"
-          color="#00BCD4"
-        />
-        <ModuleTile
-          title="KNOWLEDGE BASE"
-          iconName="bulb-outline"
-          color="#FFC107"
-        />
-        <ModuleTile
-          title="SKILL QUIZZES"
-          iconName="bar-chart-outline"
-          color="#E91E63"
-        />
+        {modules.map((mod, index) => (
+          <ModuleTile
+            key={index}
+            title={t(mod.titleKey, language)}
+            iconName={mod.iconName}
+            color={mod.color}
+          />
+        ))}
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   moduleGrid: {
     flexDirection: "row",
@@ -70,5 +72,5 @@ const styles = StyleSheet.create({
     color: "#444",
     textAlign: "center",
     marginTop: 6,
-  },  
-})
+  },
+});

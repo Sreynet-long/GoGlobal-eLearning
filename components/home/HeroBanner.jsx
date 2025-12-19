@@ -8,34 +8,38 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 const { width: screenWidth } = Dimensions.get("window");
 const SLIDE_WIDTH = screenWidth - 32;
 const AUTOSCROLL_INTERVAL = 4000;
 const SCROLL_DELAY = 100;
 
-const BANNER_DATA = [
-  {
-    id: 1,
-    title: "Tech Skills",
-    subtitle: "Explore All 240+ Courses",
-    image: require("../../assets/banners/tech-skill.png"),
-  },
-  {
-    id: 2,
-    title: "50% OFF SALE!",
-    subtitle: "On All Cloud Certifications until Friday.",
-    image: require("../../assets/banners/sale-off.png"),
-  },
-  {
-    id: 3,
-    title: "NEW: C++ Class",
-    subtitle: "Beginner to Advanced in 8 Weeks.",
-    image: require("../../assets/banners/cpp.png"),
-  },
-];
-
 const HeroBanner = () => {
+  const { language } = useLanguage();
+
+  const BANNER_DATA = [
+    {
+      id: 1,
+      title: t("tech_skill", language),
+      subtitle: t("explore_courses", language),
+      image: require("../../assets/banners/tech-skill.png"),
+    },
+    {
+      id: 2,
+      title: t("50_off_sale", language),
+      subtitle: t("cloud_sale_subtitle", language),
+      image: require("../../assets/banners/sale-off.png"),
+    },
+    {
+      id: 3,
+      title: t("new_c_class", language),
+      subtitle: t("cpp_subtitle", language),
+      image: require("../../assets/banners/cpp.png"),
+    },
+  ];
+
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef(null);
 
@@ -45,32 +49,19 @@ const HeroBanner = () => {
     setActiveIndex(newIndex);
   };
 
-  // to handle the auto-scrolling
-  const autoScroll = () => {
-    // calculate potition of the next slide
-    const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
-    const xOffset = nextIndex * SLIDE_WIDTH;
-
-    // Use a slight delay before calling scrollTo to give the "pause" effect
-    setTimeout(() => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
       scrollRef.current?.scrollTo({
-        x: xOffset,
+        x: nextIndex * SLIDE_WIDTH,
         animated: true,
       });
-      // Update the index state
       setActiveIndex(nextIndex);
-    }, SCROLL_DELAY);
-  };
-
-  useEffect(() => {
-    // Set the interval for auto-scrolling
-    const interval = setInterval(() => {
-      autoScroll();
     }, AUTOSCROLL_INTERVAL);
 
-    // clear the interval when the component unmounts
     return () => clearInterval(interval);
-  }, [activeIndex]);
+  }, [activeIndex, BANNER_DATA.length]);
+
   return (
     <View style={styles.carouselContainer}>
       <ScrollView
@@ -82,7 +73,7 @@ const HeroBanner = () => {
         scrollEventThrottle={16}
         scrollEnabled={false}
       >
-        {BANNER_DATA.map((item, index) => (
+        {BANNER_DATA.map((item) => (
           <ImageBackground
             key={item.id}
             source={item.image}
@@ -93,14 +84,15 @@ const HeroBanner = () => {
               <Text style={styles.slideTitle}>{item.title}</Text>
               <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
               <TouchableOpacity style={styles.slideButton}>
-                <Text style={styles.slideButtonText}>Explore Now</Text>
+                <Text style={styles.slideButtonText}>
+                  {t("explore_now", language)}
+                </Text>
               </TouchableOpacity>
             </View>
           </ImageBackground>
         ))}
       </ScrollView>
 
-      {/* Pagination Dots */}
       <View style={styles.pagination}>
         {BANNER_DATA.map((_, index) => (
           <View
@@ -119,11 +111,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   slide: {
-    height: "160",
+    height: 160,
     justifyContent: "center",
     padding: 20,
     borderRadius: 12,
-    overflow: "hidden"
+    overflow: "hidden",
   },
   textOverlay: {
     justifyContent: "center",

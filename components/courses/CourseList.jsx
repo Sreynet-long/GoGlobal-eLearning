@@ -4,19 +4,22 @@ import {
   ActivityIndicator,
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env.js";
+import { useLanguage } from "../../context/LanguageContext"; // <-- Import useLanguage
+import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const { language } = useLanguage();
 
   const { data, loading, error } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
@@ -27,7 +30,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
       categoryId: selectedCategoryId === "All" ? "All" : selectedCategoryId,
     },
   });
-  console.log("data", data?.getCourseWithPagination?.data);
+
   if (loading)
     return (
       <View style={styles.loadingContainer}>
@@ -39,8 +42,14 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         />
       </View>
     );
+
   if (error)
-    return <Text style={styles.textHeader}>Error: {error.message}</Text>;
+    return (
+      <Text style={styles.textHeader}>
+        {t("error_loading", language)}: {error.message}
+      </Text>
+    );
+
   const Courses = data?.getCourseWithPagination?.data || [];
 
   const filteredCourses =
@@ -48,10 +57,9 @@ export default function CourseList({ selectedCategoryId, searchText }) {
       ? Courses
       : Courses.filter((item) => item.category_id?._id === selectedCategoryId);
 
-  console.log("IMAGE_BASE_URL", IMAGE_BASE_URL);
   return (
     <View>
-      <Text style={styles.textHeader}>Courses List</Text>
+      <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
       {filteredCourses.length === 0 ? (
         <View>
           <Image
@@ -59,7 +67,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             style={styles.emptyImage}
           />
           <Text style={{ textAlign: "center", marginTop: 20 }}>
-            No courses found in this category.
+            {t("no_courses_found", language)}
           </Text>
         </View>
       ) : (
@@ -73,7 +81,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             />
             <View style={styles.cardBody}>
               <Text style={styles.textTitle}>{course.title}</Text>
-              {/* <Text style={styles.textHours}>{course.hours} hours</Text> */}
               <View style={styles.row}>
                 <View style={styles.priceBox}>
                   <Text style={styles.textPrice}>
@@ -90,7 +97,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     setModalVisible(true);
                   }}
                 >
-                  <Text style={styles.textEnroll}>Enroll</Text>
+                  <Text style={styles.textEnroll}>{t("enroll", language)}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -102,76 +109,79 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ScrollView showsVerticalScrollIndicator={false}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={{ fontSize: 20 }}>✕</Text>
-            </TouchableOpacity>
-            <Divider />
-            {selectedCourse && (
-              <>
-                <Image
-                  source={{
-                    uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
-                  }}
-                  style={styles.modalImage}
-                />
-                <Divider style={{ marginVertical: 12 }} />
-                <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={{ fontSize: 20 }}>✕</Text>
+              </TouchableOpacity>
+              <Divider />
+              {selectedCourse && (
+                <>
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
+                    }}
+                    style={styles.modalImage}
+                  />
+                  <Divider style={{ marginVertical: 12 }} />
+                  <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
 
-                <View style={styles.modalPriceRow}>
-                  <Text style={styles.oldPrice}>
-                    ${selectedCourse.original_price?.toFixed(2) ?? "0.00"}
+                  <View style={styles.modalPriceRow}>
+                    <Text style={styles.oldPrice}>
+                      ${selectedCourse.original_price?.toFixed(2) ?? "0.00"}
+                    </Text>
+                    <Text style={styles.sellPrice}>
+                      ${selectedCourse.sell_price?.toFixed(2) ?? "0.00"}
+                    </Text>
+                  </View>
+                  <TouchableOpacity style={styles.cartButton}>
+                    <Text style={styles.cartText}>Confirm Enroll</Text>
+                  </TouchableOpacity>
+                  <Divider style={{ marginVertical: 12 }} />
+                  <Text style={styles.includesTitle}>
+                    This Course includes:
                   </Text>
-                  <Text style={styles.sellPrice}>
-                    ${selectedCourse.sell_price?.toFixed(2) ?? "0.00"}
-                  </Text>
-                </View>
-                <TouchableOpacity style={styles.cartButton}>
-                  <Text style={styles.cartText}>Confirm Enroll</Text>
-                </TouchableOpacity>
-                <Divider style={{ marginVertical: 12 }} />
-                <Text style={styles.includesTitle}>This Course includes:</Text>
-                {() => {
-                  const includes = selectedCourse?.course_includes?.[0];
-                  if (!includes) return null;
-                  return (
-                    <>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_of_downloadable_resources} downloadable
-                        resources
-                      </Text>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_of_hours} hours
-                      </Text>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_of_lessons} lessons
-                      </Text>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_of_projects_practices} projects & practices
-                      </Text>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_of_video} videos
-                      </Text>
-                      <Text style={styles.includeItem}>
-                        • {includes.number_quizzes} quizzes
-                      </Text>
-                      {includes.has_certificate_of_completion && (
+                  {() => {
+                    const includes = selectedCourse?.course_includes?.[0];
+                    if (!includes) return null;
+                    return (
+                      <>
                         <Text style={styles.includeItem}>
-                          • Certificate of completion
+                          • {includes.number_of_downloadable_resources}{" "}
+                          downloadable resources
                         </Text>
-                      )}
-                      {includes.is_full_lifetime_access && (
                         <Text style={styles.includeItem}>
-                          • Full lifetime access
+                          • {includes.number_of_hours} hours
                         </Text>
-                      )}
-                    </>
-                  );
-                }}
-              </>
-            )}
+                        <Text style={styles.includeItem}>
+                          • {includes.number_of_lessons} lessons
+                        </Text>
+                        <Text style={styles.includeItem}>
+                          • {includes.number_of_projects_practices} projects &
+                          practices
+                        </Text>
+                        <Text style={styles.includeItem}>
+                          • {includes.number_of_video} videos
+                        </Text>
+                        <Text style={styles.includeItem}>
+                          • {includes.number_quizzes} quizzes
+                        </Text>
+                        {includes.has_certificate_of_completion && (
+                          <Text style={styles.includeItem}>
+                            • Certificate of completion
+                          </Text>
+                        )}
+                        {includes.is_full_lifetime_access && (
+                          <Text style={styles.includeItem}>
+                            • Full lifetime access
+                          </Text>
+                        )}
+                      </>
+                    );
+                  }}
+                </>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -179,19 +189,11 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  textHeader: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginVertical: 10,
-  },
-  textTitle: {
-    paddingVertical: 5,
-    fontSize: 16,
-  },
+  container: { padding: 16 },
+  textHeader: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
+  textTitle: { paddingVertical: 5, fontSize: 16 },
   card: {
     flexDirection: "row",
     marginBottom: 15,
@@ -203,29 +205,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     elevation: 2,
   },
-  cardImage: {
-    width: "40%",
-    height: 120,
-    resizeMode: "cover",
-  },
-  cardBody: {
-    flex: 1,
-    padding: 10,
-    justifyContent: "center",
-  },
-  textHours: {
-    fontSize: 14,
-    color: "#666",
-  },
+  cardImage: { width: "40%", height: 120, resizeMode: "cover" },
+  cardBody: { flex: 1, padding: 10, justifyContent: "center" },
+  textHours: { fontSize: 14, color: "#666" },
   textPrice: {
     fontSize: 13,
     color: "#8a8888ff",
     textDecorationLine: "line-through",
   },
-  textRating: {
-    fontSize: 14,
-    color: "#8a8888ff",
-  },
+  textRating: { fontSize: 14, color: "#8a8888ff" },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -238,25 +226,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 15,
   },
-  textEnroll: {
-    color: "white",
-    fontWeight: "500",
-  },
-  emptyImage: {
-    marginTop: 100,
-    width: 60,
-    height: 60,
-    alignSelf: "center",
-  },
+  textEnroll: { color: "white", fontWeight: "500" },
+  emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
   textSellPrice: {
     fontSize: 16,
     fontWeight: "600",
     color: "#25375aff",
     marginTop: 2,
   },
-  priceBox: {
-    flexDirection: "column",
-  },
+  priceBox: { flexDirection: "column" },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

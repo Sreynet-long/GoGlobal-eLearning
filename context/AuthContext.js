@@ -1,12 +1,26 @@
+// context/AuthContext.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { router } from "expo-router";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 const AuthContext = createContext();
 
+// ------------------- Mock API Call -------------------
+const fetchUserFromApi = async (token) => {
+  // Replace this with your real API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ id: "1", name: "John Doe", email: "john@example.com" });
+    }, 500);
+  });
+};
+
+// ------------------- Auth Provider -------------------
 export const AuthProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   const setToken = async (token) => {
     if (Platform.OS === "web") localStorage.setItem("token", token);
@@ -23,27 +37,53 @@ export const AuthProvider = ({ children }) => {
     else await AsyncStorage.removeItem("token");
   };
 
+  // ------------------- Initialize Auth -------------------
   useEffect(() => {
     const initAuth = async () => {
       const token = await getToken();
       setIsAuth(!!token);
+
+      if (token) {
+        try {
+          const fetchedUser = await fetchUserFromApi(token);
+          setUser(fetchedUser);
+        } catch (err) {
+          console.error("Failed to fetch user:", err);
+          await removeToken(); // remove invalid token
+          setIsAuth(false);
+          setUser(null);
+          router.replace("/auth"); // send to login screen
+        }
+      } else {
+        router.replace("/auth"); // if no token, go to login
+      }
+
       setLoading(false);
     };
+
     initAuth();
   }, []);
 
-  const login = async (token) => {
+  // ------------------- Login -------------------
+  const login = async (token, fetchedUser = null) => {
     await setToken(token);
-    setIsAuth(true); // immediately update tabs
+    setIsAuth(true);
+    if (fetchedUser) setUser(fetchedUser);
+    router.replace("/"); // redirect to main tabs
   };
 
+  // ------------------- Logout -------------------
   const logout = async () => {
     await removeToken();
     setIsAuth(false);
+    setUser(null);
+    router.replace("/auth"); // redirect to login
   };
 
   return (
-    <AuthContext.Provider value={{ isAuth, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuth, loading, login, logout, user, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

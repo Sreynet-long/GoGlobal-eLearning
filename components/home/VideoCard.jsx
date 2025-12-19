@@ -1,13 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 export default function VideoCard() {
+  const { language } = useLanguage();
   return (
     <View>
       <TouchableOpacity style={styles.continueCard}>
         <Ionicons name="play-circle-outline" size={24} color="#1B5E20" />
         <Text style={styles.continueText}>
-          CONTINUE LEARNING: AWS Architect
+          {t("CONTINUE_LEARNING_AWS_Architect", language)}
         </Text>
         <Ionicons name="rocket-outline" size={24} color="#FF6347" />
       </TouchableOpacity>

@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useLanguage } from "../../context/LanguageContext"; // <-- Import useLanguage
+import { t } from "../../lang";
 import { GET_COURSE_CATEGORY } from "../../schema/courseCategory";
 
 const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
@@ -28,6 +30,7 @@ const CategoryPill = ({ category_name, icon_src, active, onPress }) => (
 );
 
 export default function FeatureCategory({ onSelectedCategory }) {
+  const { language } = useLanguage(); // <-- Add this
   const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
   const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
@@ -49,7 +52,6 @@ export default function FeatureCategory({ onSelectedCategory }) {
   if (error)
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  // Combine default "All" with fetched categories
   const Category = [
     { _id: "All", category_name: "All", icon_src: "apps-outline" },
     ...data.getCourseCategoryWithPagination.data.map((cat) => ({
@@ -66,7 +68,9 @@ export default function FeatureCategory({ onSelectedCategory }) {
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>Course Categories</Text>
+      <Text style={styles.sectionTitle}>
+        {t("course_categories", language)}
+      </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -102,9 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#25375aff",
     borderColor: "#25375aff",
   },
-  activeText: {
-    color: "#fff",
-  },
+  activeText: { color: "#fff" },
   categoryPillText: {
     fontSize: 14,
     fontWeight: "600",
@@ -118,22 +120,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333",
   },
-  categoryScroll: {
-    marginBottom: 15,
-  },
-  loadingText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#666",
-  },
-  errorText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "red",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  categoryScroll: { marginBottom: 15 },
+  loadingText: { textAlign: "center", marginTop: 20, color: "#666" },
+  errorText: { textAlign: "center", marginTop: 20, color: "red" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import {
   Image,
   Platform,
@@ -8,42 +9,59 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Title } from "react-native-paper";
 import Flag_en from "../../assets/flags/en.png";
 import Flag_kh from "../../assets/flags/kh.png";
+import { useLanguage } from "../../context/LanguageContext";
 import Notification from "./Notification";
 
 const STATUS_BAR_HEIGHT =
   Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 20;
 
-export default function Topbar() {
-  const [currentLang, setCurrentLang] = useState("en");
+export default function Topbar({ showBack = false }) {
+  const router = useRouter();
+
+  const { language, changeLanguage } = useLanguage();
 
   const toggleLanguage = () => {
-    const newLang = currentLang === "en" ? "kh" : "en";
-    setCurrentLang(newLang);
-    // console.log(`language change to: ${newLang}`);
+    changeLanguage(language === "en" ? "kh" : "en");
   };
 
-  const changeFlag = () => {
-    return currentLang === "en" ? Flag_en : Flag_kh;
-  };
+  const flagSource = language === "en" ? Flag_en : Flag_kh;
+
   return (
     <View style={styles.topContainer}>
       <View style={styles.header}>
         <View style={styles.left}>
-          <Image
-            source={require("../../assets/images/Go_Global_IT_logo.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.text}>GO eLEARNING</Text>
+          {showBack ? (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backBtn}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+          ) : (
+            <>
+              <Image
+                source={require("../../assets/images/Go_Global_IT_logo.png")}
+                style={styles.logo}
+              />
+              <Text style={styles.text}>GO eLEARNING</Text>
+              <Title style={{ color: "#fff", marginLeft: 6 }}>
+                {/* {t("home", language)} */}
+              </Title>
+            </>
+          )}
         </View>
+
         <View style={styles.right}>
           <TouchableOpacity
             style={styles.flagPlaceholder}
             onPress={toggleLanguage}
           >
-            <Image source={changeFlag()} style={{ width: 20, height: 15 }} />
+            <Image source={flagSource} style={styles.flag} />
           </TouchableOpacity>
+
           <Notification />
         </View>
       </View>
@@ -73,13 +91,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
   text: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
   },
-
   right: {
     flexDirection: "row",
     alignItems: "center",
@@ -92,8 +108,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  flagText: {
-    fontSize: 16,
-    color: "#fff",
+  flag: {
+    width: 20,
+    height: 15,
+    resizeMode: "contain",
   },
 });

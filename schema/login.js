@@ -79,3 +79,42 @@ export const GET_USER_BY_ID = gql`
     }
   }
 `;
+export const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email) {
+      status
+      message {
+        messageKh
+        messageEn
+      }
+      data {
+        token
+      }
+    }
+  }
+`;
+export const VERIFY_OTP = gql`
+  mutation VerifyOTP($otp: String!, $token: String!) {
+    verifyOTP(otp: $otp, token: $token) {
+      status
+      message {
+        messageKh
+        messageEn
+      }
+      data {
+        token
+      }
+    }
+  }
+`;
+export const UPDATE_NEW_PASSWORD = gql`
+  mutation UpdateNewPassword($password: String!, $token: String!) {
+    updateNewPassword(password: $password, token: $token) {
+      status
+      message {
+        messageKh
+        messageEn
+      }
+    }
+  }
+`;

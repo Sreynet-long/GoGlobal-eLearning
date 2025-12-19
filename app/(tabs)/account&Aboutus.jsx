@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -13,7 +15,6 @@ import {
 import {
   Button,
   Card,
-  IconButton,
   Paragraph,
   RadioButton,
   Text,
@@ -23,11 +24,11 @@ import {
 } from "react-native-paper";
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { GET_USER_BY_ID, MOBILE_UPDATE_USER } from "../../schema/login";
 
-const COMPANY_ICON = "laptop-account";
 const COMPANY_LOGO = require("../../assets/images/Go_Global_IT_logo.png");
-
 const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
@@ -44,19 +45,33 @@ const COLORS = {
 
 export default function AccountOrAbout() {
   const theme = useTheme();
-  const { isAuth, loading, user: authUser, logout } = useAuth();
+  const { language } = useLanguage();
+  const { isAuth, loading, user: authUser, logout, setUser } = useAuth();
   const [editing, setEditing] = useState(false);
+  const [localProfileImage, setLocalProfileImage] = useState(null);
+
+  // Load cached profile image
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      const cached = await AsyncStorage.getItem("localProfileImage");
+      if (cached) setLocalProfileImage(cached);
+    };
+    loadProfileImage();
+  }, []);
 
   const {
     data: userData,
     refetch,
     loading: userLoading,
-  } = useQuery(GET_USER_BY_ID);
+  } = useQuery(GET_USER_BY_ID, {
+    fetchPolicy: "network-only",
+  });
 
   const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
-    onCompleted: () => {
+    onCompleted: (data) => {
       refetch?.();
       setEditing(false);
+      if (data?.mobileUpdateUser?.data) setUser(data.mobileUpdateUser.data);
     },
     onError: (err) => console.error(err),
   });
@@ -68,11 +83,32 @@ export default function AccountOrAbout() {
   const handleCall = () => Linking.openURL("tel:012660981");
   const handleEmail = () => Linking.openURL("mailto:goglobalit2022@gmail.com");
 
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setLocalProfileImage(uri);
+      await AsyncStorage.setItem("localProfileImage", uri);
+    }
+  };
+
   const handleSave = (formData) => {
+    setEditing(false);
     updateUser({
       variables: {
         id: user._id,
-        input: formData,
+        input: {
+          ...formData,
+          profile_image: localProfileImage || user.profile_image || "",
+        },
       },
     });
   };
@@ -98,12 +134,16 @@ export default function AccountOrAbout() {
                 handleSave={handleSave}
                 updating={updating}
                 logout={logout}
+                language={language}
+                localProfileImage={localProfileImage}
+                pickImage={pickImage}
               />
             ) : (
               <AboutView
                 theme={theme}
                 handleCall={handleCall}
                 handleEmail={handleEmail}
+                language={language}
               />
             )}
           </View>
@@ -113,7 +153,7 @@ export default function AccountOrAbout() {
   );
 }
 
-// ------------------- Account View -------------------
+//==================== Account View ====================
 function AccountView({
   user,
   editing,
@@ -121,6 +161,9 @@ function AccountView({
   handleSave,
   updating,
   logout,
+  language,
+  localProfileImage,
+  pickImage,
 }) {
   return (
     <View>
@@ -128,6 +171,7 @@ function AccountView({
         <Image
           source={{
             uri:
+              localProfileImage ||
               user?.profile_image ||
               "https://cdn-icons-png.flaticon.com/512/847/847969.png",
           }}
@@ -144,54 +188,75 @@ function AccountView({
           labelStyle={styles.editButtonLabel}
           onPress={() => setEditing(!editing)}
         >
-          {editing ? "Cancel" : "Edit Profile"}
+          {editing ? t("cancel", language) : t("edit_profile", language)}
         </Button>
       </View>
 
       <Card style={styles.infoCard}>
-        <Card.Title title="Account Information" titleStyle={styles.cardTitle} />
+        <Card.Title
+          title={t("account_information", language)}
+          titleStyle={styles.cardTitle}
+        />
         <Card.Content>
           {editing ? (
             <EditUser
               initialData={user}
               onSave={handleSave}
               updating={updating}
+              language={language}
+              pickImage={pickImage}
+              localProfileImage={localProfileImage}
             />
           ) : (
             <>
               <InfoRow
-                label="First Name"
+                label={t("first_name", language)}
                 value={user?.first_name}
                 icon="person"
               />
               <InfoRow
-                label="Last Name"
+                label={t("last_name", language)}
                 value={user?.last_name}
                 icon="person-outline"
               />
-              <InfoRow label="Phone" value={user?.phone_number} icon="phone" />
-              <InfoRow label="Gender" value={user?.gender} icon="wc" />
+              <InfoRow
+                label={t("phone", language)}
+                value={user?.phone_number}
+                icon="phone"
+              />
+              <InfoRow
+                label={t("gender", language)}
+                value={user?.gender}
+                icon="wc"
+              />
             </>
           )}
         </Card.Content>
       </Card>
 
-      {editing ? null : (
+      {!editing && (
         <Button
           mode="contained"
           onPress={logout}
           style={styles.logoutButtonContained}
           textColor={COLORS.white}
         >
-          Log Out
+          {t("log_out", language)}
         </Button>
       )}
     </View>
   );
 }
 
-// ------------------- Edit User Component -------------------
-function EditUser({ initialData, onSave, updating }) {
+//==================== Edit User ====================
+function EditUser({
+  initialData,
+  onSave,
+  updating,
+  language,
+  pickImage,
+  localProfileImage,
+}) {
   const [formData, setFormData] = useState({
     first_name: initialData.first_name || "",
     last_name: initialData.last_name || "",
@@ -202,7 +267,7 @@ function EditUser({ initialData, onSave, updating }) {
   return (
     <View>
       <TextInput
-        label="First Name"
+        label={t("first_name", language)}
         value={formData.first_name}
         onChangeText={(text) => setFormData({ ...formData, first_name: text })}
         mode="flat"
@@ -210,14 +275,14 @@ function EditUser({ initialData, onSave, updating }) {
         autoFocus
       />
       <TextInput
-        label="Last Name"
+        label={t("last_name", language)}
         value={formData.last_name}
         onChangeText={(text) => setFormData({ ...formData, last_name: text })}
         mode="flat"
         style={styles.inputField}
       />
       <TextInput
-        label="Phone Number"
+        label={t("phone", language)}
         value={formData.phone_number}
         onChangeText={(text) =>
           setFormData({ ...formData, phone_number: text })
@@ -231,10 +296,22 @@ function EditUser({ initialData, onSave, updating }) {
         value={formData.gender}
       >
         <View style={{ flexDirection: "row", gap: 10, marginVertical: 10 }}>
-          <RadioButton.Item label="Male" value="male" />
-          <RadioButton.Item label="Female" value="female" />
+          <RadioButton.Item label={t("male", language)} value="male" />
+          <RadioButton.Item label={t("female", language)} value="female" />
         </View>
       </RadioButton.Group>
+      <Button
+        mode="outlined"
+        onPress={pickImage}
+        style={[
+          styles.logoutButtonContained,
+          { marginBottom: 0 },
+          { backgroundColor: COLORS.grey300 },
+        ]}
+        textColor={COLORS.primary}
+      >
+        {t("change_profile_image", language) || "Change Profile Image"}
+      </Button>
 
       <Button
         mode="contained"
@@ -246,13 +323,13 @@ function EditUser({ initialData, onSave, updating }) {
         loading={updating}
         textColor={COLORS.white}
       >
-        Save Changes
+        {t("save_changes", language)}
       </Button>
     </View>
   );
 }
 
-// ------------------- Info Row -------------------
+//==================== Info Row ====================
 function InfoRow({ label, value, icon }) {
   return (
     <View style={styles.infoRow}>
@@ -272,8 +349,46 @@ function InfoRow({ label, value, icon }) {
   );
 }
 
-// ------------------- About View -------------------
-function AboutView({ theme, handleCall, handleEmail }) {
+//==================== About View ====================
+function AboutView({ theme, handleCall, handleEmail, language }) {
+  const [openItem, setOpenItem] = useState(null);
+  const toggleItem = (key) => setOpenItem(openItem === key ? null : key);
+
+  const contactItems = [
+    {
+      key: "phone",
+      label: t("call_us", language),
+      value: "012 660 981",
+      icon: "phone",
+      onPress: handleCall,
+    },
+    {
+      key: "email",
+      label: t("email", language),
+      value: "goglobalit2022@gmail.com",
+      icon: "email",
+      onPress: handleEmail,
+    },
+    {
+      key: "website",
+      label: t("website", language),
+      value: "https://www.go-globalit.com/",
+      icon: "link",
+      onPress: () => Linking.openURL("https://www.go-globalit.com/"),
+    },
+    {
+      key: "facebook",
+      label: t("facebook", language),
+      value:
+        "https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d",
+      icon: "facebook",
+      onPress: () =>
+        Linking.openURL(
+          "https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d"
+        ),
+    },
+  ];
+
   return (
     <ScrollView
       style={[
@@ -289,80 +404,77 @@ function AboutView({ theme, handleCall, handleEmail }) {
             style={[styles.logoImage, { borderColor: theme.colors.primary }]}
             resizeMode="contain"
           />
-          <Title style={styles.mainTitle}>About Go eLEARNING</Title>
+          <Title style={styles.mainTitle}>
+            {t("about_go_elearning", language)}
+          </Title>
         </View>
+
         <Card style={styles.card}>
           <Card.Content>
-            <Title style={styles.cardTitle}>Our Story</Title>
+            <Title style={styles.cardTitle}>{t("our_story", language)}</Title>
             <Paragraph style={styles.paragraph}>
-              Our company was first created within the company circles
-              supervised by Go Global School. It initially started as an office
-              focusing on IT & Marketing.
+              {t("our_story_text1", language)}
             </Paragraph>
             <Paragraph style={styles.paragraph}>
-              Later, in 2022, it evolved to become a dedicated company. We offer
-              two main services: developing secure programmes and advanced
-              algorithms to help our clients protect and efficiently store their
-              critical information and data.
+              {t("our_story_text2", language)}
             </Paragraph>
           </Card.Content>
         </Card>
+
         <Card style={styles.card}>
           <Card.Content>
-            <View style={styles.missionVisionItem}>
+            <View style={[styles.missionVisionItem, { paddingBottom: 0 }]}>
               <Title
                 style={[styles.cardTitle, { color: theme.colors.primary }]}
               >
-                Our Vision
+                {t("our_vision", language)}
               </Title>
               <Text style={styles.missionVisionText}>
-                "Let's move to the digital area."
+                {t("our_vision_text", language)}
               </Text>
             </View>
             <View style={styles.missionVisionItem}>
               <Title
                 style={[styles.cardTitle, { color: theme.colors.secondary }]}
               >
-                Our Mission
+                {t("our_mission", language)}
               </Title>
               <Text style={styles.missionVisionText}>
-                "Innovate, promote, and encourage using technology in digital
-                lifestyle."
+                {t("our_mission_text", language)}
               </Text>
             </View>
           </Card.Content>
         </Card>
+
         <Card style={[styles.card, styles.contactCard]}>
           <Card.Content>
-            <Title style={styles.cardTitle}>Talk to Us</Title>
-            <View style={styles.contactRow}>
-              <IconButton
-                icon="phone"
-                size={24}
-                color={theme.colors.primary}
-                onPress={handleCall}
-              />
-              <View>
-                <Text style={styles.contactLabel}>Call Us</Text>
-                <Text style={styles.contactValue} onPress={handleCall}>
-                  012 660 981
+            <Title style={styles.cardTitle}>{t("contact_us", language)}</Title>
+            <View style={styles.contactIconRow}>
+              {contactItems.map((item) => (
+                <View
+                  key={item.key}
+                  style={styles.contactIconButton}
+                  onClick={() => toggleItem(item.key)}
+                >
+                  <MaterialIcons
+                    name={item.icon}
+                    size={32}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.contactLabel}>{item.label}</Text>
+                </View>
+              ))}
+            </View>
+            {openItem && (
+              <View style={styles.contactValueContainer}>
+                <Text
+                  style={styles.contactValue}
+                  onPress={contactItems.find((i) => i.key === openItem).onPress}
+                >
+                  {contactItems.find((i) => i.key === openItem).value}
                 </Text>
               </View>
-            </View>
-            <View style={styles.contactRow}>
-              <IconButton
-                icon="email"
-                size={24}
-                color={theme.colors.primary}
-                onPress={handleEmail}
-              />
-              <View>
-                <Text style={styles.contactLabel}>Email</Text>
-                <Text style={styles.contactValue} onPress={handleEmail}>
-                  goglobalit2022@gmail.com
-                </Text>
-              </View>
-            </View>
+            )}
           </Card.Content>
         </Card>
       </View>
@@ -370,7 +482,7 @@ function AboutView({ theme, handleCall, handleEmail }) {
   );
 }
 
-// ------------------- Styles -------------------
+//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   contentContainer: {
@@ -381,9 +493,8 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   scrollContent: { paddingBottom: 40 },
-  header: { alignItems: "center", marginBottom: 25 },
   card: { marginBottom: 20, borderRadius: 12, elevation: 2 },
-  profileHeader: { marginTop: 70, alignItems: "center", marginBottom: 30 },
+  profileHeader: { marginTop: 50, alignItems: "center", marginBottom: 0 },
   avatar: {
     width: 100,
     height: 100,
@@ -405,6 +516,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 10,
+    paddingTop: 20,
     textAlign: "center",
   },
   infoRow: {
@@ -424,8 +536,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: COLORS.error,
   },
-  logoIcon: { marginBottom: 5 },
-  mainTitle: { fontSize: 28, fontWeight: "700" },
+  mainTitle: { fontSize: 28, fontWeight: "700", marginTop: "20" },
   paragraph: { lineHeight: 22, marginBottom: 10, fontSize: 15 },
   missionVisionItem: {
     paddingVertical: 10,
@@ -434,13 +545,23 @@ const styles = StyleSheet.create({
   },
   missionVisionText: { fontSize: 16, fontStyle: "italic", paddingLeft: 10 },
   contactCard: { paddingVertical: 10 },
-  contactRow: {
+  contactIconRow: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
+    justifyContent: "space-around",
+    marginVertical: 10,
   },
-  contactLabel: { fontSize: 12, color: "gray" },
-  contactValue: { fontSize: 16, fontWeight: "600" },
+  contactIconButton: { alignItems: "center", width: 70 },
+  contactValueContainer: { marginTop: 10, alignItems: "center" },
+  contactLabel: { fontSize: 12, textAlign: "center", marginTop: 4 },
+  contactValue: {
+    fontSize: 16,
+    color: COLORS.primary,
+    textDecorationLine: "none",
+    textAlign: "center",
+    borderTopWidth: 2,
+    padding: 20,
+    fontWeight: "bold",
+  },
   inputField: { marginBottom: 10, backgroundColor: "transparent" },
   logoContainer: {
     alignItems: "center",

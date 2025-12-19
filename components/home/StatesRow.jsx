@@ -1,7 +1,7 @@
-import { View, Text ,StyleSheet} from 'react-native'
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react'
-
+import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 const StatCircle = ({ label, value, icon, color }) => (
   <View style={styles.statCircle}>
@@ -10,40 +10,46 @@ const StatCircle = ({ label, value, icon, color }) => (
     <Text style={styles.statLabel}>{label}</Text>
   </View>
 );
+
 export default function StatesRow() {
+  const { language } = useLanguage();
+
+  const stats = [
+    { labelKey: "14_day_streak", value: "14", icon: "flame", color: "#E65100" },
+    { labelKey: "badges_earned", value: "3", icon: "medal", color: "#FFC107" },
+    {
+      labelKey: "hours_this_month",
+      value: "20",
+      icon: "time",
+      color: "#00BCD4",
+    },
+    {
+      labelKey: "cert_ready",
+      value: "85%",
+      icon: "checkmark-circle",
+      color: "#4CAF50",
+    },
+  ];
+
   return (
     <View>
       <View style={styles.statsRow}>
+        {stats.map((stat, index) => (
           <StatCircle
-            label="14-Day Streak"
-            value="14"
-            icon="flame"
-            color="#E65100"
+            key={index}
+            label={t(stat.labelKey, language)}
+            value={stat.value}
+            icon={stat.icon}
+            color={stat.color}
           />
-          <StatCircle
-            label="Badges Earned"
-            value="3"
-            icon="medal"
-            color="#FFC107"
-          />
-          <StatCircle
-            label="Hours This Month"
-            value="20"
-            icon="time"
-            color="#00BCD4"
-          />
-          <StatCircle
-            label="Cert Ready"
-            value="85%"
-            icon="checkmark-circle"
-            color="#4CAF50"
-          />
-        </View>
+        ))}
+      </View>
     </View>
-  )
+  );
 }
+
 const styles = StyleSheet.create({
-    statsRow: {
+  statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 10,

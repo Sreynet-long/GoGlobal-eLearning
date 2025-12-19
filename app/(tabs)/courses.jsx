@@ -4,26 +4,39 @@ import CourseList from "../../components/courses/CourseList";
 import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
-export default function courses() {
+export default function Courses() {
+  const { language } = useLanguage();
   const [searchText, setSearchText] = useState("");
-  console.log("searchText", searchText);
   const [selectedCategoryId, setSelectedCategoryId] = useState("All");
+
   return (
     <View style={styles.screenContainer}>
       <Topbar />
       <View style={styles.contentContainer}>
-        <Search value={searchText} onChange={setSearchText} />
+        {/* Search Component */}
+        <Search
+          value={searchText}
+          onChange={setSearchText}
+          placeholder={t("search_courses", language)}
+        />
+
+        {/* Feature Categories */}
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
+
+        {/* Course List */}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <CourseList
-            selectedCategoryId={selectedCategoryId}
+            selectedCategoryId={selectedCategoryId} // ✅ pass this instead
             searchText={searchText}
+            language={language} // optional if CourseList uses language
           />
         </ScrollView>
       </View>
@@ -31,6 +44,7 @@ export default function courses() {
   );
 }
 
+//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {

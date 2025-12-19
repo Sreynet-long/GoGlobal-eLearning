@@ -1,26 +1,28 @@
 import { ApolloProvider } from "@apollo/client/react";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { AuthProvider, useAuth } from "../context/AuthContext";
+import { AuthProvider } from "../context/AuthContext";
+import { LanguageProvider } from "../context/LanguageContext";
 import client from "../lib/apolloClient";
 
-function AppStack() {
-  const { isAuth, loading } = useAuth();
-
-  if (loading) return null;
-
-  return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
-  );
-}
-
 export default function RootLayout() {
+  const [fontsLoad, error] = useFonts({
+    Siemreap: require("../assets/fonts/Siemreap-Regular.ttf"),
+  });
   return (
-    <ApolloProvider client={client}>
-      <AuthProvider>
-        <AppStack />
-      </AuthProvider>
-    </ApolloProvider>
+    <LanguageProvider>
+      <ApolloProvider client={client}>
+        <AuthProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="auth" />
+          </Stack>
+        </AuthProvider>
+      </ApolloProvider>
+    </LanguageProvider>
   );
 }
