@@ -100,4 +100,7 @@ export default {
   password: "Password",
   log_in: "Login",
   change_profile_image: "Change profile picture",
+  change_password:"Change Password",
+  terms_conditions:"Terms & Conditions",
+   security:"Security"
 };

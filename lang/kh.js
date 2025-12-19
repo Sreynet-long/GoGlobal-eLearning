@@ -85,7 +85,7 @@ export default {
   our_mission: "បេសកកម្មរបស់យើង",
   our_mission_text:
     '"ច្នៃប្រឌិត ផ្សព្វផ្សាយ និងលើកទឹកចិត្តការប្រើបច្ចេកវិទ្យានៅក្នុងជីវិតឌីជីថល"',
-  contact_us: "ទំនាក់ទំនងយើង",
+  contact_us: "ទាក់ទងមកយើងខ្ញុំ",
   call_us: "លេខទូរស័ព្ទ",
   website: "វេបសាយ",
   facebook: "ហ្វេសប៊ុក",
@@ -100,4 +100,7 @@ export default {
   password: "ពាក្យសម្ងាត់",
   log_in: "ចូល",
   change_profile_image: "ផ្លាស់ប្តូររូបភាព",
+  change_password:"ផ្លាស់ប្តូរពាក្យសម្ងាត់",
+  terms_conditions:"លក្ខខណ្ឌ",
+  security:"សុវត្ថិភាព"
 };
