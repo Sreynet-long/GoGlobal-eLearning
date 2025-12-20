@@ -15,23 +15,24 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-  headerShown: false,
-  tabBarActiveTintColor: "white",
-  tabBarStyle: {
-    backgroundColor: "#25375aff",
-    position: "absolute",
-    bottom: 10,
-    left: 15,
-    right: 15,
-    height: 60,
-    borderRadius: 50,
-    elevation: 0,
-    shadowOpacity: 0,
-  },
-  tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
-  tabBarItemStyle: { justifyContent: "center", alignItems: "center" },
-}}
-
+        headerShown: false,
+        tabBarActiveTintColor: "white",
+        tabBarStyle: {
+          backgroundColor: "#25375aff",
+          position: "absolute",
+          bottom: 35,
+          left: 15,
+          right: 15,
+          height: 60,
+          borderRadius: 50,
+          elevation: 0,
+          shadowOpacity: 0,
+          marginRight: 10,
+          marginLeft: 10,
+        },
+        tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
+        tabBarItemStyle: { justifyContent: "center", alignItems: "center" },
+      }}
     >
       <Tabs.Screen
         name="index"

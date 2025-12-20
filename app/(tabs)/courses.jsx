@@ -33,7 +33,7 @@ export default function Courses() {
           <CourseList
             selectedCategoryId={selectedCategoryId}
             searchText={searchText}
-            language={language} 
+            language={language}
           />
         </ScrollView>
       </View>

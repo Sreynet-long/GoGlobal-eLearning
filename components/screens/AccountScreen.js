@@ -8,18 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  Button,
-  Card,
-  RadioButton,
-  Text,
-  TextInput,
-  useTheme,
-} from "react-native-paper";
+import { Button, RadioButton, Text, TextInput } from "react-native-paper";
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -40,8 +34,10 @@ const COLORS = {
   borderLight: "#e9ecef",
 };
 
+const UPLOAD_API = "http://192.168.5.36:6800/api/direct-upload/";
+const FILE_BASE_URL = "http://192.168.5.36:6800/api/file/";
+
 export default function AccountScreen() {
-  const theme = useTheme();
   const { language } = useLanguage();
   const { user: authUser, logout, setUser } = useAuth();
   const [editing, setEditing] = useState(false);
@@ -61,6 +57,7 @@ export default function AccountScreen() {
     refetch,
     loading: userLoading,
   } = useQuery(GET_USER_BY_ID, { fetchPolicy: "network-only" });
+
   const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
     onCompleted: (data) => {
       refetch?.();
@@ -72,16 +69,13 @@ export default function AccountScreen() {
 
   const user = userData?.getUserById || authUser || {};
 
-  if (userLoading) return null;
-
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) return;
-
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.7,
+      quality: 1,
     });
     if (!result.canceled) {
       const uri = result.assets[0].uri;
@@ -90,251 +84,241 @@ export default function AccountScreen() {
     }
   };
 
-  const handleSave = (formData) => {
-    setEditing(false);
+  const uploadFiles = async (fileUri) => {
+    try {
+      if (!fileUri) return null;
+      const formData = new FormData();
+      const uri = fileUri.startsWith("file://") ? fileUri : "file://" + fileUri;
+      formData.append("files", {
+        uri,
+        name: uri.split("/").pop(),
+        type: "image/jpeg",
+      });
+      const response = await fetch(UPLOAD_API, {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      return result?.files?.[0]?.filename || null;
+    } catch (error) {
+      console.error("Upload error:", error);
+      return null;
+    }
+  };
+
+  const handleSave = async (formData) => {
+    let profileImageFilename = user.profile_image || "";
+    if (localProfileImage && !localProfileImage.startsWith("http")) {
+      const uploaded = await uploadFiles(localProfileImage);
+      if (uploaded) profileImageFilename = uploaded;
+    }
     updateUser({
       variables: {
         id: user._id,
-        input: {
-          ...formData,
-          profile_image: localProfileImage || user.profile_image || "",
-        },
+        input: { ...formData, profile_image: profileImageFilename },
       },
     });
   };
 
-  const handleTabChange = (tab) => {
-    if (editing) setEditing(false);
-    setActiveTab(tab);
-  };
+  if (userLoading) return null;
 
   return (
     <KeyboardAvoidingView
       style={styles.screenContainer}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Topbar />
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.profileHeader}>
-          <Image
-            source={{
-              uri:
-                localProfileImage ||
-                user?.profile_image ||
-                "https://cdn-icons-png.flaticon.com/512/847/847969.png",
-            }}
-            style={styles.avatar}
-          />
-          <Text style={styles.profileName}>
+      <StatusBar barStyle="light-content" />
+      <View style={styles.headerBackground}>
+        <Topbar />
+        <View style={styles.profileSection}>
+          <View style={styles.avatarWrapper}>
+            <Image
+              source={{
+                uri: localProfileImage
+                  ? localProfileImage
+                  : user?.profile_image
+                  ? FILE_BASE_URL + user.profile_image
+                  : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+              }}
+              style={styles.avatar}
+            />
+            {editing && (
+              <TouchableOpacity style={styles.cameraBadge} onPress={pickImage}>
+                <MaterialIcons
+                  name="photo-camera"
+                  size={18}
+                  color={COLORS.white}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          <Text style={styles.userNameText}>
             {user?.first_name} {user?.last_name}
           </Text>
-          <Text style={styles.profileEmail}>{user?.email}</Text>
-
-          <Button
-            mode="text"
-            textColor={COLORS.primary}
-            labelStyle={styles.editButtonLabel}
-            onPress={() => setEditing(!editing)}
-          >
-            {editing ? t("cancel", language) : t("edit_profile", language)}
-          </Button>
+          <Text style={styles.userEmailText}>{user?.email}</Text>
         </View>
+      </View>
 
-        <View style={styles.tabHeader}>
+      <View style={styles.contentCard}>
+        <View style={styles.segmentedControl}>
           <TouchableOpacity
-            onPress={() => handleTabChange("account")}
+            onPress={() => {
+              setEditing(false);
+              setActiveTab("account");
+            }}
             style={[
-              styles.tabButton,
-              activeTab === "account" && styles.activeTab,
+              styles.segmentBtn,
+              activeTab === "account" && styles.segmentBtnActive,
             ]}
           >
-            <Text style={styles.tabText}>
+            <Text
+              style={[
+                styles.segmentText,
+                activeTab === "account" && styles.segmentTextActive,
+              ]}
+            >
               {t("account_information", language)}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => handleTabChange("security")}
+            onPress={() => {
+              setEditing(false);
+              setActiveTab("security");
+            }}
             style={[
-              styles.tabButton,
-              activeTab === "security" && styles.activeTab,
+              styles.segmentBtn,
+              activeTab === "security" && styles.segmentBtnActive,
             ]}
           >
-            <Text style={styles.tabText}>{t("security", language)}</Text>
+            <Text
+              style={[
+                styles.segmentText,
+                activeTab === "security" && styles.segmentTextActive,
+              ]}
+            >
+              {t("security", language)}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {activeTab === "account" ? (
-          <AccountDetailsView
-            user={user}
-            editing={editing}
-            setEditing={setEditing}
-            handleSave={handleSave}
-            updating={updating}
-            language={language}
-            pickImage={pickImage}
-            localProfileImage={localProfileImage}
-            logout={logout}
-          />
-        ) : (
-          <SecurityView language={language} logout={logout} />
-        )}
-      </ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              {activeTab === "account"
+                ? t("personal_details", language)
+                : t("settings", language)}
+            </Text>
+            {activeTab === "account" && (
+              <TouchableOpacity onPress={() => setEditing(!editing)}>
+                <Text style={styles.editActionText}>
+                  {editing
+                    ? t("cancel", language)
+                    : t("edit_profile", language)}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {activeTab === "account" ? (
+            <AccountDetailsView
+              user={user}
+              editing={editing}
+              handleSave={handleSave}
+              updating={updating}
+              language={language}
+              pickImage={pickImage}
+              logout={logout}
+            />
+          ) : (
+            <SecurityView language={language} logout={logout} />
+          )}
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
-//==================== Account Details ====================
 function AccountDetailsView({
   user,
   editing,
-  setEditing,
   handleSave,
   updating,
   language,
-  pickImage,
-  localProfileImage,
   logout,
 }) {
+  if (editing) {
+    return (
+      <EditUser
+        initialData={user}
+        onSave={handleSave}
+        updating={updating}
+        language={language}
+      />
+    );
+  }
   return (
     <View>
-      <Card style={styles.infoCard}>
-        <Card.Content>
-          {editing ? (
-            <EditUser
-              initialData={user}
-              onSave={handleSave}
-              updating={updating}
-              language={language}
-              pickImage={pickImage}
-              localProfileImage={localProfileImage}
-            />
-          ) : (
-            <>
-              <InfoRow
-                label={t("first_name", language)}
-                value={user?.first_name}
-                icon="person"
-              />
-              <InfoRow
-                label={t("last_name", language)}
-                value={user?.last_name}
-                icon="person-outline"
-              />
-              <InfoRow
-                label={t("phone", language)}
-                value={user?.phone_number}
-                icon="phone"
-              />
-              <InfoRow
-                label={t("gender", language)}
-                value={user?.gender}
-                icon="wc"
-              />
-            </>
-          )}
-        </Card.Content>
-        {!editing && (
-          <Button
-            mode="contained"
-            onPress={logout}
-            style={styles.logoutButtonContained}
-            textColor={COLORS.white}
-          >
-            {t("log_out", language)}
-          </Button>
-        )}
-      </Card>
+      <InfoRow
+        label={t("first_name", language)}
+        value={user?.first_name}
+        icon="person"
+      />
+      <InfoRow
+        label={t("last_name", language)}
+        value={user?.last_name}
+        icon="badge"
+      />
+      <InfoRow
+        label={t("phone", language)}
+        value={user?.phone_number}
+        icon="smartphone"
+      />
+      <InfoRow label={t("gender", language)} value={user?.gender} icon="face" />
+      <Button
+        mode="contained"
+        onPress={logout}
+        style={styles.logoutBtn}
+        labelStyle={{ fontWeight: "700" }}
+      >
+        {t("log_out", language)}
+      </Button>
     </View>
   );
 }
 
-//==================== Security View ====================
 function SecurityView({ language, logout }) {
-  const securityItems = [
-    {
-      key: "change_password",
-      label: t("change_password", language),
-      icon: "lock",
-      onPress: () => {
-        navigation.navigate("auth/update-password");
-      },
-    },
-    {
-      key: "about_us",
-      label: t("about_us", language),
-      icon: "info-outline",
-      onPress: () => {
-        // navigation.navigate("AboutUs");
-      },
-    },
-    {
-      key: "contact_us",
-      label: t("contact_us", language),
-      icon: "phone",
-      onPress: () => {
-      },
-    },
-    {
-      key: "terms_conditions",
-      label: t("terms_conditions", language),
-      icon: "description", 
-      onPress: () => {
-        // navigation.navigate("TermsConditions");
-      },
-    },
+  const items = [
+    { key: "1", label: t("change_password", language), icon: "lock-reset" },
+    { key: "2", label: t("about_us", language), icon: "corporate-fare" },
+    { key: "3", label: t("contact_us", language), icon: "support-agent" },
+    { key: "4", label: t("terms_conditions", language), icon: "gavel" },
   ];
-
   return (
     <View>
-      <Card style={styles.infoCard}>
-        {securityItems.map((item) => (
-          <TouchableOpacity
-            key={item.key}
-            style={styles.securityItem}
-            onPress={item.onPress}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MaterialIcons
-                name={item.icon}
-                size={20}
-                color={COLORS.grey600}
-                style={{ marginRight: 8 }}
-              />
-              <Text style={styles.infoLabel}>{item.label}</Text>
-            </View>
-            <MaterialIcons
-              name="chevron-right"
-              size={20}
-              color={COLORS.grey600}
-            />
-          </TouchableOpacity>
-        ))}
-
-        <Button
-          mode="contained"
-          onPress={logout}
-          style={styles.logoutButtonContained}
-          textColor={COLORS.white}
-        >
-          {t("log_out", language)}
-        </Button>
-      </Card>
+      {items.map((item) => (
+        <TouchableOpacity key={item.key} style={styles.securityRow}>
+          <View style={styles.securityIconBox}>
+            <MaterialIcons name={item.icon} size={22} color={COLORS.primary} />
+          </View>
+          <Text style={styles.securityLabel}>{item.label}</Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={COLORS.grey300}
+          />
+        </TouchableOpacity>
+      ))}
+      <Button mode="contained" onPress={logout} style={styles.logoutBtn}>
+        {t("log_out", language)}
+      </Button>
     </View>
   );
 }
 
-//==================== Edit User ====================
-function EditUser({
-  initialData,
-  onSave,
-  updating,
-  language,
-  pickImage,
-  localProfileImage,
-}) {
+function EditUser({ initialData, onSave, updating, language }) {
   const [formData, setFormData] = useState({
     first_name: initialData.first_name || "",
     last_name: initialData.last_name || "",
@@ -343,178 +327,197 @@ function EditUser({
   });
 
   return (
-    <View style={styles.infoCardEdit}>
+    <View style={styles.editForm}>
       <View style={styles.row}>
         <TextInput
           label={t("first_name", language)}
           value={formData.first_name}
-          onChangeText={(text) =>
-            setFormData({ ...formData, first_name: text })
-          }
-          mode="flat"
-          style={[styles.inputField, { flex: 1, marginRight: 5 }]}
-          autoFocus
+          onChangeText={(v) => setFormData({ ...formData, first_name: v })}
+          style={[styles.input, { marginRight: 8 }]}
+          mode="outlined"
+          activeOutlineColor={COLORS.primary}
         />
         <TextInput
           label={t("last_name", language)}
           value={formData.last_name}
-          onChangeText={(text) => setFormData({ ...formData, last_name: text })}
-          mode="flat"
-          style={[styles.inputField, { flex: 1, marginLeft: 5 }]}
+          onChangeText={(v) => setFormData({ ...formData, last_name: v })}
+          style={styles.input}
+          mode="outlined"
+          activeOutlineColor={COLORS.primary}
         />
       </View>
-
       <TextInput
         label={t("phone", language)}
         value={formData.phone_number}
-        onChangeText={(text) =>
-          setFormData({ ...formData, phone_number: text })
-        }
-        mode="flat"
-        style={styles.inputField}
-        keyboardType="phone-pad"
-      />
-
-      <RadioButton.Group
-        onValueChange={(val) => setFormData({ ...formData, gender: val })}
-        value={formData.gender}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 10,
-            // marginVertical: 10,
-            justifyContent: "center",
-          }}
-        >
-          <RadioButton.Item label={t("male", language)} value="male" />
-          <RadioButton.Item label={t("female", language)} value="female" />
-        </View>
-      </RadioButton.Group>
-
-      {/* <View style={styles.buttonRow}> */}
-      <Button
+        onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
+        style={styles.fullInput}
         mode="outlined"
-        onPress={pickImage}
-        style={[styles.rowButton, { backgroundColor: COLORS.white }]}
-        textColor={COLORS.primary}
-      >
-        {t("change_profile", language)}
-      </Button>
-
+        keyboardType="phone-pad"
+        activeOutlineColor={COLORS.primary}
+      />
+      <View style={styles.radioContainer}>
+        <RadioButton.Group
+          onValueChange={(val) => setFormData({ ...formData, gender: val })}
+          value={formData.gender}
+        >
+          <View style={styles.radioRow}>
+            <View style={styles.radioItem}>
+              <RadioButton value="male" color={COLORS.primary} />
+              <Text>{t("male", language)}</Text>
+            </View>
+            <View style={styles.radioItem}>
+              <RadioButton value="female" color={COLORS.primary} />
+              <Text>{t("female", language)}</Text>
+            </View>
+          </View>
+        </RadioButton.Group>
+      </View>
       <Button
         mode="contained"
-        onPress={() => onSave(formData)}
-        style={[styles.rowButton, { backgroundColor: COLORS.primary }]}
         loading={updating}
-        textColor={COLORS.white}
+        onPress={() => onSave(formData)}
+        style={styles.saveBtn}
       >
         {t("save_changes", language)}
       </Button>
-      {/* </View> */}
     </View>
   );
 }
 
-//==================== Info Row ====================
 function InfoRow({ label, value, icon }) {
   return (
     <View style={styles.infoRow}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {icon && (
-          <MaterialIcons
-            name={icon}
-            size={20}
-            color={COLORS.grey600}
-            style={{ marginRight: 8 }}
-          />
-        )}
-        <Text style={styles.infoLabel}>{label}</Text>
+      <View style={styles.infoIconContainer}>
+        <MaterialIcons name={icon} size={20} color={COLORS.primary} />
       </View>
-      <Text style={styles.infoValue}>{value || "-"}</Text>
+      <View style={styles.infoTextContainer}>
+        <Text style={styles.infoLabel}>{label}</Text>
+        <Text style={styles.infoValue}>{value || "-"}</Text>
+      </View>
     </View>
   );
 }
 
-//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  contentContainer: {
-    flexGrow: 1,
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 20,
-    marginBottom: 0,
-  },
-  profileHeader: { marginTop: 30, alignItems: "center", marginBottom: 10 },
+  headerBackground: { paddingBottom: 50 },
+  profileSection: { alignItems: "center", marginTop: 20 },
+  avatarWrapper: { position: "relative" },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    borderWidth: 4,
-    borderColor: COLORS.primary,
-    marginBottom: 10,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.3)",
   },
-  profileName: { fontSize: 26, fontWeight: "800", color: "#343a40" },
-  profileEmail: { color: COLORS.grey600, fontSize: 14, marginBottom: 10 },
-  editButtonLabel: { fontSize: 14, fontWeight: "700" },
-  tabHeader: {
-    flexDirection: "row",
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.grey300,
-  },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: "center" },
-  tabText: { fontSize: 16, fontWeight: "600", color: COLORS.textDark },
-  activeTab: { borderBottomWidth: 3, borderBottomColor: COLORS.primary },
-  infoCard: {
-    borderRadius: 16,
-    // marginBottom: 80,
-    backgroundColor: COLORS.cardBackground,
+  cameraBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: COLORS.accent,
+    borderRadius: 15,
+    padding: 6,
     elevation: 5,
-    height: "auto",
-    padding: 10,
   },
-  infoCardEdit: {
-    borderRadius: 16,
-
+  userNameText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: COLORS.white,
+    marginTop: 10,
+  },
+  userEmailText: { color: "rgba(255,255,255,0.7)", fontSize: 14 },
+  contentCard: {
+    flex: 1,
     backgroundColor: COLORS.white,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
   },
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: "#F0F2F5",
+    borderRadius: 12,
+    padding: 4,
+    marginTop: -25,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  segmentBtnActive: { backgroundColor: COLORS.white },
+  segmentText: { fontWeight: "600", color: COLORS.grey600 },
+  segmentTextActive: { color: COLORS.primary },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 25,
+    marginBottom: 15,
+  },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primary },
+  editActionText: { color: COLORS.accent, fontWeight: "700" },
   infoRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    backgroundColor: "#F8F9FA",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 12,
   },
-  infoLabel: { fontSize: 15, color: COLORS.grey600, fontWeight: "600" },
-  infoValue: { fontSize: 15, fontWeight: "700", color: "#212529" },
-  logoutButtonContained: {
-    borderRadius: 12,
-    paddingVertical: 6,
-    elevation: 3,
-    marginTop: 10,
-    backgroundColor: COLORS.error,
+  infoIconContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(37, 55, 90, 0.1)",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
   },
-  inputField: { marginBottom: 10, backgroundColor: "transparent" },
-  securityItem: {
+  infoTextContainer: { flex: 1 },
+  infoLabel: {
+    fontSize: 12,
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+  },
+  infoValue: { fontSize: 16, fontWeight: "700", color: COLORS.textDark },
+  securityRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 15,
-    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.borderLight,
   },
-  securityLabel: { fontSize: 16, color: COLORS.textDark },
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-    padding: 0,
+  securityIconBox: { marginRight: 15 },
+  securityLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "500",
+    color: COLORS.textDark,
   },
-  rowButton: { flex: 1, marginTop: 5, borderRadius: 12 },
+  logoutBtn: {
+    marginTop: 20,
+    backgroundColor: COLORS.error,
+    borderRadius: 12,
+    paddingVertical: 5,
+  },
+  editForm: { marginTop: 5 },
+  row: { flexDirection: "row", marginBottom: 12 },
+  input: { flex: 1, backgroundColor: COLORS.white },
+  fullInput: { marginBottom: 12, backgroundColor: COLORS.white },
+  radioContainer: { marginVertical: 10 },
+  radioRow: { flexDirection: "row", justifyContent: "space-around" },
+  radioItem: { flexDirection: "row", alignItems: "center" },
+  saveBtn: {
+    marginTop: 10,
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+    paddingVertical: 5,
+  },
 });
