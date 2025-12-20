@@ -15,22 +15,23 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "white",
-        tabBarStyle: {
-          backgroundColor: "#25375aff",
-          marginBottom: 15,
-          height: 60,
-          marginLeft: 15,
-          marginRight: 15,
-          borderRadius: 50,
-        },
-        tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
-        tabBarItemStyle: {
-          justifyContent: "center",
-          alignItems: "center",
-        },
-      }}
+  headerShown: false,
+  tabBarActiveTintColor: "white",
+  tabBarStyle: {
+    backgroundColor: "#25375aff",
+    position: "absolute",
+    bottom: 10,
+    left: 15,
+    right: 15,
+    height: 60,
+    borderRadius: 50,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
+  tabBarItemStyle: { justifyContent: "center", alignItems: "center" },
+}}
+
     >
       <Tabs.Screen
         name="index"
@@ -38,9 +39,9 @@ export default function TabsLayout() {
           title: t("home", language),
           tabBarIcon: ({ color, focused }) =>
             focused ? (
-              <FontAwesome6 name="house-chimney" size={20} color={color} />
+              <FontAwesome6 name="house-chimney" size={23} color={color} />
             ) : (
-              <FontAwesome6 name="house" size={20} color={color} />
+              <FontAwesome6 name="house" size={23} color={color} />
             ),
         }}
       />
