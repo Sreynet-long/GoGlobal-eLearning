@@ -18,8 +18,11 @@ export default function RootLayout() {
               headerShown: false,
             }}
           >
-            <Stack.Screen name="(tabs)" styles={{getBackgroundColorAsync:"white"}}/>
-            <Stack.Screen name="(auth)" />
+            <Stack.Screen
+              name="(tabs)"
+              // styles={{ getBackgroundColorAsync: "white" }}
+            />
+            <Stack.Screen name="auth" />
           </Stack>
         </AuthProvider>
       </ApolloProvider>

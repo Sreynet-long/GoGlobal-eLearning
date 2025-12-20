@@ -100,7 +100,9 @@ export default {
   password: "ពាក្យសម្ងាត់",
   log_in: "ចូល",
   change_profile_image: "ផ្លាស់ប្តូររូបភាព",
-  change_password:"ផ្លាស់ប្តូរពាក្យសម្ងាត់",
-  terms_conditions:"លក្ខខណ្ឌ",
-  security:"សុវត្ថិភាព"
+  change_password: "ផ្លាស់ប្តូរពាក្យសម្ងាត់",
+  terms_conditions: "លក្ខខណ្ឌ",
+  security: "សុវត្ថិភាព",
+  personal_details: "ព័ត៌មានផ្ទាល់ខ្លួន",
+  settings: "ការកំណត់",
 };

@@ -1,107 +1,303 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
-import { Image, Linking, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Image,
+  Linking,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Card, Text, Title, useTheme } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
 const COMPANY_LOGO = require("../../assets/images/Go_Global_IT_logo.png");
+
 const COLORS = {
-    primary: "#25375A",
-    accent: "#D4AF37",
-    background: "#F7F9FC",
-    white: "#FFFFFF",
-    grey300: "#E0E0E0",
-    grey600: "#757575",
+  primary: "#25375A",
+  accent: "#D4AF37",
+  background: "#F7F9FC",
+  white: "#FFFFFF",
+  grey300: "#E0E0E0",
+  grey600: "#757575",
+  textDark: "#212121",
 };
 
 export default function AboutScreen() {
-    const theme = useTheme();
-    const { language } = useLanguage();
-    const [openItem, setOpenItem] = useState(null);
+  const theme = useTheme();
+  const { language } = useLanguage();
+  const [openItem, setOpenItem] = useState(null);
 
-    const toggleItem = (key) => setOpenItem(openItem === key ? null : key);
+  const toggleItem = (key) => setOpenItem(openItem === key ? null : key);
 
-    const handleCall = () => Linking.openURL("tel:012660981");
-    const handleEmail = () => Linking.openURL("mailto:goglobalit2022@gmail.com");
+  const handleCall = () => Linking.openURL("tel:012660981");
+  const handleEmail = () => Linking.openURL("mailto:goglobalit2022@gmail.com");
 
-    const contactItems = [
-        { key: "phone", label: t("call_us", language), value: "012 660 981", icon: "phone", onPress: handleCall },
-        { key: "email", label: t("email", language), value: "goglobalit2022@gmail.com", icon: "email", onPress: handleEmail },
-        { key: "website", label: t("website", language), value: "https://www.go-globalit.com/", icon: "link", onPress: () => Linking.openURL("https://www.go-globalit.com/") },
-        { key: "facebook", label: t("facebook", language), value: "https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d", icon: "facebook", onPress: () => Linking.openURL("https://www.facebook.com/profile.php?id=100090694682396&mibextid=LQQJ4d") },
-    ];
+  const contactItems = [
+    {
+      key: "phone",
+      label: t("call_us", language),
+      value: "012 660 981",
+      icon: "phone",
+      onPress: handleCall,
+    },
+    {
+      key: "email",
+      label: t("email", language),
+      value: "goglobalit2022@gmail.com",
+      icon: "email",
+      onPress: handleEmail,
+    },
+    {
+      key: "website",
+      label: t("website", language),
+      value: "go-globalit.com",
+      icon: "language",
+      onPress: () => Linking.openURL("https://www.go-globalit.com/"),
+    },
+    {
+      key: "facebook",
+      label: t("facebook", language),
+      value: "Facebook",
+      icon: "facebook",
+      onPress: () =>
+        Linking.openURL(
+          "https://www.facebook.com/profile.php?id=100090694682396"
+        ),
+    },
+  ];
 
-    return (
-        <ScrollView style={[styles.screenContainer, { backgroundColor: theme.colors.background }]} showsVerticalScrollIndicator={false}>
-            <View style={styles.contentContainer}>
-                <View style={styles.logoContainer}>
-                    <Image source={COMPANY_LOGO} style={[styles.logoImage, { borderColor: theme.colors.primary }]} resizeMode="contain" />
-                    <Title style={styles.mainTitle}>{t("about_go_elearning", language)}</Title>
-                </View>
+  return (
+    <View style={styles.screenContainer}>
+      <StatusBar barStyle="light-content" />
 
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Title style={styles.cardTitle}>{t("our_story", language)}</Title>
-                        <Text>{t("our_story_text1", language)}</Text>
-                        <Text>{t("our_story_text2", language)}</Text>
-                    </Card.Content>
-                </Card>
+      <View style={styles.topColorBlock}>
+        <View style={styles.headerContent}>
+          <View style={styles.logoWrapper}>
+            <Image
+              source={COMPANY_LOGO}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Title style={styles.mainTitle}>
+            {t("about_go_elearning", language)}
+          </Title>
+          <Text style={styles.subTitle}>Innovation • Education • Global</Text>
+        </View>
+      </View>
 
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <View style={[styles.missionVisionItem, { paddingBottom: 0 }]}>
-                            <Title style={[styles.cardTitle, { color: theme.colors.primary }]}>{t("our_vision", language)}</Title>
-                            <Text style={styles.missionVisionText}>{t("our_vision_text", language)}</Text>
-                        </View>
-                        <View style={styles.missionVisionItem}>
-                            <Title style={[styles.cardTitle, { color: theme.colors.secondary }]}>{t("our_mission", language)}</Title>
-                            <Text style={styles.missionVisionText}>{t("our_mission_text", language)}</Text>
-                        </View>
-                    </Card.Content>
-                </Card>
-
-                <Card style={[styles.card, styles.contactCard]}>
-                    <Card.Content>
-                        <Title style={styles.cardTitle}>{t("contact_us", language)}</Title>
-                        <View style={styles.contactIconRow}>
-                            {contactItems.map((item) => (
-                                <View key={item.key} style={styles.contactIconButton} onClick={() => toggleItem(item.key)}>
-                                    <MaterialIcons name={item.icon} size={32} color={theme.colors.primary} />
-                                    <Text style={styles.contactLabel}>{item.label}</Text>
-                                </View>
-                            ))}
-                        </View>
-                        {openItem && (
-                            <View style={styles.contactValueContainer}>
-                                <Text style={styles.contactValue} onPress={contactItems.find((i) => i.key === openItem).onPress}>
-                                    {contactItems.find((i) => i.key === openItem).value}
-                                </Text>
-                            </View>
-                        )}
-                    </Card.Content>
-                </Card>
+      <View style={styles.mainContent}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          <Card style={[styles.card, { marginTop: 20 }]}>
+            <Card.Content>
+              <View style={styles.sectionHeader}>
+                <MaterialIcons
+                  name="history-edu"
+                  size={36}
+                  color={COLORS.accent}
+                />
+                <Title style={styles.cardTitle}>
+                  {t("our_story", language)}
+                </Title>
+              </View>
+              <Text style={styles.paragraph}>
+                {t("our_story_text1", language)}
+              </Text>
+              <Text style={styles.paragraph}>
+                {t("our_story_text2", language)}
+              </Text>
+            </Card.Content>
+          </Card>
+          <View style={styles.row}>
+            <View style={[styles.halfCard, { backgroundColor: "#E3F2FD" }]}>
+              <MaterialIcons
+                name="visibility"
+                size={35}
+                color={COLORS.primary}
+              />
+              <Text style={styles.smallTitle}>{t("our_vision", language)}</Text>
+              <Text style={styles.smallText}>
+                {t("our_vision_text", language)}
+              </Text>
             </View>
+            <View style={[styles.halfCard, { backgroundColor: "#FFFDE7" }]}>
+              <MaterialIcons
+                name="rocket-launch"
+                size={35}
+                color={COLORS.accent}
+              />
+              <Text style={styles.smallTitle}>
+                {t("our_mission", language)}
+              </Text>
+              <Text style={styles.smallText}>
+                {t("our_mission_text", language)}
+              </Text>
+            </View>
+          </View>
+
+          <Title style={styles.contactSectionTitle}>
+            {t("contact_us", language)}
+          </Title>
+          <View style={styles.contactGrid}>
+            {contactItems.map((item) => (
+              <TouchableOpacity
+                key={item.key}
+                style={styles.contactItem}
+                onPress={() => {
+                  toggleItem(item.key);
+                  item.onPress();
+                }}
+              >
+                <View style={styles.iconCircle}>
+                  <MaterialIcons
+                    name={item.icon}
+                    size={35}
+                    color={COLORS.primary}
+                  />
+                </View>
+                <Text style={styles.contactLabel}>{item.label}</Text>
+                <Text style={styles.contactValueShort} numberOfLines={1}>
+                  {item.value}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
-    );
+      </View>
+    </View>
+  );
 }
 
-//==================== Styles ====================
 const styles = StyleSheet.create({
-    screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-    contentContainer: { flex: 1, backgroundColor: COLORS.white, borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 16 },
-    card: { marginBottom: 20, borderRadius: 12, elevation: 2 },
-    logoContainer: { alignItems: "center", justifyContent: "center", marginVertical: 20 },
-    logoImage: { width: 80, height: 80, borderWidth: 2, borderRadius: 40, marginBottom: 20 },
-    mainTitle: { fontSize: 28, fontWeight: "700", marginTop: "20" },
-    cardTitle: { fontSize: 20, fontWeight: "700", marginBottom: 10, paddingTop: 20, textAlign: "center" },
-    paragraph: { lineHeight: 22, marginBottom: 10, fontSize: 15 },
-    missionVisionItem: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "rgba(0,0,0,0.05)" },
-    missionVisionText: { fontSize: 16, fontStyle: "italic", paddingLeft: 10 },
-    contactCard: { paddingVertical: 10 },
-    contactIconRow: { flexDirection: "row", justifyContent: "space-around", marginVertical: 10 },
-    contactIconButton: { alignItems: "center", width: 70 },
-    contactValueContainer: { marginTop: 10, alignItems: "center" },
-    contactLabel: { fontSize: 12, textAlign: "center", marginTop: 4 },
-    contactValue: { fontSize: 16, color: COLORS.primary, textDecorationLine: "none", textAlign: "center", borderTopWidth: 2, padding: 20, fontWeight: "bold" },
+  screenContainer: { flex: 1, backgroundColor: COLORS.white },
+
+  topColorBlock: {
+    backgroundColor: COLORS.primary,
+    height: 250,
+    paddingTop: Platform.OS === "ios" ? 50 : 40,
+    alignItems: "center",
+  },
+  headerContent: { alignItems: "center" },
+  logoWrapper: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+  logoImage: { width: 60, height: 60 },
+  mainTitle: {
+    fontSize: 25,
+    fontWeight: "800",
+    color: COLORS.white,
+    marginTop: 12,
+  },
+  subTitle: { color: "rgba(255,255,255,0.6)", fontSize: 15, letterSpacing: 1 },
+
+  mainContent: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    marginTop: -50,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    paddingHorizontal: 20,
+    paddingTop: 5,
+  },
+  card: {
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    elevation: 3,
+    marginBottom: 15,
+    overflow: "hidden",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    gap: 8,
+  },
+  cardTitle: { fontSize: 25, fontWeight: "700", color: COLORS.primary },
+  paragraph: {
+    lineHeight: 20,
+    marginBottom: 12,
+    fontSize: 19,
+    color: COLORS.grey600,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  halfCard: {
+    width: "48%",
+    padding: 15,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  smallTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    marginVertical: 8,
+    color: COLORS.textDark,
+  },
+  smallText: {
+    fontSize: 18,
+    textAlign: "center",
+    color: COLORS.grey600,
+    fontStyle: "italic",
+  },
+  contactSectionTitle: {
+    fontSize: 25,
+    fontWeight: "800",
+    color: COLORS.primary,
+    marginBottom: 15,
+    marginLeft: 5,
+  },
+  contactGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 40,
+  },
+  contactItem: {
+    width: "48%",
+    backgroundColor: "#F8F9FA",
+    borderRadius: 15,
+    padding: 15,
+    alignItems: "center",
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#F1F3F5",
+  },
+  iconCircle: {
+    width: 55,
+    height: 55,
+    borderRadius: 22.5,
+    backgroundColor: "rgba(37, 55, 90, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  contactLabel: { fontSize: 16, color: COLORS.grey600, fontWeight: "600" },
+  contactValueShort: {
+    fontSize: 18,
+    color: COLORS.primary,
+    marginTop: 2,
+    fontWeight: "700",
+  },
 });
