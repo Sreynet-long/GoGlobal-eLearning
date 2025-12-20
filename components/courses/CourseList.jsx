@@ -49,7 +49,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   if (isInitialLoading)
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#58589bff" />
+        <ActivityIndicator size="large" color="#0404d8ff" />
       </View>
     );
 
@@ -64,7 +64,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     <View>
       <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
 
-      {isRefetching && (
+      {isInitialLoading && (
         <ActivityIndicator size="small" style={{ marginVertical: 10 }} />
       )}
 
@@ -122,7 +122,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
@@ -130,6 +130,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                 <Text style={{ fontSize: 20 }}>✕</Text>
               </TouchableOpacity>
               <Divider />
+              <ScrollView showsVerticalScrollIndicator={false}>
               {selectedCourse && (
                 <>
                   <Image
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 250,
+    marginTop: 195,
   },
   emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
   modalOverlay: {

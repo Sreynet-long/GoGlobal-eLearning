@@ -3,53 +3,72 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState } from "react";
 
-export default function EnrolledButton() {
+export default function EnrolledButton({course, onSuccess}) {
   const { language } = useLanguage();
   const { isAuth } = useAuth();
+  
+  const handleEnroll = async (course) => {
+  try {
+    const stored = await AsyncStorage.getItem("enrolledCourses");
+    const enrolled = stored ? JSON.parse(stored) : [];
 
-  const handleEnroll = async () => {
-    if (!isAuth) {
-      Alert.alert(t("please_login_first", language));
+    // prevent duplicate enroll
+    const exists = enrolled.find((c) => c._id === course._id);
+    if (exists) {
+      Alert.alert("Information", "You already enrolled this course");
       return;
     }
-    try {
-      const enrollCourse =
-        JSON.parse(await AsyncStorage.getItem("enrollCourse")) || [];
-      if (!enrollCourse.includes(course._id)) {
-        enrollCourse.push(course._id);
-        await AsyncStorage.setItem(
-          "enrollCourse",
-          JSON.stringify(enrollCourse)
-        );
-        Alert.alert(t("enroll_successful", language));
-        if (onSuccess) onSuccess();
-      } else {
-        Alert.alert(t("already_enrolled", language));
-      }
-    } catch (error) {
-      console.error("Error enrolling in course:", error);
-      Alert.alert(t("enroll_failed", language));
+
+    const enrolledCourses = {
+      ...course,
+      process: 0,
     }
-  };
+    enrolled.push(enrolledCourses);
+    await AsyncStorage.setItem(
+      "enrolledCourses",
+      JSON.stringify(enrolled)
+    );
+
+    Alert.alert("Success", "Course enrolled successfully");
+    onSuccess?.()
+    setModalVisible(false);
+  } catch (err) {
+    console.log("Enroll error:", err);
+    Alert.alert("Error", "Failed to enroll course");
+  }
+};
+
 
   return (
-    <TouchableOpacity  style={{
-        backgroundColor: "#213292ff",
-        marginTop: 15,
-        padding: 14,
-        borderRadius: 8,
-        alignItems: "center",
-      }} onPress={handleEnroll}>
-      <Text
-        style={{
-          alignItems: "center",
-          color: "#fff",    
-          fontSize: 16,
-        }}
-      >
-        {t("confirm_enroll", language) || "Confirm Enroll"}
-      </Text>
-    </TouchableOpacity>
+    <TouchableOpacity
+  style={styles.cartButton}
+  onPress={() => {
+    if (!isAuth) {
+      Alert.alert("Login required", "Please login first");
+      return;
+    }
+    handleEnroll(course);
+  }}
+>
+  <Text style={styles.cartText}>
+    {t("confirm_enroll", language)}
+  </Text>
+</TouchableOpacity>
   );
 }
+
+const styles = {
+  cartButton: {
+    backgroundColor: "#58589bff", 
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  cartText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+};
