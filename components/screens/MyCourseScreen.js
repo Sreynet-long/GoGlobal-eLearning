@@ -8,8 +8,7 @@ import { useLanguage } from "../../context/LanguageContext";
 
 export default function MyCourseScreen() {
   const { language } = useLanguage();
-  const [searchText, setSearchText] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   return (
     <View style={styles.screenContainer}>
@@ -17,13 +16,14 @@ export default function MyCourseScreen() {
 
       <View style={styles.contentContainer}>
         <Search
-          value={searchText}
-          onChange={setSearchText}
-         placeholder={language === "en" ? "Search courses" : "ស្វែងរកវគ្គសិក្សា"} />
+          placeholder={
+            language === "en" ? "Search courses" : "ស្វែងរកវគ្គសិក្សា"
+          }
+        />
 
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
           <FeatureCategory
-            onSelectedCategory={setSelectedCategoryId}
+            onSelectedCategory={setSelectedCategory}
             language={language}
           />
         </View>
@@ -33,8 +33,7 @@ export default function MyCourseScreen() {
           showsVerticalScrollIndicator={false}
         >
           <EnrolledCourses
-            selectedCategoryId={selectedCategoryId}
-            searchText={searchText}
+            selectedCategory={selectedCategory}
             language={language}
           />
         </ScrollView>

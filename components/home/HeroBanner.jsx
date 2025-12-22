@@ -12,9 +12,9 @@ import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
 const { width: screenWidth } = Dimensions.get("window");
-const SLIDE_WIDTH = screenWidth - 32;
+const SLIDE_MARGIN = 16;
+const SLIDE_WIDTH = screenWidth - SLIDE_MARGIN * 2;
 const AUTOSCROLL_INTERVAL = 4000;
-const SCROLL_DELAY = 100;
 
 const HeroBanner = () => {
   const { language } = useLanguage();
@@ -43,19 +43,10 @@ const HeroBanner = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef(null);
 
-  const handleScroll = (event) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.round(contentOffsetX / SLIDE_WIDTH);
-    setActiveIndex(newIndex);
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
-      scrollRef.current?.scrollTo({
-        x: nextIndex * SLIDE_WIDTH,
-        animated: true,
-      });
+      scrollRef.current?.scrollTo({ x: nextIndex * SLIDE_WIDTH, animated: true });
       setActiveIndex(nextIndex);
     }, AUTOSCROLL_INTERVAL);
 
@@ -68,19 +59,17 @@ const HeroBanner = () => {
         ref={scrollRef}
         horizontal
         pagingEnabled
+        scrollEnabled={false} // Auto-scroll only
         showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        scrollEnabled={false}
       >
         {BANNER_DATA.map((item) => (
           <ImageBackground
             key={item.id}
             source={item.image}
             style={[styles.slide, { width: SLIDE_WIDTH }]}
-            imageStyle={{ borderRadius: 12 }}
+            imageStyle={{ borderRadius: 20 }}
           >
-            <View style={styles.textOverlay}>
+            <View style={styles.gradientOverlay}>
               <Text style={styles.slideTitle}>{item.title}</Text>
               <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
               <TouchableOpacity style={styles.slideButton}>
@@ -97,7 +86,10 @@ const HeroBanner = () => {
         {BANNER_DATA.map((_, index) => (
           <View
             key={index}
-            style={[styles.dot, { opacity: index === activeIndex ? 1 : 0.5 }]}
+            style={[
+              styles.dot,
+              index === activeIndex && styles.activeDot,
+            ]}
           />
         ))}
       </View>
@@ -107,40 +99,52 @@ const HeroBanner = () => {
 
 const styles = StyleSheet.create({
   carouselContainer: {
-    height: 160,
-    marginBottom: 15,
+    marginVertical: 5,
+    height: 200,
   },
   slide: {
-    height: 160,
-    justifyContent: "center",
-    padding: 20,
-    borderRadius: 12,
+    height: 200,
+    // marginHorizontal: SLIDE_MARGIN / 2,
+    justifyContent: "flex-end",
     overflow: "hidden",
+    borderRadius: 20,
+    elevation: 5,
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
-  textOverlay: {
-    justifyContent: "center",
+  gradientOverlay: {
+    backgroundColor: "rgba(0,0,0,0.35)",
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   slideTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#FFD700", 
     marginBottom: 4,
   },
   slideSubtitle: {
     fontSize: 14,
     color: "#fff",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   slideButton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#ffffffff",
     paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    borderRadius: 25,
     alignSelf: "flex-start",
-    marginTop: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   slideButtonText: {
-    color: "#25375aff",
+    color: "#25375A",
     fontWeight: "bold",
     fontSize: 14,
   },
@@ -151,11 +155,19 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   dot: {
-    backgroundColor: "#fff",
     width: 8,
     height: 8,
     borderRadius: 4,
+    backgroundColor: "#fff",
     marginHorizontal: 4,
+    opacity: 0.5,
+  },
+  activeDot: {
+    width: 16,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#3fe947ff", 
+    opacity: 1,
   },
 });
 

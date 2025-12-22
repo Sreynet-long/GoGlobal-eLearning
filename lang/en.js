@@ -119,4 +119,6 @@ export default {
   didnt_receive_code: "Didn't Receive Any Code?",
   resend_code: "Resend Code!",
   back_to_login: "Back to Login",
+  back_to_forgot_password:"Back to Forgot Password.",
+  RESUME_LEARNING:"RESUME LEARNING"
 };

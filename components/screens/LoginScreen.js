@@ -27,15 +27,14 @@ import {
   MOBILE_REGISTER_ACCOUNT,
 } from "../../schema/login";
 
-const COMPANY_LOGO = require("../../assets/images/Go_Global_IT_logo.png");
-
 const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
   white: "#FFFFFF",
   error: "#D32F2F",
-  grey600: "#757575",
-  background: "#F7F9FC",
+  grey200: "#E2E8F0",
+  grey600: "#64748B",
+  background: "#F8FAFC",
 };
 
 export default function LoginScreen() {
@@ -51,12 +50,9 @@ export default function LoginScreen() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-
   const [fetchUser] = useLazyQuery(GET_USER_BY_ID, {
     fetchPolicy: "network-only",
-    onCompleted: (data) => {
-      if (data?.getUserById) setUser(data.getUserById);
-    },
+    onCompleted: (data) => { if (data?.getUserById) setUser(data.getUserById); },
   });
 
   const [loginMutation] = useMutation(MOBILE_LOGIN, {
@@ -66,15 +62,10 @@ export default function LoginScreen() {
         await fetchUser();
         resetForm();
       } else {
-        const msg =
-          data?.mobileLogin?.message?.[`message${language.toUpperCase()}`] ||
-          t("invalid_email_password", language);
-        setError(msg);
+        setError(data?.mobileLogin?.message?.[`message${language.toUpperCase()}`] || t("invalid_email_password", language));
       }
     },
-    onError: (err) => {
-      setError(err.message || t("invalid_email_password", language));
-    },
+    onError: (err) => setError(err.message || t("invalid_email_password", language)),
   });
 
   const [signupMutation] = useMutation(MOBILE_REGISTER_ACCOUNT, {
@@ -83,54 +74,31 @@ export default function LoginScreen() {
         await login(data.mobileRegisterAccount.data.token);
         await fetchUser();
         resetForm();
-      } else
-        setError(
-          data?.mobileRegisterAccount?.message?.[
-            `message${language.toUpperCase()}`
-          ]
-        );
+      } else {
+        setError(data?.mobileRegisterAccount?.message?.[`message${language.toUpperCase()}`]);
+      }
     },
     onError: (err) => setError(err.message),
   });
 
   const resetForm = () => {
-    setFirstName("");
-    setLastName("");
-    setPhone("");
-    setGender("");
-    setEmail("");
-    setPassword("");
-    setAgreeTerms(false);
-    setError("");
+    setFirstName(""); setLastName(""); setPhone(""); setGender("");
+    setEmail(""); setPassword(""); setAgreeTerms(false); setError("");
   };
 
   const handleAuth = () => {
     setError("");
-    if (!email || !password)
-      return setError(t("email_password_required", language));
+    if (!email || !password) return setError(t("email_password_required", language));
     if (isSignUp) {
-      if (!firstName || !lastName || !phone || !gender)
-        return setError(t("complete_all_fields", language));
+      if (!firstName || !lastName || !phone || !gender) return setError(t("complete_all_fields", language));
       if (!agreeTerms) return setError(t("agree_terms_required", language));
-      signupMutation({
-        variables: {
-          input: {
-            first_name: firstName,
-            last_name: lastName,
-            phone_number: phone,
-            email,
-            password,
-            gender: gender.toLowerCase(),
-          },
-        },
-      });
-    } else loginMutation({ variables: { email, password } });
+      signupMutation({ variables: { input: { first_name: firstName, last_name: lastName, phone_number: phone, email, password, gender: gender.toLowerCase() } } });
+    } else {
+      loginMutation({ variables: { email, password } });
+    }
   };
 
-  const toggleForm = () => {
-    setIsSignUp(!isSignUp);
-    resetForm();
-  };
+  const toggleForm = () => { setIsSignUp(!isSignUp); resetForm(); };
 
   if (loading || isAuth) return null;
 
@@ -140,158 +108,138 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <StatusBar barStyle="light-content" />
+      <View style={styles.headerBlock}><Topbar /></View>
 
-      <View style={styles.headerBlock}>
-        <Topbar />
-        <View style={styles.headerInfo}>
-          {/* <View style={styles.logoCircle}>
-            <Image
-              source={COMPANY_LOGO}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View> */}
-          <Text style={styles.headerTitle}>
-            {isSignUp
-              ? t("create_account", language)
-              : t("welcome_back", language)}
-          </Text>
-          <Text style={styles.headerSubtitle}>
-            {isSignUp
-              ? t("join_us_today", language)
-              : t("please_login_to_continue", language)}
-          </Text>
-        </View>
-      </View>
       <View style={styles.mainContainer}>
         <ScrollView
-          contentContainerStyle={styles.scrollPadding}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>
+              {isSignUp ? t("create_account", language) : t("welcome_back", language)}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              {isSignUp ? t("join_us_today", language) : t("please_login_to_continue", language)}
+            </Text>
+          </View>
+
           {error && (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
 
-          {isSignUp && (
-            <View style={styles.formSection}>
-              <View style={styles.row}>
+          <View style={styles.formContainer}>
+            {isSignUp && (
+              <>
+                <View style={styles.row}>
+                  <TextInput
+                    label={t("first_name", language)}
+                    mode="outlined"
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    style={styles.flexInput}
+                    outlineStyle={styles.inputOutline}
+                  />
+                  <TextInput
+                    label={t("last_name", language)}
+                    mode="outlined"
+                    value={lastName}
+                    onChangeText={setLastName}
+                    style={styles.flexInput}
+                    outlineStyle={styles.inputOutline}
+                  />
+                </View>
+
                 <TextInput
-                  label={t("first_name", language)}
+                  label={t("phone", language)}
                   mode="outlined"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  style={styles.flexInput}
-                  outlineColor={COLORS.grey600}
-                  activeOutlineColor={COLORS.primary}
+                  value={phone}
+                  onChangeText={setPhone}
+                  style={styles.inputSpacing}
+                  keyboardType="phone-pad"
+                  outlineStyle={styles.inputOutline}
                 />
-                <TextInput
-                  label={t("last_name", language)}
-                  mode="outlined"
-                  value={lastName}
-                  onChangeText={setLastName}
-                  style={styles.flexInput}
-                  outlineColor={COLORS.grey600}
-                  activeOutlineColor={COLORS.primary}
-                />
-              </View>
 
-              <TextInput
-                label={t("phone", language)}
-                mode="outlined"
-                value={phone}
-                onChangeText={setPhone}
-                style={styles.inputSpacing}
-                keyboardType="phone-pad"
-                outlineColor={COLORS.grey600}
-                activeOutlineColor={COLORS.primary}
-              />
+                <View style={styles.genderContainer}>
+                  <Text style={styles.genderLabel}>{t("gender", language)}</Text>
+                  <RadioButton.Group value={gender} onValueChange={setGender}>
+                    <View style={styles.radioRow}>
+                      {["MALE", "FEMALE", "OTHER"].map((g) => (
+                        <TouchableOpacity 
+                          key={g} 
+                          style={styles.radioItem} 
+                          onPress={() => setGender(g)}
+                        >
+                          <RadioButton value={g} color={COLORS.primary} />
+                          <Text style={styles.radioText}>{t(g.toLowerCase(), language)}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </RadioButton.Group>
+                </View>
+              </>
+            )}
 
-              <View style={styles.radioContainer}>
-                <Text style={styles.radioLabel}>{t("gender", language)}</Text>
-                <RadioButton.Group value={gender} onValueChange={setGender}>
-                  <View style={styles.radioRow}>
-                    {["MALE", "FEMALE", "OTHER"].map((g) => (
-                      <View key={g} style={styles.radioItem}>
-                        <RadioButton value={g} color={COLORS.primary} />
-                        <Text style={styles.radioText}>
-                          {t(g.toLowerCase(), language)}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </RadioButton.Group>
-              </View>
-            </View>
-          )}
+            <TextInput
+              label={t("email", language)}
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.inputSpacing}
+              autoCapitalize="none"
+              outlineStyle={styles.inputOutline}
+              left={<TextInput.Icon icon="email-outline" color={COLORS.grey600} />}
+            />
 
-          <TextInput
-            label={t("email", language)}
-            mode="outlined"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.inputSpacing}
-            autoCapitalize="none"
-            outlineColor={COLORS.grey600}
-            activeOutlineColor={COLORS.primary}
-          />
-          <TextInput
-            label={t("password", language)}
-            mode="outlined"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            style={styles.inputSpacing}
-            outlineColor={COLORS.grey600}
-            activeOutlineColor={COLORS.primary}
-          />
+            <TextInput
+              label={t("password", language)}
+              mode="outlined"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              style={styles.inputSpacing}
+              outlineStyle={styles.inputOutline}
+              left={<TextInput.Icon icon="lock-outline" color={COLORS.grey600} />}
+            />
 
-          {isSignUp && (
-            <TouchableOpacity
-              style={styles.checkboxArea}
-              onPress={() => setAgreeTerms(!agreeTerms)}
-              activeOpacity={0.7}
+            {isSignUp && (
+              <TouchableOpacity
+                style={styles.checkboxArea}
+                onPress={() => setAgreeTerms(!agreeTerms)}
+                activeOpacity={0.7}
+              >
+                <Checkbox status={agreeTerms ? "checked" : "unchecked"} color={COLORS.primary} />
+                <Text style={styles.checkboxText}>{t("agree_terms", language)}</Text>
+              </TouchableOpacity>
+            )}
+
+            <Button
+              mode="contained"
+              onPress={handleAuth}
+              style={styles.mainButton}
+              contentStyle={styles.buttonContent}
             >
-              <Checkbox
-                status={agreeTerms ? "checked" : "unchecked"}
-                color={COLORS.primary}
-              />
-              <Text style={styles.checkboxText}>
-                {t("agree_terms", language)}
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          <Button
-            mode="contained"
-            onPress={handleAuth}
-            style={styles.mainButton}
-            contentStyle={{ paddingVertical: 6 }}
-          >
-            {isSignUp ? t("sign_up", language) : t("log_in", language)}
-          </Button>
+              {isSignUp ? t("sign_up", language) : t("log_in", language)}
+            </Button>
+          </View>
 
           <View style={styles.footerActions}>
             {!isSignUp && (
               <Button
                 onPress={() => router.push("/auth/forgot-password")}
                 textColor={COLORS.primary}
-                labelStyle={{ fontWeight: "700" }}
+                labelStyle={styles.forgotBtnLabel}
               >
                 {t("forgot_password", language)}
               </Button>
             )}
 
-            <TouchableOpacity
-              onPress={toggleForm}
-              style={styles.toggleTextContainer}
-            >
+            <TouchableOpacity onPress={toggleForm} style={styles.toggleTextContainer}>
               <Text style={styles.greyText}>
-                {isSignUp
-                  ? t("already_have_account", language)
-                  : t("dont_have_account", language)}
+                {isSignUp ? t("already_have_account", language) : t("dont_have_account", language)}{" "}
                 <Text style={styles.accentText}>
                   {isSignUp ? t("log_in", language) : t("sign_up", language)}
                 </Text>
@@ -306,98 +254,104 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  headerBlock: {
-    paddingBottom: 60,
-  },
-  headerInfo: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.white,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-    elevation: 5,
-  },
-  logo: { width: 50, height: 50 },
-  headerTitle: { fontSize: 26, fontWeight: "800", color: COLORS.white },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.7)",
-    fontSize: 14,
-    marginTop: 4,
-  },
+  headerBlock: { paddingBottom: 10 },
+  
   mainContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    marginTop: -40,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     overflow: "hidden",
-    justifyContent: "center",
-    alignContent: "center",
   },
-  scrollPadding: {
+
+  scrollContent: {
     paddingHorizontal: 25,
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingTop: 0,
+    paddingBottom: 90,
+    flexGrow: 1,
+    justifyContent: "center", 
   },
-  errorBox: {
-    backgroundColor: "#FFEBEE",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
-  },
-  errorText: { color: COLORS.error, fontWeight: "600" },
 
-  formSection: { marginBottom: 10 },
-  row: { flexDirection: "row", gap: 12, marginBottom: 12 },
-  flexInput: { flex: 1, backgroundColor: COLORS.white },
-  inputSpacing: { marginBottom: 5, backgroundColor: COLORS.white },
-
-  radioContainer: {
+  headerInfo: {
+    alignItems: "center",
     marginBottom: 15,
-    backgroundColor: "#F8F9FA",
-    padding: 12,
-    borderRadius: 12,
   },
-  radioLabel: {
-    fontSize: 13,
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: COLORS.primary,
+    textAlign: "center",
+  },
+  headerSubtitle: {
+    fontSize: 15,
+    color: COLORS.grey600,
+    marginTop: 0,
+    textAlign: "center",
+  },
+
+  errorBox: {
+    backgroundColor: "#FEF2F2",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#FEE2E2",
+    alignItems: "center",
+  },
+  errorText: { color: COLORS.error, fontWeight: "600", textAlign: "center" },
+
+  formContainer: {
+    width: "100%",
+  },
+  row: { flexDirection: "row", gap: 12, marginBottom: 10 },
+  flexInput: { flex: 1, backgroundColor: COLORS.white },
+  inputSpacing: { marginBottom: 15, backgroundColor: COLORS.white },
+  inputOutline: { borderRadius: 12, borderColor: COLORS.grey200 },
+
+  genderContainer: {
+    marginBottom: 10,
+    backgroundColor: COLORS.background,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.grey200,
+  },
+  genderLabel: {
+    fontSize: 14,
     color: COLORS.grey600,
     marginBottom: 5,
-    fontWeight: "600",
+    fontWeight: "700",
   },
-  radioRow: { flexDirection: "row", justifyContent: "space-around" },
+  radioRow: { flexDirection: "row", justifyContent: "space-between" },
   radioItem: { flexDirection: "row", alignItems: "center" },
-  radioText: { fontSize: 14, color: COLORS.primary },
+  radioText: { fontSize: 14, color: COLORS.primary, fontWeight: "500" },
 
   checkboxArea: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
-    marginLeft: -8,
+    marginBottom: 10,
   },
-  checkboxText: { fontSize: 14, color: COLORS.grey600 },
+  checkboxText: { fontSize: 14, color: COLORS.grey600, fontWeight: "500" },
 
   mainButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 14,
-    marginTop: 10,
-    elevation: 2,
+    borderRadius: 16,
+    elevation: 0,
+    shadowColor: "transparent",
   },
+  buttonContent: {
+    height: 54,
+  },
+
   footerActions: {
     marginTop: 20,
     alignItems: "center",
   },
+  forgotBtnLabel: { fontWeight: "700", fontSize: 14 },
   toggleTextContainer: {
     marginTop: 0,
-    padding: 10,
+    padding: 0,
   },
-  greyText: { color: COLORS.grey600, fontSize: 14 },
+  greyText: { color: COLORS.grey600, fontSize: 15, textAlign: "center" },
   accentText: { color: COLORS.primary, fontWeight: "800" },
 });

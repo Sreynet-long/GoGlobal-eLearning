@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons"; // Added for back icon
 import { useRouter } from "expo-router";
 import {
   Image,
@@ -13,15 +14,13 @@ import Flag_kh from "../../assets/flags/kh.png";
 import { useLanguage } from "../../context/LanguageContext";
 import Notification from "./Notification";
 
-// Better handling for safe area heights
-const STATUS_BAR_HEIGHT =
-  Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 0) + 20;
+const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 0) + 15;
 
 const COLORS = {
   primary: "#25375A",
   white: "#FFFFFF",
-  glass: "rgba(255, 255, 255, 0.15)",
-  border: "rgba(255, 255, 255, 0.3)",
+  glass: "rgba(255, 255, 255, 0.12)",
+  border: "rgba(255, 255, 255, 0.2)",
 };
 
 export default function Topbar({ showBack = false }) {
@@ -32,76 +31,64 @@ export default function Topbar({ showBack = false }) {
     changeLanguage(language === "en" ? "kh" : "en");
   };
 
-  const flagSource = language === "en" ? Flag_en : Flag_kh;
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)");
+    }
+  };
 
   return (
     <View style={styles.topContainer}>
       <View style={styles.header}>
-        {/* Left Section */}
-        <View style={styles.left}>
-          {showBack ? (
-            <TouchableOpacity
-              onPress={() => {
-                if (router.canGoBack()) {
-                  router.back();
-                } else {
-                  router.replace("/(tabs)");
-                }
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.brandGroup}>
-                <View style={styles.logoCircle}>
-                  <Image
-                    source={require("../../assets/images/Go_Global_IT_logo.png")}
-                    style={styles.logo}
-                  />
-                </View>
-                <View>
-                  <Text style={styles.brandText}>GO eLEARNING</Text>
-                  <View style={styles.onlineIndicator}>
-                    <Text style={styles.statusText}>
-                      Innovation • Education • Global
-                    </Text>
-                  </View>
-                </View>
-              </View>
+        
+        {/* Left Section: Back / Logo / Brand */}
+        <View style={styles.leftSide}>
+          {showBack && (
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <Ionicons name="chevron-back" size={24} color={COLORS.white} />
             </TouchableOpacity>
-          ) : (
-            <View style={styles.brandGroup}>
-              <View style={styles.logoCircle}>
-                <Image
-                  source={require("../../assets/images/Go_Global_IT_logo.png")}
-                  style={styles.logo}
-                />
-              </View>
-              <View>
-                <Text style={styles.brandText}>GO eLEARNING</Text>
-                <View style={styles.onlineIndicator}>
-                  <Text style={styles.statusText}>
-                    Innovation • Education • Global
-                  </Text>
-                </View>
+          )}
+
+          <View style={styles.brandGroup}>
+            <View style={styles.logoBox}>
+              <Image
+                source={require("../../assets/images/Go_Global_IT_logo.png")}
+                style={styles.logo}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.brandTitle}>GO <Text style={styles.lightText}>eLEARNING</Text></Text>
+              <View style={styles.statusRow}>
+                {/* <View style={styles.pulseDot} /> */}
+                <Text style={styles.statusText}>
+Innovation • Education • Global</Text>
               </View>
             </View>
-          )}
-        </View>
-
-        {/* Right Section */}
-        <View style={styles.right}>
-          <TouchableOpacity
-            style={styles.glassChip}
-            onPress={toggleLanguage}
-            activeOpacity={0.8}
-          >
-            <Image source={flagSource} style={styles.flag} />
-            <Text style={styles.langCode}>{language.toUpperCase()}</Text>
-          </TouchableOpacity>
-
-          <View style={styles.notificationWrapper}>
-            <Notification />
           </View>
         </View>
+
+        {/* Right Section: Utilities */}
+        <View style={styles.rightSide}>
+          <View style={styles.utilityBar}>
+            <TouchableOpacity 
+              style={styles.langToggle} 
+              onPress={toggleLanguage}
+              activeOpacity={0.7}
+            >
+              <Image source={language === "en" ? Flag_en : Flag_kh} style={styles.flag} />
+              <Text style={styles.langText}>{language.toUpperCase()}</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.divider} />
+            
+            <View style={styles.notifIcon}>
+              <Notification />
+            </View>
+          </View>
+        </View>
+
       </View>
     </View>
   );
@@ -111,105 +98,120 @@ const styles = StyleSheet.create({
   topContainer: {
     backgroundColor: COLORS.primary,
     paddingTop: STATUS_BAR_HEIGHT,
-    paddingBottom: 30,
-    // paddingTop: 10,
+    paddingBottom: 20,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
-  left: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  brandGroup: {
+  leftSide: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  logoCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.white,
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: COLORS.glass,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 4,
-  },
-  logo: {
-    width: 45,
-    height: 45,
-    resizeMode: "contain",
-  },
-  brandText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: COLORS.white,
-    letterSpacing: 0.5,
-  },
-  onlineIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: -2,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#4CAF50",
-  },
-  statusText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.6)",
-    fontWeight: "600",
-  },
-  circleBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.glass,
     borderWidth: 1,
     borderColor: COLORS.border,
-    justifyContent: "center",
-    alignItems: "center",
   },
-  right: {
+  brandGroup: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  glassChip: {
+  logoBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  logo: {
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
+  },
+  textContainer: {
+    justifyContent: "center",
+  },
+  brandTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: COLORS.white,
+    letterSpacing: -0.2,
+  },
+  lightText: {
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.8)",
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginTop: 2,
+  },
+  pulseDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: "#4ade80", // Bright green
+  },
+  statusText: {
+    fontSize: 9,
+    color: "rgba(255,255,255,0.5)",
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  rightSide: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  utilityBar: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.glass,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
+    paddingHorizontal: 4,
+    height: 40,
+  },
+  langToggle: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 20,
     gap: 6,
   },
   flag: {
-    width: 20,
-    height: 14,
+    width: 18,
+    height: 12,
     borderRadius: 2,
-    resizeMode: "cover",
   },
-  langCode: {
+  langText: {
     color: COLORS.white,
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 11,
+    fontWeight: "800",
   },
-  notificationWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.glass,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  divider: {
+    width: 1,
+    height: 20,
+    backgroundColor: COLORS.border,
+  },
+  notifIcon: {
+    width: 36,
+    height: 36,
     justifyContent: "center",
     alignItems: "center",
   },

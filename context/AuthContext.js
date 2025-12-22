@@ -49,13 +49,13 @@ export const AuthProvider = ({ children }) => {
           setUser(fetchedUser);
         } catch (err) {
           console.error("Failed to fetch user:", err);
-          await removeToken(); // remove invalid token
+          await removeToken();
           setIsAuth(false);
           setUser(null);
-          router.replace("/auth"); // send to login screen
+          // router.replace("/auth");
         }
       } else {
-        router.replace("/auth"); // if no token, go to login
+        // router.replace("/auth");
       }
 
       setLoading(false);
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     await setToken(token);
     setIsAuth(true);
     if (fetchedUser) setUser(fetchedUser);
-    router.replace("/"); // redirect to main tabs
+    router.replace("/");
   };
 
   // ------------------- Logout -------------------
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
     await removeToken();
     setIsAuth(false);
     setUser(null);
-    router.replace("/auth"); // redirect to login
+    router.replace("/");
   };
 
   return (

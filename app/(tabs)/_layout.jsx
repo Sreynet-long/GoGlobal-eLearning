@@ -4,6 +4,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { Tabs } from "expo-router";
+import { Platform, StyleSheet, View } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -16,34 +17,48 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "white",
+        tabBarShowLabel: true, 
+        tabBarActiveTintColor: "#25375A", 
+        tabBarInactiveTintColor: "#94a3b8", 
         tabBarStyle: {
-          backgroundColor: "#25375aff",
+          backgroundColor: "#ffffff",
           position: "absolute",
-          bottom: 35,
-          left: 15,
-          right: 15,
-          height: 60,
-          borderRadius: 50,
-          elevation: 0,
-          shadowOpacity: 0,
-          marginRight: 10,
-          marginLeft: 10,
+          bottom: 25,
+          left: 20,
+          right: 20,
+          height: 75,
+          borderRadius: 24, 
+          paddingBottom: 12,
+          paddingTop: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+          elevation: 5,
+          borderWidth: 1,
+          borderColor: "#f1f5f9",
+          ...Platform.select({
+            ios: { borderTopWidth: 0 },
+            android: { borderTopWidth: 0 },
+          }),
         },
-        tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
-        tabBarItemStyle: { justifyContent: "center", alignItems: "center" },
+        tabBarLabelStyle: { 
+          fontWeight: "700", 
+          fontSize: 10, 
+          marginTop: 2, 
+          textTransform: 'capitalize', 
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t("home", language),
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <FontAwesome6 name="house-chimney" size={23} color={color} />
-            ) : (
-              <FontAwesome6 name="house" size={23} color={color} />
-            ),
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeTab : styles.inactiveTab}>
+              <FontAwesome6 name={focused ? "house-chimney" : "house"} size={22} color={color} />
+            </View>
+          ),
         }}
       />
 
@@ -51,20 +66,15 @@ export default function TabsLayout() {
         name="courses"
         options={{
           title: t("courses", language),
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <MaterialCommunityIcons
-                name="book-open-page-variant"
-                size={24}
-                color={color}
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeTab : styles.inactiveTab}>
+              <MaterialCommunityIcons 
+                name={focused ? "book-open-page-variant" : "book-education"} 
+                size={24} 
+                color={color} 
               />
-            ) : (
-              <MaterialCommunityIcons
-                name="book-education"
-                size={24}
-                color={color}
-              />
-            ),
+            </View>
+          ),
         }}
       />
 
@@ -72,26 +82,19 @@ export default function TabsLayout() {
         name="myCourses&Login"
         options={{
           title: isAuth ? t("my_courses", language) : t("login", language),
-          tabBarIcon: ({ color, focused }) =>
-            isAuth ? (
-              focused ? (
-                <MaterialCommunityIcons
-                  name="book-open-page-variant"
-                  size={24}
-                  color={color}
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeTab : styles.inactiveTab}>
+              {isAuth ? (
+                <MaterialCommunityIcons 
+                  name={focused ? "book-open-page-variant" : "book-heart"} 
+                  size={24} 
+                  color={color} 
                 />
               ) : (
-                <MaterialCommunityIcons
-                  name="book-heart"
-                  size={24}
-                  color={color}
-                />
-              )
-            ) : focused ? (
-              <FontAwesome5 name="door-open" size={22} color={color} />
-            ) : (
-              <FontAwesome5 name="door-closed" size={22} color={color} />
-            ),
+                <FontAwesome5 name={focused ? "door-open" : "door-closed"} size={20} color={color} />
+              )}
+            </View>
+          ),
         }}
       />
 
@@ -99,20 +102,32 @@ export default function TabsLayout() {
         name="account&Aboutus"
         options={{
           title: isAuth ? t("account", language) : t("about_us", language),
-          tabBarIcon: ({ color, focused }) =>
-            isAuth ? (
-              focused ? (
-                <FontAwesome6 name="user-graduate" size={22} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeTab : styles.inactiveTab}>
+              {isAuth ? (
+                <FontAwesome6 name={focused ? "user-graduate" : "user-large"} size={20} color={color} />
               ) : (
-                <FontAwesome6 name="user-large" size={21} color={color} />
-              )
-            ) : focused ? (
-              <FontAwesome name="question-circle" size={24} color={color} />
-            ) : (
-              <FontAwesome name="question-circle-o" size={24} color={color} />
-            ),
+                <FontAwesome name={focused ? "question-circle" : "question-circle-o"} size={22} color={color} />
+              )}
+            </View>
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  activeTab: {
+    backgroundColor: '#25375A10', 
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginBottom: 2, 
+  },
+  inactiveTab: {
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    marginBottom: 2,
+  }
+});

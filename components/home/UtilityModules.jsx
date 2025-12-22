@@ -4,37 +4,30 @@ import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
 const ModuleTile = ({ title, iconName, color }) => (
-  <TouchableOpacity style={styles.moduleTile}>
-    <Ionicons name={iconName} size={30} color={color} />
-    <Text style={styles.moduleTitle}>{title}</Text>
+  <TouchableOpacity activeOpacity={0.6} style={styles.moduleTile}>
+    <View style={[styles.iconCircle, { backgroundColor: `${color}10` }]}>
+      <Ionicons name={iconName} size={24} color={color} />
+    </View>
+    <Text style={styles.moduleTitle} numberOfLines={2}>
+      {title}
+    </Text>
   </TouchableOpacity>
 );
 
 export default function UtilityModules() {
   const { language } = useLanguage();
+  
   const modules = [
-    { titleKey: "my_enrollments", iconName: "book-outline", color: "#3F51B5" },
-    {
-      titleKey: "cert_tracks",
-      iconName: "clipboard-outline",
-      color: "#FF5722",
-    },
-    { titleKey: "community", iconName: "people-outline", color: "#4CAF50" },
-    {
-      titleKey: "live_sessions",
-      iconName: "calendar-outline",
-      color: "#00BCD4",
-    },
-    { titleKey: "knowledge_base", iconName: "bulb-outline", color: "#FFC107" },
-    {
-      titleKey: "skill_quizzes",
-      iconName: "bar-chart-outline",
-      color: "#E91E63",
-    },
+    { titleKey: "my_enrollments", iconName: "book", color: "#6366f1" },
+    { titleKey: "cert_tracks", iconName: "ribbon", color: "#f59e0b" },
+    { titleKey: "community", iconName: "chatbubbles", color: "#10b981" },
+    { titleKey: "live_sessions", iconName: "videocam", color: "#ef4444" },
+    { titleKey: "knowledge_base", iconName: "library", color: "#8b5cf6" },
+    { titleKey: "skill_quizzes", iconName: "extension-puzzle", color: "#06b6d4" },
   ];
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.moduleGrid}>
         {modules.map((mod, index) => (
           <ModuleTile
@@ -50,27 +43,40 @@ export default function UtilityModules() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+    marginBottom: 25,
+  },
   moduleGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
   },
   moduleTile: {
     width: "30%",
-    aspectRatio: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    marginBottom: 10,
-    padding: 10,
+    paddingVertical: 12,
+  },
+  iconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
   moduleTitle: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#444",
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#475569", 
     textAlign: "center",
-    marginTop: 6,
+    lineHeight: 14,
+    paddingHorizontal: 4,
   },
 });
