@@ -1,9 +1,22 @@
+// context/AuthContext.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 const AuthContext = createContext();
 
+// ------------------- Mock API Call -------------------
+const fetchUserFromApi = async (token) => {
+  // Replace this with your real API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ id: "1", name: "John Doe", email: "john@example.com" });
+    }, 500);
+  });
+};
+
+// ------------------- Auth Provider -------------------
 export const AuthProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,29 +45,39 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         try {
-          const response = await fetchUserFromApi(token);
-          setUser(response);
+          const fetchedUser = await fetchUserFromApi(token);
+          setUser(fetchedUser);
         } catch (err) {
-          console.error(err);
+          console.error("Failed to fetch user:", err);
+          await removeToken();
+          setIsAuth(false);
+          setUser(null);
+          // router.replace("/auth");
         }
+      } else {
+        // router.replace("/auth");
       }
 
       setLoading(false);
     };
+
     initAuth();
   }, []);
 
+  // ------------------- Login -------------------
   const login = async (token, fetchedUser = null) => {
     await setToken(token);
     setIsAuth(true);
-
     if (fetchedUser) setUser(fetchedUser);
+    router.replace("/(tabs)/account&Aboutus");
   };
 
+  // ------------------- Logout -------------------
   const logout = async () => {
     await removeToken();
     setIsAuth(false);
     setUser(null);
+    router.replace("/");
   };
 
   return (

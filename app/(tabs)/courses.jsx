@@ -41,7 +41,6 @@ export default function Courses() {
   );
 }
 
-//==================== Styles ====================
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375aff" },
   contentContainer: {

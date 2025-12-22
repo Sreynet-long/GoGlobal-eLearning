@@ -37,7 +37,6 @@ export default function UpdatePassword() {
   const [updatePassword, { loading }] = useMutation(UPDATE_NEW_PASSWORD, {
     onCompleted: (data) => {
       if (data?.updateNewPassword?.status) {
-        // Using replace to prevent users from going back to the reset flow
         router.replace("/myCourses&Login");
       } else {
         setError(
@@ -69,8 +68,6 @@ export default function UpdatePassword() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar barStyle="light-content" />
-
-      {/* Security Header */}
       <View style={styles.headerBlock}>
         <View style={styles.headerContent}>
           <View style={styles.iconCircle}>
@@ -82,8 +79,6 @@ export default function UpdatePassword() {
           </Text>
         </View>
       </View>
-
-      {/* Input Sheet */}
       <View style={styles.mainContainer}>
         <ScrollView
           contentContainerStyle={styles.scrollPadding}

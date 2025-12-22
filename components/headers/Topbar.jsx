@@ -41,8 +41,13 @@ export default function Topbar({ showBack = false }) {
         <View style={styles.left}>
           {showBack ? (
             <TouchableOpacity
-              onPress={() => router.back()}
-              // style={styles.circleBtn}
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace("/(tabs)");
+                }
+              }}
               activeOpacity={0.7}
             >
               <View style={styles.brandGroup}>

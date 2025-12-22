@@ -202,12 +202,12 @@ const styles = StyleSheet.create({
   },
   logoImage: { width: 60, height: 60 },
   mainTitle: {
-    fontSize: 25,
+    fontSize: 23,
     fontWeight: "800",
     color: COLORS.white,
     marginTop: 12,
   },
-  subTitle: { color: "rgba(255,255,255,0.6)", fontSize: 15, letterSpacing: 1 },
+  subTitle: { color: "rgba(255,255,255,0.6)", fontSize: 13, letterSpacing: 1 },
 
   mainContent: {
     flex: 1,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   paragraph: {
     lineHeight: 20,
     marginBottom: 12,
-    fontSize: 19,
+    fontSize: 17,
     color: COLORS.grey600,
   },
   row: {
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   smallTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
     marginVertical: 8,
     color: COLORS.textDark,
   },
   smallText: {
-    fontSize: 18,
+    fontSize: 17,
     textAlign: "center",
     color: COLORS.grey600,
     fontStyle: "italic",

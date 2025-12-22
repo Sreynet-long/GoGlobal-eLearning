@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -52,9 +53,11 @@ export default function VerifyOTP() {
   const inputs = useRef([]);
 
   const [verifyOtp, { loading }] = useMutation(VERIFY_OTP, {
-    onCompleted: (data) => {
+    onCompleted: async (data) => {
       if (data?.verifyOTP?.status && data?.verifyOTP?.data?.token) {
-        router.push({
+        await AsyncStorage.multiRemove(["otpToken", "otpPhone", "pendingOtp"]);
+
+        router.replace({
           pathname: "/auth/update-password",
           params: { token: data.verifyOTP.data.token },
         });
