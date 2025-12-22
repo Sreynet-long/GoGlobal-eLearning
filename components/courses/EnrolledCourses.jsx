@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
-import EmptyCourse from "./EmtyCourse";
+import EmptyCourse from "./EmptyCourse";
 import { IMAGE_BASE_URL } from "../../config/env";
 
 export default function EnrolledCourses({ selectedCategoryId }) {

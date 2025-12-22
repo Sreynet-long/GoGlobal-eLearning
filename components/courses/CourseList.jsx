@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
+  FlatList,
   Image,
   Modal,
   ScrollView,
@@ -18,119 +18,136 @@ import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 import CourseIncludes from "./CourseInclude";
 import EnrolledButton from "./EnrolledButton";
+import EmptyCourse from "./EmptyCourse.jsx";
+
+/* ---------------- Skeleton ---------------- */
+const CourseSkeleton = () => (
+  <View style={styles.contentContainerStyle}>
+    <View style={[styles.card, { opacity: 0.5 }]}>
+      <View style={styles.skeletonImage} />
+      <View style={styles.cardBody}>
+        <View style={styles.skeletonLine} />
+        <View style={[styles.skeletonLine, { width: "50%" }]} />
+      </View>
+    </View>
+  </View>
+);
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const { language } = useLanguage();
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
   const { isAuth } = useAuth();
 
-  const categoryId = selectedCategoryId === "All" ? "All" : selectedCategoryId;
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const { data, loading, error, networkStatus } = useQuery(
-    GET_COURSE_WITH_PAGINATION,
-    {
-      variables: {
-        page: 1,
-        limit: 50,
-        pagination: false,
-        keyword: searchText?.trim() || "",
-        categoryId,
-      },
-      fetchPolicy: "cache-and-network",
-      notifyOnNetworkStatusChange: true,
-    }
-  );
+  const { data, loading, error , refetch} = useQuery(GET_COURSE_WITH_PAGINATION, {
+    variables : {
+      page: 1,
+      limit: 50,
+      pagination: false,
+      keyword: searchText?.trim() || "",
+      categoryId: selectedCategoryId && selectedCategoryId === "All" ? "All" : selectedCategoryId,
+    },
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
+  });
 
-  const isInitialLoading = loading && !data;
-  const isRefetching = networkStatus === 4;
+  useEffect(() => {
+    refetch();
+  }, [searchText, selectedCategoryId]);
+
   const courses = data?.getCourseWithPagination?.data ?? [];
+  const isInitialLoading = loading && !data;
 
-  if (isInitialLoading)
+  /* ---------------- Loading ---------------- */
+  if (isInitialLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0404d8ff" />
+      <View>
+        {[...Array(5)].map((_, i) => (
+          <CourseSkeleton key={i} />
+        ))}
       </View>
     );
+  }
 
-  if (error)
+  /* ---------------- Error ---------------- */
+  if (error) {
     return (
-      <View style={{alignItems: "center" , marginTop: 250}}>
+      <View style={{ alignItems: "center", marginTop: 200 }}>
         <Text style={{ color: "red" }}>Error: {error.message}</Text>
       </View>
     );
+  }
 
-  return (
-    <View>
-      <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
+  /* ---------------- Render Item (courses) ---------------- */
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => {
+        setSelectedCourse(item);
+        setModalVisible(true);
+      }}
+    >
+      <Image
+        source={{ uri: `${IMAGE_BASE_URL}/file/${item.thumbnail}` }}
+        style={styles.cardImage}
+      />
 
-      {isInitialLoading && (
-        <ActivityIndicator size="small" style={{ marginVertical: 10 }} />
-      )}
+      <View style={styles.cardBody}>
+        <Text style={styles.textTitle}>{item.title}</Text>
 
-      {courses.length === 0 ? (
-        <View>
-          <Image
-            source={require("../../assets/images/find-course.png")}
-            style={styles.emptyImage}
-          />
-          <Text style={{ textAlign: "center", marginTop: 20 }}>
-            {t("no_courses_found", language)}
-          </Text>
-        </View>
-      ) : (
-        courses.map((course) => (
+        <View style={styles.row}>
+          <View style={styles.priceBox}>
+            <Text style={styles.textPrice}>
+              ${item.original_price?.toFixed(2) ?? "0.00"}
+            </Text>
+            <Text style={styles.textSellPrice}>
+              ${item.sell_price?.toFixed(2) ?? "0.00"}
+            </Text>
+          </View>
+
           <TouchableOpacity
-            style={styles.card}
-            key={course._id}
+            style={styles.enrollButton}
             onPress={() => {
-              setSelectedCourse(course);
+              setSelectedCourse(item);
               setModalVisible(true);
             }}
           >
-            <Image
-              source={{ uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}` }}
-              style={styles.cardImage}
-            />
-            <View style={styles.cardBody}>
-              <Text style={styles.textTitle}>{course.title}</Text>
-              <View style={styles.row}>
-                <View style={styles.priceBox}>
-                  <Text style={styles.textPrice}>
-                    ${course.original_price?.toFixed(2) ?? "0.00"}
-                  </Text>
-                  <Text style={styles.textSellPrice}>
-                    ${course.sell_price?.toFixed(2) ?? "0.00"}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.enrollButton}
-                  onPress={() => {
-                    setSelectedCourse(course);
-                    setModalVisible(true);
-                  }}
-                >
-                  <Text style={styles.textEnroll}>{t("enroll", language)}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <Text style={styles.textEnroll}>{t("enroll", language)}</Text>
           </TouchableOpacity>
-        ))
-      )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
-      {/* Modal */}
+  return (
+    <View style={styles.contentContainerStyle}>
+      <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
+      
+      <FlatList
+        data={courses}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20, flexGrow:1 }}
+        ListEmptyComponent={<EmptyCourse/>}
+      />
+
+      {/* ---------------- Modal ---------------- */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={{ fontSize: 20 }}>✕</Text>
-              </TouchableOpacity>
-              <Divider />
-              <ScrollView showsVerticalScrollIndicator={false}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ fontSize: 20 }}>✕</Text>
+            </TouchableOpacity>
+
+            <Divider />
+
+            <ScrollView showsVerticalScrollIndicator={false}>
               {selectedCourse && (
                 <>
                   <Image
@@ -139,22 +156,34 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     }}
                     style={styles.modalImage}
                   />
+
                   <Divider style={{ marginVertical: 12 }} />
+
                   <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
+
                   <View style={styles.modalPriceRow}>
                     <Text style={styles.oldPrice}>
                       ${selectedCourse.original_price?.toFixed(2) ?? "0.00"}
                     </Text>
-                    <Text style={{ marginHorizontal: 5, fontSize: 18, color: "#888" }}>|</Text>
+                    <Text style={{ marginHorizontal: 6 }}>|</Text>
                     <Text style={styles.sellPrice}>
                       ${selectedCourse.sell_price?.toFixed(2) ?? "0.00"}
                     </Text>
                   </View>
-                  <EnrolledButton course={selectedCourse} onSuccess={() => setModalVisible(false)} />
+
+                  {isAuth && (
+                    <EnrolledButton
+                      course={selectedCourse}
+                      onSuccess={() => setModalVisible(false)}
+                    />
+                  )}
+
                   <Divider style={{ marginVertical: 12 }} />
+
                   <Text style={styles.includesTitle}>
                     This Course includes:
                   </Text>
+
                   <CourseIncludes course={selectedCourse} />
                 </>
               )}
@@ -166,55 +195,63 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   );
 }
 
+/* ---------------- Styles ---------------- */
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  textHeader: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
-  textTitle: { paddingVertical: 5, fontSize: 16 },
+  contentContainerStyle: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
+
+  textHeader: { fontSize: 18, fontWeight: "700", paddingBottom: 10 },
+
   card: {
     flexDirection: "row",
-    marginBottom: 15,
+    marginBottom: 10,
     backgroundColor: "#f8f8f8",
     borderRadius: 10,
     overflow: "hidden",
-    borderColor: "#e0e0e0",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
     elevation: 2,
   },
-  cardImage: { width: "40%", height: 120, resizeMode: "cover" },
+
+  cardImage: { width: "40%", height: 120 },
   cardBody: { flex: 1, padding: 10, justifyContent: "center" },
+
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 20,
     alignItems: "center",
-    marginTop: 10,
   },
+
   enrollButton: {
     backgroundColor: "#3F51B5",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 15,
   },
-  textEnroll: { color: "white", fontWeight: "500" },
-  priceBox: { flexDirection: "column" },
+
+  textEnroll: { color: "#fff", fontWeight: "500" },
+  textTitle: { fontSize: 16, fontWeight: "600" },
+
+  priceBox: {},
   textPrice: {
-    fontSize: 13,
-    color: "#8a8888ff",
+    fontSize: 14,
+    color: "#999",
     textDecorationLine: "line-through",
   },
-  textSellPrice: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#25375aff",
-    marginTop: 2,
+  textSellPrice: { fontSize: 16, fontWeight: "700" },
+
+  skeletonImage: {
+    width: "40%",
+    height: 120,
+    backgroundColor: "#ddd",
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 195,
+  skeletonLine: {
+    height: 14,
+    backgroundColor: "#ddd",
+    marginBottom: 8,
   },
-  emptyImage: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -222,29 +259,20 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 29,
-    borderTopRightRadius: 29,
+    height: "84%",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     padding: 16,
-    height: "87%",
   },
-  closeButton: { alignSelf: "flex-end", padding: 5, marginBottom: 5 },
+  closeButton: { alignSelf: "flex-end", padding: 5 },
   modalImage: { width: "100%", height: 180, borderRadius: 10, marginTop: 10 },
   modalTitle: { fontSize: 18, fontWeight: "700", marginVertical: 10 },
   modalPriceRow: { flexDirection: "row", alignItems: "center" },
   sellPrice: { fontSize: 24, fontWeight: "700" },
   oldPrice: {
-    marginLeft: 6,
-    color: "#888",
+    fontSize: 18,
     textDecorationLine: "line-through",
-    fontSize: 20,
+    color: "#888",
   },
-  cartButton: {
-    backgroundColor: "#6a2bd9",
-    marginTop: 15,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  cartText: { color: "#fff", fontWeight: "600" },
   includesTitle: { marginTop: 15, fontWeight: "700", fontSize: 16 },
 });
