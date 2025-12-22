@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    backgroundColor: "white",
+    backgroundColor: "#25375aff",
   },
 });

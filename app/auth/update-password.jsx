@@ -8,7 +8,8 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  View,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
@@ -19,9 +20,10 @@ const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
   white: "#FFFFFF",
-  error: "#D32F2F",
-  grey600: "#757575",
-  background: "#F7F9FC",
+  error: "#E11D48",
+  grey200: "#E2E8F0",
+  grey600: "#64748B",
+  bgLight: "#F8FAFC",
 };
 
 export default function UpdatePassword() {
@@ -68,91 +70,90 @@ export default function UpdatePassword() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar barStyle="light-content" />
-      <View style={styles.headerBlock}>
-        <View style={styles.headerContent}>
-          <View style={styles.iconCircle}>
-            <MaterialIcons name="security" size={45} color={COLORS.primary} />
+
+      <View style={styles.heroSection}>
+        <View style={styles.iconContainer}>
+          <View style={styles.iconSoftSquare}>
+            <MaterialIcons name="verified-user" size={42} color={COLORS.primary} />
           </View>
-          <Text style={styles.headerTitle}>{t("new_password", language)}</Text>
-          <Text style={styles.headerSubtitle}>
-            {t("set_new_password", language)}
-          </Text>
         </View>
+        <Text style={styles.heroTitle}>{t("new_password", language)}</Text>
+        <Text style={styles.heroSubtitle}>{t("set_new_password", language)}</Text>
       </View>
+
       <View style={styles.mainContainer}>
         <ScrollView
-          contentContainerStyle={styles.scrollPadding}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           {error ? (
-            <View style={styles.errorBox}>
-              <MaterialIcons
-                name="error-outline"
-                size={20}
-                color={COLORS.error}
-              />
+            <View style={styles.errorBanner}>
+              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          <TextInput
-            label={t("new_password", language)}
-            mode="outlined"
-            secureTextEntry={!showPass}
-            value={password}
-            onChangeText={setPassword}
-            style={styles.inputSpacing}
-            outlineColor={COLORS.grey600}
-            activeOutlineColor={COLORS.primary}
-            left={<TextInput.Icon icon="lock-outline" color={COLORS.primary} />}
-            right={
-              <TextInput.Icon
-                icon={showPass ? "eye-off" : "eye"}
-                onPress={() => setShowPass(!showPass)}
-                color={COLORS.grey600}
-              />
-            }
-          />
+          <View style={styles.formArea}>
+            <TextInput
+              label={t("new_password", language)}
+              mode="outlined"
+              secureTextEntry={!showPass}
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              activeOutlineColor={COLORS.primary}
+              left={<TextInput.Icon icon="lock-outline" color={COLORS.grey600} />}
+              right={
+                <TextInput.Icon
+                  icon={showPass ? "eye-off" : "eye"}
+                  onPress={() => setShowPass(!showPass)}
+                  color={COLORS.grey600}
+                />
+              }
+            />
 
-          <TextInput
-            label={t("confirm_password", language)}
-            mode="outlined"
-            secureTextEntry={!showPass}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            style={styles.inputSpacing}
-            outlineColor={COLORS.grey600}
-            activeOutlineColor={COLORS.primary}
-            left={
-              <TextInput.Icon
-                icon="check-decagram-outline"
-                color={COLORS.primary}
-              />
-            }
-          />
+            <TextInput
+              label={t("confirm_password", language)}
+              mode="outlined"
+              secureTextEntry={!showPass}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              activeOutlineColor={COLORS.primary}
+              left={<TextInput.Icon icon="shield-check-outline" color={COLORS.grey600} />}
+            />
 
-          <Button
-            mode="contained"
-            loading={loading}
-            onPress={handleUpdate}
-            style={styles.updateButton}
-            contentStyle={{ paddingVertical: 8 }}
-            labelStyle={{ fontSize: 16, fontWeight: "700" }}
+            <Button
+              mode="contained"
+              loading={loading}
+              onPress={handleUpdate}
+              style={styles.updateButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+            >
+              {t("update_password", language)}
+            </Button>
+          </View>
+
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
           >
-            {t("update_password", language)}
-          </Button>
+            <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
+            <Text style={styles.backButtonText}>{t("back_to_forgot_password", language)}</Text>
+          </TouchableOpacity>
 
           <View style={styles.tipBox}>
-            <MaterialIcons
-              name="info-outline"
-              size={16}
-              color={COLORS.grey600}
-            />
+            <MaterialIcons name="lightbulb-outline" size={18} color={COLORS.accent} />
             <Text style={styles.tipText}>
               Make sure your password is at least 8 characters long for better
               security.
             </Text>
           </View>
+
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
@@ -161,92 +162,109 @@ export default function UpdatePassword() {
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  headerBlock: {
-    paddingTop: Platform.OS === "ios" ? 60 : 40,
+  
+  heroSection: {
+    paddingTop: Platform.OS === "ios" ? 70 : 50,
     paddingBottom: 60,
-    alignItems: "center",
-  },
-  headerContent: {
     alignItems: "center",
     paddingHorizontal: 40,
   },
-  iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: "rgba(255,255,255,0.9)",
+  iconContainer: { marginBottom: 20 },
+  iconSoftSquare: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
-    elevation: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 8,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "800",
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: "900",
     color: COLORS.white,
     textAlign: "center",
+    letterSpacing: -0.5,
   },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.7)",
+  heroSubtitle: {
     fontSize: 15,
+    color: "rgba(255,255,255,0.6)",
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 8,
     lineHeight: 22,
   },
+
   mainContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    marginTop: -40,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    marginTop: -30,
   },
-  scrollPadding: {
-    paddingHorizontal: 25,
-    paddingTop: 50,
+  scrollContent: {
+    paddingHorizontal: 30,
+    paddingTop: 45,
+    paddingBottom: 40,
+    alignItems: "center",
   },
-  errorBox: {
+
+  errorBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFEBEE",
-    padding: 12,
+    backgroundColor: "#FFF1F2",
+    padding: 14,
     borderRadius: 12,
     marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
+    width: "100%",
     gap: 10,
+    borderWidth: 1,
+    borderColor: "#FEE2E2",
   },
-  errorText: {
-    color: COLORS.error,
-    fontWeight: "600",
-    flex: 1,
-  },
-  inputSpacing: {
-    marginBottom: 20,
-    backgroundColor: COLORS.white,
-  },
+  errorText: { color: COLORS.error, fontWeight: "600", fontSize: 13, flex: 1 },
+
+  formArea: { width: "100%" },
+  input: { backgroundColor: COLORS.white, marginBottom: 16 },
+  inputOutline: { borderRadius: 12, borderColor: COLORS.grey200 },
+
   updateButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 15,
-    elevation: 4,
+    borderRadius: 16,
     marginTop: 10,
-    marginBottom: 30,
+    elevation: 0,
   },
+  buttonContent: { height: 56 },
+  buttonLabel: { fontSize: 16, fontWeight: "800" },
+
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    padding: 10,
+    gap: 8,
+  },
+  backButtonText: { color: COLORS.grey600, fontWeight: "700", fontSize: 14 },
+
   tipBox: {
     flexDirection: "row",
-    backgroundColor: "#F1F3F5",
-    padding: 15,
-    borderRadius: 12,
+    backgroundColor: COLORS.bgLight,
+    padding: 16,
+    borderRadius: 16,
     alignItems: "center",
-    gap: 10,
+    gap: 12,
+    marginTop: 30,
+    borderWidth: 1,
+    borderColor: COLORS.grey200,
+    width: '100%',
   },
   tipText: {
     color: COLORS.grey600,
-    fontSize: 12,
+    fontSize: 13,
     flex: 1,
     lineHeight: 18,
+    fontWeight: '500'
   },
 });

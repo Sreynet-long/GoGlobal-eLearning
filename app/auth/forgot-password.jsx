@@ -20,9 +20,10 @@ const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
   white: "#FFFFFF",
-  error: "#D32F2F",
-  grey600: "#757575",
-  background: "#F7F9FC",
+  error: "#E11D48",
+  grey200: "#E2E8F0",
+  grey600: "#64748B",
+  bgLight: "#F8FAFC",
 };
 
 export default function ForgotPassword() {
@@ -55,69 +56,63 @@ export default function ForgotPassword() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar barStyle="light-content" />
-      <View style={styles.headerBlock}>
-        <View style={styles.headerContent}>
-          <View style={styles.iconCircle}>
-            <MaterialIcons name="lock-reset" size={45} color={COLORS.primary} />
+
+      <View style={styles.heroSection}>
+        <View style={styles.iconContainer}>
+          <View style={styles.iconSoftSquare}>
+            <MaterialIcons name="lock-reset" size={42} color={COLORS.primary} />
           </View>
-          <Text style={styles.headerTitle}>
-            {t("forgot_password", language)}
-          </Text>
-          <Text style={styles.headerSubtitle}>
-            {t("enter_email_for_reset", language)}
-          </Text>
         </View>
+        <Text style={styles.heroTitle}>{t("forgot_password", language)}</Text>
+        <Text style={styles.heroSubtitle}>{t("enter_email_for_reset", language)}</Text>
       </View>
+
       <View style={styles.mainContainer}>
         <ScrollView
-          contentContainerStyle={styles.scrollPadding}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           {error ? (
-            <View style={styles.errorBox}>
-              <MaterialIcons
-                name="error-outline"
-                size={20}
-                color={COLORS.error}
-              />
+            <View style={styles.errorBanner}>
+              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          <TextInput
-            label={t("email", language)}
-            mode="outlined"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            style={styles.inputSpacing}
-            outlineColor={COLORS.grey600}
-            activeOutlineColor={COLORS.primary}
-            left={
-              <TextInput.Icon icon="email-outline" color={COLORS.primary} />
-            }
-          />
+          <View style={styles.formArea}>
+            <TextInput
+              label={t("email", language)}
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              activeOutlineColor={COLORS.primary}
+              left={<TextInput.Icon icon="email-outline" color={COLORS.grey600} />}
+            />
 
-          <Button
-            mode="contained"
-            loading={loading}
-            onPress={() => forgotPassword({ variables: { email } })}
-            style={styles.sendButton}
-            contentStyle={{ paddingVertical: 8 }}
-            labelStyle={{ fontSize: 16, fontWeight: "700" }}
-          >
-            {t("send_code", language)}
-          </Button>
+            <Button
+              mode="contained"
+              loading={loading}
+              onPress={() => forgotPassword({ variables: { email } })}
+              style={styles.sendButton}
+              contentStyle={styles.sendButtonContent}
+              labelStyle={styles.sendButtonLabel}
+            >
+              {t("send_code", language)}
+            </Button>
+          </View>
 
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
+            activeOpacity={0.7}
           >
-            <MaterialIcons name="arrow-back" size={20} color={COLORS.primary} />
-            <Text style={styles.backButtonText}>
-              {t("back_to_login", language)}
-            </Text>
+            <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
+            <Text style={styles.backButtonText}>{t("back_to_login", language)}</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -127,89 +122,108 @@ export default function ForgotPassword() {
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  headerBlock: {
-    paddingTop: Platform.OS === "ios" ? 60 : 40,
+  
+  heroSection: {
+    paddingTop: Platform.OS === "ios" ? 70 : 50,
     paddingBottom: 60,
-    alignItems: "center",
-  },
-  headerContent: {
     alignItems: "center",
     paddingHorizontal: 40,
   },
-  iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: "rgba(255,255,255,0.9)",
+  iconContainer: { marginBottom: 20 },
+  iconSoftSquare: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
-    elevation: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 8,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "800",
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: "900",
     color: COLORS.white,
     textAlign: "center",
+    letterSpacing: -0.5,
   },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.7)",
+  heroSubtitle: {
     fontSize: 15,
+    color: "rgba(255,255,255,0.6)",
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 8,
     lineHeight: 22,
   },
+
   mainContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    marginTop: -40,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    marginTop: -30,
   },
-  scrollPadding: {
-    paddingHorizontal: 25,
+  scrollContent: {
+    paddingHorizontal: 30,
     paddingTop: 50,
+    paddingBottom: 40,
+    alignItems: "center",
   },
-  errorBox: {
+
+  errorBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFEBEE",
-    padding: 12,
+    backgroundColor: "#FFF1F2",
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
+    marginBottom: 30,
+    width: "100%",
     gap: 10,
+    borderWidth: 1,
+    borderColor: "#FEE2E2",
   },
   errorText: {
     color: COLORS.error,
     fontWeight: "600",
+    fontSize: 13,
     flex: 1,
   },
-  inputSpacing: {
-    marginBottom: 25,
+
+  formArea: { width: "100%" },
+  input: {
     backgroundColor: COLORS.white,
+    marginBottom: 25,
   },
+  inputOutline: {
+    borderRadius: 12,
+    borderColor: COLORS.grey200,
+  },
+
   sendButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 15,
-    elevation: 4,
-    marginBottom: 20,
+    borderRadius: 16,
+    elevation: 0,
   },
+  sendButtonContent: {
+    height: 56,
+  },
+  sendButtonLabel: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
   backButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 30,
     padding: 10,
-    gap: 5,
+    gap: 8,
   },
   backButtonText: {
-    color: COLORS.primary,
+    color: COLORS.grey600,
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 14,
   },
 });

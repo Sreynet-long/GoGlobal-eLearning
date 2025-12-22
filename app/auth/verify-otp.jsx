@@ -1,3 +1,4 @@
+// pages/auth/verify-otp.jsx
 import { gql, useMutation } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,7 +18,18 @@ import { Button, Text } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
-const VERIFY_OTP = gql`
+const COLORS = {
+  primary: "#25375A",
+  accent: "#D4AF37",
+  white: "#FFFFFF",
+  error: "#E11D48",
+  grey200: "#E2E8F0",
+  grey600: "#64748B",
+  bgLight: "#F8FAFC",
+};
+
+// ---------------------- OTP Mutation ----------------------
+export const VERIFY_OTP = gql`
   mutation VerifyOTP($otp: String!, $token: String!) {
     verifyOTP(otp: $otp, token: $token) {
       status
@@ -31,16 +43,6 @@ const VERIFY_OTP = gql`
     }
   }
 `;
-
-const COLORS = {
-  primary: "#25375A",
-  accent: "#D4AF37",
-  white: "#FFFFFF",
-  error: "#D32F2F",
-  grey300: "#E0E0E0",
-  grey600: "#757575",
-  background: "#F7F9FC",
-};
 
 export default function VerifyOTP() {
   const router = useRouter();
@@ -56,52 +58,33 @@ export default function VerifyOTP() {
     onCompleted: async (data) => {
       if (data?.verifyOTP?.status && data?.verifyOTP?.data?.token) {
         await AsyncStorage.multiRemove(["otpToken", "otpPhone", "pendingOtp"]);
-
         router.replace({
           pathname: "/auth/update-password",
           params: { token: data.verifyOTP.data.token },
         });
       } else {
-        showError(
+        setError(
           language === "kh"
             ? data?.verifyOTP?.message?.messageKh
-            : data?.verifyOTP?.message?.messageEn ||
-                t("incorrect_code", language)
+            : data?.verifyOTP?.message?.messageEn || t("incorrect_code", language)
         );
       }
     },
-    onError: (err) => showError(err.message),
+    onError: (err) => setError(err.message),
   });
-
-  const showError = (message) => {
-    setError(message);
-    setTimeout(() => setError(""), 5000);
-  };
 
   const handleChange = (text, index) => {
     if (!/^\d*$/.test(text)) return;
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
-
-    if (text && index < 5) {
-      inputs.current[index + 1]?.focus();
-    }
+    if (text && index < 5) inputs.current[index + 1]?.focus();
   };
 
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
-  };
-
-  const handleVerify = () => {
-    const otpCode = otp.join("");
-    if (otpCode.length < 6) {
-      showError(t("enter_all_digits", language));
-      return;
-    }
-    verifyOtp({ variables: { otp: otpCode, token } });
   };
 
   return (
@@ -111,77 +94,75 @@ export default function VerifyOTP() {
     >
       <StatusBar barStyle="light-content" />
 
-      <View style={styles.headerBlock}>
-        <View style={styles.headerContent}>
-          <View style={styles.iconCircle}>
-            <MaterialIcons
-              name="verified-user"
-              size={45}
-              color={COLORS.primary}
-            />
+      <View style={styles.heroSection}>
+        <View style={styles.iconContainer}>
+          <View style={styles.iconPulse}>
+            <MaterialIcons name="security" size={40} color={COLORS.primary} />
           </View>
-          <Text style={styles.headerTitle}>
-            {t("code_verification", language)}
-          </Text>
-          <Text style={styles.headerSubtitle}>
-            {t("type_verification_code", language)}
-          </Text>
         </View>
+        <Text style={styles.heroTitle}>{t("code_verification", language)}</Text>
+        <Text style={styles.heroSubtitle}>
+          {t("type_verification_code", language)}
+        </Text>
       </View>
 
       <View style={styles.mainContainer}>
-        <ScrollView contentContainerStyle={styles.scrollPadding}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           {error ? (
-            <View style={styles.errorBox}>
-              <MaterialIcons
-                name="error-outline"
-                size={20}
-                color={COLORS.error}
-              />
+            <View style={styles.errorBanner}>
+              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          <View style={styles.otpGrid}>
-            {otp.map((digit, index) => (
-              <RNTextInput
-                key={index}
-                ref={(ref) => (inputs.current[index] = ref)}
-                value={digit}
-                onChangeText={(text) => handleChange(text, index)}
-                onKeyPress={(e) => handleKeyPress(e, index)}
-                onFocus={() => setFocusedIndex(index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                style={[
-                  styles.otpInput,
-                  focusedIndex === index && styles.otpInputFocused,
-                  digit !== "" && styles.otpInputFilled,
-                ]}
-                selectionColor={COLORS.primary}
-              />
-            ))}
+          <View style={styles.otpWrapper}>
+            <View style={styles.otpGrid}>
+              {otp.map((digit, index) => (
+                <RNTextInput
+                  key={index}
+                  ref={(ref) => (inputs.current[index] = ref)}
+                  value={digit}
+                  onChangeText={(text) => handleChange(text, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  onFocus={() => setFocusedIndex(index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  style={[
+                    styles.otpInput,
+                    focusedIndex === index && styles.otpInputFocused,
+                    digit !== "" && styles.otpInputFilled,
+                  ]}
+                  selectionColor={COLORS.primary}
+                />
+              ))}
+            </View>
           </View>
 
           <Button
             mode="contained"
             loading={loading}
-            onPress={handleVerify}
-            style={styles.verifyButton}
-            contentStyle={{ paddingVertical: 8 }}
-            labelStyle={{ fontSize: 16, fontWeight: "700" }}
+            onPress={() => verifyOtp({ variables: { otp: otp.join(""), token } })}
+            style={styles.actionButton}
+            contentStyle={styles.actionButtonContent}
+            labelStyle={styles.actionButtonLabel}
           >
             {t("verify", language)}
           </Button>
 
-          <View style={styles.resendContainer}>
-            <Text style={styles.resendText}>
-              {t("didnt_receive_code", language)}
-            </Text>
-            <TouchableOpacity>
-              <Text style={styles.resendLink}>
-                {t("resend_code", language)}
-              </Text>
+          <View style={styles.footerCenter}>
+            <View style={styles.resendRow}>
+              <Text style={styles.resendPrompt}>{t("didnt_receive_code", language)}</Text>
+              <TouchableOpacity onPress={() => {}}>
+                <Text style={styles.resendAction}>{t("resend_code", language)}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.backLink} onPress={() => router.back()}>
+              <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
+              <Text style={styles.backLinkText}>{t("back_to_forgot_password", language)}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -192,117 +173,64 @@ export default function VerifyOTP() {
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  headerBlock: {
-    paddingTop: Platform.OS === "ios" ? 60 : 40,
+
+  heroSection: {
+    paddingTop: Platform.OS === "ios" ? 70 : 50,
     paddingBottom: 60,
     alignItems: "center",
+    paddingHorizontal: 40,
   },
-  headerContent: {
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-  iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: "rgba(255,255,255,0.9)",
+  iconContainer: { marginBottom: 20 },
+  iconPulse: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
-    elevation: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 8,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: COLORS.white,
-    textAlign: "center",
-  },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.7)",
-    fontSize: 15,
-    textAlign: "center",
-    marginTop: 8,
-    lineHeight: 22,
-  },
+  heroTitle: { fontSize: 26, fontWeight: "900", color: COLORS.white, textAlign: "center", letterSpacing: -0.5 },
+  heroSubtitle: { fontSize: 15, color: "rgba(255,255,255,0.6)", textAlign: "center", marginTop: 8, lineHeight: 22 },
+
   mainContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    marginTop: -40,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    marginTop: -30,
   },
-  scrollPadding: {
-    paddingHorizontal: 25,
-    paddingTop: 40,
-  },
-  errorBox: {
+  scrollContent: { paddingHorizontal: 30, paddingTop: 40, paddingBottom: 40, alignItems: "center" },
+
+  errorBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFEBEE",
-    padding: 12,
+    backgroundColor: "#FFF1F2",
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 25,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
+    marginBottom: 30,
+    width: "100%",
     gap: 10,
   },
-  errorText: {
-    color: COLORS.error,
-    fontWeight: "600",
-    flex: 1,
-  },
-  otpGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 35,
-  },
-  otpInput: {
-    width: 48,
-    height: 58,
-    borderWidth: 1.5,
-    borderColor: COLORS.grey300,
-    borderRadius: 12,
-    fontSize: 24,
-    fontWeight: "700",
-    textAlign: "center",
-    backgroundColor: "#F8F9FA",
-    color: COLORS.primary,
-  },
-  otpInputFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
-    elevation: 3,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  otpInputFilled: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
-  },
-  verifyButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 15,
-    elevation: 4,
-  },
-  resendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 25,
-    gap: 5,
-  },
-  resendText: {
-    color: COLORS.grey600,
-    fontSize: 14,
-  },
-  resendLink: {
-    color: COLORS.primary,
-    fontWeight: "800",
-    fontSize: 14,
-  },
+  errorText: { color: COLORS.error, fontWeight: "600", fontSize: 13 },
+
+  otpWrapper: { width: "100%", alignItems: "center", marginBottom: 40 },
+  otpGrid: { flexDirection: "row", justifyContent: "center", gap: 10 },
+  otpInput: { width: 46, height: 58, borderWidth: 1.5, borderColor: COLORS.grey200, borderRadius: 14, fontSize: 22, fontWeight: "800", textAlign: "center", backgroundColor: COLORS.bgLight, color: COLORS.primary },
+  otpInputFocused: { borderColor: COLORS.primary, backgroundColor: COLORS.white, borderWidth: 2 },
+  otpInputFilled: { borderColor: COLORS.primary, backgroundColor: COLORS.white },
+
+  actionButton: { width: "100%", borderRadius: 16, backgroundColor: COLORS.primary, marginBottom: 30 },
+  actionButtonContent: { height: 56 },
+  actionButtonLabel: { fontSize: 16, fontWeight: "800" },
+
+  footerCenter: { alignItems: "center", width: "100%" },
+  resendRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 25 },
+  resendPrompt: { color: COLORS.grey600, fontSize: 14 },
+  resendAction: { color: COLORS.primary, fontWeight: "800", fontSize: 14 },
+  backLink: { flexDirection: "row", alignItems: "center", gap: 8, padding: 10 },
+  backLinkText: { color: COLORS.grey600, fontWeight: "700", fontSize: 14 },
 });

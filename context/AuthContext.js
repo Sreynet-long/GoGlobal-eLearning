@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     await setToken(token);
     setIsAuth(true);
     if (fetchedUser) setUser(fetchedUser);
-    router.replace("/(tabs)/account&Aboutus");
+    router.replace("/");
   };
 
   // ------------------- Logout -------------------
