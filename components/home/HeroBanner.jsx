@@ -46,7 +46,10 @@ const HeroBanner = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
-      scrollRef.current?.scrollTo({ x: nextIndex * SLIDE_WIDTH, animated: true });
+      scrollRef.current?.scrollTo({
+        x: nextIndex * SLIDE_WIDTH,
+        animated: true,
+      });
       setActiveIndex(nextIndex);
     }, AUTOSCROLL_INTERVAL);
 
@@ -59,7 +62,7 @@ const HeroBanner = () => {
         ref={scrollRef}
         horizontal
         pagingEnabled
-        scrollEnabled={false} // Auto-scroll only
+        scrollEnabled={true} // Auto-scroll only
         showsHorizontalScrollIndicator={false}
       >
         {BANNER_DATA.map((item) => (
@@ -86,10 +89,7 @@ const HeroBanner = () => {
         {BANNER_DATA.map((_, index) => (
           <View
             key={index}
-            style={[
-              styles.dot,
-              index === activeIndex && styles.activeDot,
-            ]}
+            style={[styles.dot, index === activeIndex && styles.activeDot]}
           />
         ))}
       </View>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderRadius: 20,
     elevation: 5,
-    shadowColor: "#000", 
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   slideTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#FFD700", 
+    color: "#FFD700",
     marginBottom: 4,
   },
   slideSubtitle: {
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#3fe947ff", 
+    backgroundColor: "#3fe947ff",
     opacity: 1,
   },
 });

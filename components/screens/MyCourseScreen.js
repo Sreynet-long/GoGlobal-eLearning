@@ -8,7 +8,7 @@ import { useLanguage } from "../../context/LanguageContext";
 
 export default function MyCourseScreen() {
   const { language } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
   return (
     <View style={styles.screenContainer}>
@@ -23,7 +23,7 @@ export default function MyCourseScreen() {
 
         <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
           <FeatureCategory
-            onSelectedCategory={setSelectedCategory}
+            onSelectedCategory={setSelectedCategoryId}
             language={language}
           />
         </View>
@@ -33,7 +33,7 @@ export default function MyCourseScreen() {
           showsVerticalScrollIndicator={false}
         >
           <EnrolledCourses
-            selectedCategory={selectedCategory}
+            selectedCategoryId={selectedCategoryId}
             language={language}
           />
         </ScrollView>

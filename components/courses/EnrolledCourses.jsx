@@ -7,11 +7,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  FlatList,
 } from "react-native";
+import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import EmptyCourse from "./EmptyCourse";
-import { IMAGE_BASE_URL } from "../../config/env";
 
 export default function EnrolledCourses({ selectedCategoryId }) {
   const { language } = useLanguage();
@@ -39,7 +40,9 @@ export default function EnrolledCourses({ selectedCategoryId }) {
     selectedCategoryId === "All"
       ? courses
       : courses.filter(
-          (c) => c.category_id?._id === selectedCategoryId
+          (c) =>
+            c.category_id?._id === selectedCategoryId ||
+            c.category_id?._id === selectedCategoryId
         );
 
   // ---------- Loading ----------
@@ -51,44 +54,57 @@ export default function EnrolledCourses({ selectedCategoryId }) {
     );
   }
 
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.card} key={item._id} onPress={() => {
+      // setSelectedCourse(item);
+      // setModelVisible(true);
+    }}>
+      <Image
+        source={{
+          uri: `${IMAGE_BASE_URL}/file/${item.thumbnail}`,
+        }}
+        style={styles.cardImage}
+      />
+
+      <View style={styles.cardBody}>
+        <Text style={styles.textTitle}>{item.title}</Text>
+
+        <Text style={styles.textHours}>
+          {item.course_includes?.number_of_hours ?? 0} {t("hours", language)}
+        </Text>
+        <View style={{ paddingTop: 10 }}>
+          <View style={styles.progressBarContainer}>
+            <View
+              style={[
+                styles.progressBar,
+                { width: `${item.progress ?? 0}%` },
+              ]}
+            />
+          </View>
+
+          <Text style={styles.progressText}>
+            {item.progress ?? 0}% {t("completed", language)}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <View>
       <Text style={styles.textHeader}>
         {t("courses_enrolled_list", language)}
       </Text>
 
-      {filteredCourses.length === 0 ? (
-        <EmptyCourse />
-      ) : (
-        filteredCourses.map((course) => (
-          <TouchableOpacity style={styles.card} key={course._id}>
-            <Image
-              source={{
-                uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}`,
-              }}
-              style={styles.cardImage}
-            />
+      <FlatList
+      data={filteredCourses}
+      keyExtractor={(item)=> item._id}
+      renderItem={renderItem}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{paddingBottom: 30}}
+      ListEmptyComponent={<EmptyCourse/>}
+      />
 
-            <View style={styles.cardBody}>
-              <Text style={styles.textTitle}>{course.title}</Text>
-
-              <Text style={styles.textHours}>
-                {course.course_includes?.number_of_hours ?? 0}{" "}
-                {t("hours", language)}
-              </Text>
-              <View style={{paddingTop: 10}}>
-                <View>
-                <Text style={styles.progressBarContainer} />
-                <Text style={[ { width: `${course.progress}%` }]}/>
-                </View> 
-                <Text style={styles.progressText}>
-                  {course.progress ?? 0}% {t("completed", language)}
-                </Text> 
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))
-      )}
     </View>
   );
 }
@@ -125,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#25375aff",
     borderRadius: 4,
     height: 4,
-    marginRight: 10
+    marginRight: 10,
   },
   progressText: {
     fontSize: 12,

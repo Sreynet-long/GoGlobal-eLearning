@@ -171,12 +171,12 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     </Text>
                   </View>
 
-                  {isAuth && (
+                  
                     <EnrolledButton
                       course={selectedCourse}
                       onSuccess={() => setModalVisible(false)}
                     />
-                  )}
+                  
 
                   <Divider style={{ marginVertical: 12 }} />
 
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    height: "84%",
+    height: "86.5%",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 16,

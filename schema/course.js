@@ -45,3 +45,40 @@ query GetCourseWithPagination($page: Int, $limit: Int, $keyword: String, $pagina
   }
 }
 `;
+
+export const GET_COURSE_ENROLLED_WITH_PAGINATION = gql`
+query GetCourseEnrolledWithPagination($page: Int, $limit: Int, $keyword: String, $pagination: Boolean, $courseId: ID) {
+  getCourseEnrolledWithPagination(page: $page, limit: $limit, keyword: $keyword, pagination: $pagination, course_id: $courseId) {
+    data {
+      _id
+      category_name
+      icon_src
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`;
+export const CREATE_COURSE_ENROLLED = gql`
+mutation CreateCourseEnrolled($input: CourseEnrolledInput) {
+  createCourseEnrolled(input: $input) {
+    status
+    message {
+      messageKh
+      messageEn
+    }
+  }
+}
+`;
