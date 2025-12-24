@@ -45,9 +45,9 @@ const CourseCard = ({ item, language, onPress }) => {
           </View>
         </View>
 
-        <View style={styles.cardFooter}>
+        {/* <View style={styles.cardFooter}>
           <Text style={styles.continueText}>Continue learning →</Text>
-        </View>
+        </View> */}
       </View>
     </TouchableOpacity>
   );
@@ -167,14 +167,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     elevation: 3,
     borderWidth: 1,
     borderColor: "#f0f0f0",
     overflow: "hidden",
   },
-  cardImage: { width: width * 0.3, height: "100%", backgroundColor: "#eee" },
+  cardImage: { width: width * 0.32, height: 110, backgroundColor: "#eee" },
   cardBody: { flex: 1, padding: 12, justifyContent: "space-between" },
   textTitle: {
     fontSize: 15,
