@@ -45,7 +45,7 @@ export default function FeatureCategory({ onSelectedCategory }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#58589bff" />
+        {/* <ActivityIndicator size="small" color="#58589bff" /> */}
       </View>
     );
   }

@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -13,15 +14,20 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import  CourseContent  from "../../components/courses/CourseContent";
-import { IMAGE_BASE_URL } from "../../config/env";
+
+import CourseContent from "../../components/courses/CourseContent";
+import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
 import { GET_COURSE_BY_ID } from "../../schema/course";
+
 const TABS = ["Course content", "Overview"];
 
 export default function CoursePlayerScreen() {
   const router = useRouter();
   const { courseId } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("Course content");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef(null);
+
   const { data, loading } = useQuery(GET_COURSE_BY_ID, {
     variables: { courseById: courseId },
     skip: !courseId,
@@ -54,8 +60,7 @@ export default function CoursePlayerScreen() {
   const renderOverview = () => (
     <View>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>About this course</Text>
-
+        <Text style={styles.cardTitle}>About this course:</Text>
         <InfoRow
           icon="tag-outline"
           label="Category"
@@ -93,8 +98,7 @@ export default function CoursePlayerScreen() {
         />
       </View>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>This course includes</Text>
-
+        <Text style={styles.cardTitle}>This course includes:</Text>
         <IncludeItem
           text={`${includes?.number_of_hours} hours on-demand video`}
         />
@@ -104,7 +108,6 @@ export default function CoursePlayerScreen() {
         <IncludeItem
           text={`${includes?.number_of_projects_practices} projects & practices`}
         />
-
         {includes?.is_full_lifetime_access && (
           <IncludeItem text="Full lifetime access" />
         )}
@@ -114,6 +117,46 @@ export default function CoursePlayerScreen() {
       </View>
     </View>
   );
+
+  /* ---------------- VIDEO RENDER ---------------- */
+  const renderVideo = () => {
+    if (course?.video_url) {
+      return (
+        <View style={styles.videoWrapper}>
+          <Video
+            ref={videoRef}
+            source={{ uri: `${FILE_BASE_URL}/file/${course.video_url}` }}
+            style={styles.videoWrapper}
+            useNativeControls
+            resizeMode="contain"
+            isLooping
+            onPlaybackStatusUpdate={(status) => setIsPlaying(status.isPlaying)}
+          />
+          {!isPlaying && (
+            <View style={styles.playOverlay}>
+              <TouchableOpacity
+                style={styles.playCircle}
+                onPress={() => videoRef.current.playAsync()}
+              >
+                <MaterialCommunityIcons name="play" size={45} color="white" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      );
+    }
+
+    // fallback thumbnail if no video exists
+    return (
+      <View style={styles.videoWrapper}>
+        <Image
+          source={{ uri: `${IMAGE_BASE_URL}/file/${course?.thumbnail}` }}
+          style={styles.videoWrapper}
+          resizeMode="cover"
+        />
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -127,21 +170,9 @@ export default function CoursePlayerScreen() {
         </Text>
       </View>
 
-      {/* THUMBNAIL */}
-      <View style={styles.videoWrapper}>
-        <Image
-          source={{ uri: `${IMAGE_BASE_URL}/file/${course?.thumbnail}` }}
-          style={styles.videoPlaceholder}
-        />
-        <View style={styles.playOverlay}>
-          <TouchableOpacity
-            style={styles.playCircle}
-            onPress={() => console.log("Play")}
-          >
-            <MaterialCommunityIcons name="play" size={45} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* VIDEO */}
+      {renderVideo()}
+
       {/* TABS */}
       <View style={styles.tabBar}>
         {TABS.map((tab) => (
@@ -173,13 +204,14 @@ export default function CoursePlayerScreen() {
 }
 
 /* ---------------- SMALL COMPONENTS ---------------- */
-const InfoRow = ({ icon, label, value, text }) => (
+const InfoRow = ({ icon, label, value }) => (
   <View style={styles.row}>
     <MaterialCommunityIcons name={icon} size={20} color="#3F51B5" />
     <Text style={styles.rowLabel}>{label}</Text>
     <Text style={styles.rowValue}>{value}</Text>
   </View>
 );
+
 const IncludeItem = ({ text }) => (
   <View style={styles.includeRow}>
     <MaterialCommunityIcons name="check-circle" size={18} color="#4CAF50" />
@@ -191,7 +223,6 @@ const IncludeItem = ({ text }) => (
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F7FA" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -199,9 +230,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   headerTitle: { fontSize: 16, fontWeight: "700", marginLeft: 10 },
-  // Video Header
+
   videoWrapper: { width: "100%", aspectRatio: 16 / 9, backgroundColor: "#000" },
-  videoPlaceholder: { width: "100%", height: "100%", opacity: 0.6 },
   playOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
@@ -216,19 +246,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  tabBar: {
-    flexDirection: "row",
-    backgroundColor: "#FFF",
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: "#3F51B5",
-  },
+  tabBar: { flexDirection: "row", backgroundColor: "#FFF" },
+  tab: { flex: 1, paddingVertical: 14, alignItems: "center" },
+  activeTab: { borderBottomWidth: 3, borderBottomColor: "#3F51B5" },
   tabText: { color: "#999", fontWeight: "600" },
   activeTabText: { color: "#3F51B5" },
 
@@ -238,60 +258,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
+  cardTitle: { fontSize: 16, fontWeight: "700", marginBottom: 12 },
 
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
+  row: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   rowLabel: { flex: 1, marginLeft: 10, color: "#555" },
   rowValue: { fontWeight: "700" },
 
-  includeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
+  includeRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   includeText: { marginLeft: 8 },
-
-  sectionCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: "hidden",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    padding: 16,
-    alignItems: "center",
-    backgroundColor: "#FFF",
-  },
-  sectionTitleText: { fontSize: 15, fontWeight: "700", color: "#2D3436" },
-  sectionSubText: { fontSize: 12, color: "#ADADAD", marginTop: 2 },
-  // Lesson Rows
-  lessonRow: {
-    flexDirection: "row",
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#F8F9FA",
-    alignItems: "center",
-  },
-  activeLessonRow: { backgroundColor: "#F0F3FF" },
-  lessonInfo: { flex: 1, marginLeft: 12 },
-  lessonTitle: { fontSize: 14, color: "#636E72", fontWeight: "500" },
-  activeLessonText: { color: "#3F51B5", fontWeight: "700" },
-  lessonDuration: { fontSize: 11, color: "#B2BEC3", marginTop: 2 },
-
-  // Empty State
-  emptyState: { padding: 50, alignItems: "center" },
-  emptyText: { color: "#B2BEC3", marginTop: 10 },
 });
