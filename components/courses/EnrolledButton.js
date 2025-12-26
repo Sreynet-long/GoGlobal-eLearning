@@ -1,69 +1,78 @@
+import { useMutation } from "@apollo/client";
+import { useRouter } from "expo-router";
 import { Alert, Text, TouchableOpacity } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState } from "react";
+import { CREATE_COURSE_ENROLLED } from "../../schema/course";
 
-export default function EnrolledButton({course, onSuccess}) {
+export default function EnrolledButton({ course, onSuccess }) {
   const { language } = useLanguage();
   const { isAuth } = useAuth();
-  
-  const handleEnroll = async (course) => {
-  try {
-    const stored = await AsyncStorage.getItem("enrolledCourses");
-    const enrolled = stored ? JSON.parse(stored) : [];
+  const router = useRouter();
 
-    // prevent duplicate enroll
-    const exists = enrolled.find((c) => c._id === course._id);
-    if (exists) {
-      Alert.alert("Information", "You already enrolled this course");
-      return;
+  const [createCourseEnrolled, { loading }] = useMutation(CREATE_COURSE_ENROLLED);
+
+  const handleEnroll = async () => {
+    try {
+      const { data } = await createCourseEnrolled({
+        variables: { input: { course_id: course._id } },
+      });
+
+      const enroll = data?.createCourseEnrolled;
+
+      if (!enroll) {
+        Alert.alert("Error", "Something went wrong!");
+        return;
+      }
+
+      if (!enroll.status) {
+        Alert.alert("Information", "You already enrolled in this course.");
+        return;
+      }
+
+      Alert.alert("Success", "Course enrolled successfully!");
+      onSuccess?.();
+    } catch (err) {
+      console.log("Enroll error:", err);
+      Alert.alert("Error", "Enroll failed. Please try again.");
     }
+  };
 
-    const enrolledCourses = {
-      ...course,
-      process: 0,
-    }
-    enrolled.push(enrolledCourses);
-    await AsyncStorage.setItem(
-      "enrolledCourses",
-      JSON.stringify(enrolled)
-    );
-
-    Alert.alert("Success", "Course enrolled successfully");
-    onSuccess?.()
-    setModalVisible(false);
-  } catch (err) {
-    console.log("Enroll error:", err);
-    Alert.alert("Error", "Failed to enroll course");
-  }
-};
-
+  const handleLoginRequired = () => {
+    Alert.alert("Login required", "Please login first", [
+      {
+        text: "OK",
+        onPress: () => router.push("/auth/loginScreen"),
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
 
   return (
     <TouchableOpacity
-  style={styles.cartButton}
-  onPress={() => {
-    if (!isAuth) {
-      Alert.alert("Login required", "Please login first");
-      return;
-    }
-    handleEnroll(course);
-  }}
->
-  <Text style={styles.cartText}>
-    {t("confirm_enroll", language)}
-  </Text>
-</TouchableOpacity>
+      style={[styles.cartButton, loading && { opacity: 0.6 }]}
+      disabled={loading}
+      onPress={() => {
+        if (!isAuth) {
+          handleLoginRequired();
+          return;
+        }
+        handleEnroll();
+      }}
+    >
+      <Text style={styles.cartText}>
+        {loading ? "Enrolling..." : t("confirm_enroll", language)}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = {
   cartButton: {
-    backgroundColor: "#58589bff", 
+    backgroundColor: "#58589bff",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
   },

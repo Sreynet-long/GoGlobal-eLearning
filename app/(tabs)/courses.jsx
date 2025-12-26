@@ -29,16 +29,16 @@ export default function Courses() {
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 
-        <ScrollView
+        {/* <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-        >
+        > */}
           <CourseList
             selectedCategoryId={selectedCategoryId}
             searchText={searchText}
             language={language}
           />
-        </ScrollView>
+        {/* </ScrollView> */}
       </View>
     </View>
   );
