@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client/react";
+import { useMutation } from "@apollo/client";
 import { useRouter } from "expo-router";
 import { Alert, Text, TouchableOpacity } from "react-native";
 import { useAuth } from "../../context/AuthContext";
@@ -11,18 +11,12 @@ export default function EnrolledButton({ course, onSuccess }) {
   const { isAuth } = useAuth();
   const router = useRouter();
 
-  const [createCourseEnrolled, { loading }] = useMutation(
-    CREATE_COURSE_ENROLLED
-  );
+  const [createCourseEnrolled, { loading }] = useMutation(CREATE_COURSE_ENROLLED);
 
   const handleEnroll = async () => {
     try {
       const { data } = await createCourseEnrolled({
-        variables: {
-          input: {
-            course_id: course._id,
-          },
-        },
+        variables: { input: { course_id: course._id } },
       });
 
       const enroll = data?.createCourseEnrolled;
@@ -33,18 +27,15 @@ export default function EnrolledButton({ course, onSuccess }) {
       }
 
       if (!enroll.status) {
-        Alert.alert("Information" , "You already enrolled this course.");
+        Alert.alert("Information", "You already enrolled in this course.");
         return;
       }
 
-        Alert.alert(
-          "Sucess",
-          "Course enrolled successfully!"
-          );
-          onSuccess();
-      } catch (err) {
-        console.log("Enroll error:", err);
-        Alert.alert("Error", "Enroll failed");
+      Alert.alert("Success", "Course enrolled successfully!");
+      onSuccess?.();
+    } catch (err) {
+      console.log("Enroll error:", err);
+      Alert.alert("Error", "Enroll failed. Please try again.");
     }
   };
 
@@ -52,18 +43,16 @@ export default function EnrolledButton({ course, onSuccess }) {
     Alert.alert("Login required", "Please login first", [
       {
         text: "OK",
-        style: "ok",
+        onPress: () => router.push("/auth/loginScreen"),
       },
-      // {
-      //   text: "Ok",
-      //   onPress: () => router.push("/(auth)/login"),
-      // }
+      { text: "Cancel", style: "cancel" },
     ]);
   };
 
   return (
     <TouchableOpacity
-      style={styles.cartButton}
+      style={[styles.cartButton, loading && { opacity: 0.6 }]}
+      disabled={loading}
       onPress={() => {
         if (!isAuth) {
           handleLoginRequired();
@@ -86,7 +75,6 @@ const styles = {
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
-    
   },
   cartText: {
     color: "#fff",

@@ -12,11 +12,10 @@ import {
 import { Divider } from "react-native-paper";
 import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
 import VideoList from "./VideoList";
-import VideoPlayer from "./VideoPlayer";
 
 export default function CourseContent({ courseId, onSelectVideo }) {
   const [expandedSection, setExpandedSection] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(false);
   const scrollRef = useRef(null);
 
   const { data, loading } = useQuery(GET_CONTENT_SECTION_WITH_PAGINATION, {
@@ -28,6 +27,7 @@ export default function CourseContent({ courseId, onSelectVideo }) {
   const sections = data?.getContentSectionWithPagination?.data || [];
 
   const handleSelectVideo = (video) => {
+    setSelectedVideo(video);
    onSelectVideo(video);
     // scroll to top to show video player
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -36,7 +36,7 @@ export default function CourseContent({ courseId, onSelectVideo }) {
   return (
     <ScrollView ref={scrollRef} style={{ flex: 1}}>
       {/* VIDEO PLAYER */}
-      {selectedVideo && <VideoPlayer video={selectedVideo} />}
+      {/* {selectedVideo && <VideoPlayer video={selectedVideo} />} */}
 
       {/* COURSE CURRICULUM */}
       <View style={styles.card}>

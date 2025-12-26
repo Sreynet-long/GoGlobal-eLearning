@@ -16,7 +16,7 @@ import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_ENROLLED_WITH_PAGINATION } from "../../schema/course";
-import EmptyCourse from "./EmptyCourse";
+import EmptyCourseEnroll from "./EmptyCourse";
 
 const { width } = Dimensions.get("window");
 
@@ -123,7 +123,7 @@ export default function EnrolledCourses({ searchText }) {
             {t("courses_enrolled_list", language)}
           </Text>
         }
-        ListEmptyComponent={!loading ? <EmptyCourse /> : null}
+        ListEmptyComponent={!loading ? <EmptyCourseEnroll/> : null}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={

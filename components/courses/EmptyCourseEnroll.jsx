@@ -11,7 +11,7 @@ export default function EmptyCourse() {
         source={require("../../assets/images/find-course.png")}
         style={styles.image}
       />
-      <Text style={styles.text}>{t("no_courses_found", language)}</Text>
+      <Text style={styles.text}>{t("no_courses_enrolled", language)}</Text>
     </View>
   );
 }

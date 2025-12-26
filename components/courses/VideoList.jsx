@@ -25,7 +25,12 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
     fetchPolicy: "network-only",
   });
 
-  if (loading) return <ActivityIndicator style={{ margin: 12 }} />;
+  if (loading)
+    return (
+      <ActivityIndicator
+        style={{ margin: 12, color: "rgba(79, 120, 255, 1)" }}
+      />
+    );
   if (error)
     return (
       <Text style={{ color: "red", padding: 12 }}>Failed to load videos</Text>
@@ -34,7 +39,10 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
   // REMOVE DUPLICATE VIDEOS
   const videos = Array.from(
     new Map(
-      (data?.getVideoContentWithPagination?.data || []).map((v) => [v._id, v])
+      (data?.getVideoContentWithPagination?.data || []).map((v) => [
+        `${v.video_content_order}-${v.video_content_name}`,
+        v,
+      ])
     ).values()
   );
 
@@ -62,13 +70,13 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
               <Text style={styles.lessonDuration}>Video</Text>
             </View>
 
-            {video.resources?.length > 0 && (
+            {/* {video.resources?.length > 0 && (
               <MaterialCommunityIcons
                 name="file-download-outline"
                 size={18}
                 color="#3F51B5"
               />
-            )}
+            )} */}
           </TouchableOpacity>
 
           {/* LIST ALL RESOURCES */}
@@ -78,20 +86,24 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
               const fileUrl = FILE_BASE_URL + res;
               return (
                 <View key={i} style={styles.lessonPdfRow}>
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => Linking.openURL(FILE_BASE_URL + res)}
-                    style={{ paddingLeft: 30, paddingVertical: 4, marginRight: 1}}
-                  >
-                    <Text style={{ color: "#3F51B5", fontSize: 14 }}>
-                      {filename}
-                    </Text>
-                  </TouchableOpacity>
                   <DownloadButton
                     // style={{ marginRight: 10}}
                     fileUrl={fileUrl}
                     filename={filename}
                   />
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => Linking.openURL(FILE_BASE_URL + res)}
+                    style={{
+                      paddingLeft: 10,
+                      paddingVertical: 4,
+                      marginRight: 1,
+                    }}
+                  >
+                    <Text style={{ color: "#3F51B5", fontSize: 14 }}>
+                      {filename}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               );
             })}
@@ -116,8 +128,8 @@ const styles = StyleSheet.create({
     borderTopColor: "#F8F9FA",
     alignItems: "center",
   },
-  activeLessonRow: { backgroundColor: "#3b4d96ff" },
+  activeLessonRow: { backgroundColor: "#bbc9ffff" },
   lessonInfo: { flex: 1, marginLeft: 12 },
   lessonTitle: { fontSize: 15, color: "#636E72", fontWeight: "600" },
-  lessonDuration: { fontSize: 11, color: "#B2BEC3", marginTop: 2 },
+  lessonDuration: { fontSize: 11, color: "#505050ff", marginTop: 2 },
 });

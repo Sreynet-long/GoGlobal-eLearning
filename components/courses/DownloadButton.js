@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
+import * as Linking from "expo-linking";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -11,8 +12,8 @@ const [localUri, setLocalUri ] = useState(null);
       const uri = FileSystem.documentDirectory + filename;
 
       const result = await FileSystem.downloadAsync(fileUrl, uri);
-    setLocalUri(result.uri);
-      Alert.alert("Download Now !", `Saved to: ${result.uri}`);
+    // setLocalUri(result.uri);
+      // Alert.alert("Download Now !", `Saved to: ${result.uri}`);
 
       // Optionally open/share the file
       if (await Sharing.isAvailableAsync()) {

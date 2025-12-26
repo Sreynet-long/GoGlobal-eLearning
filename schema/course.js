@@ -26,8 +26,13 @@ export const GET_COURSE_WITH_PAGINATION = gql`
           createdAt
           updatedAt
         }
+        is_free_course
         original_price
         sell_price
+        what_you_learn
+        who_this_course_is_for
+        requirements
+        description
         course_includes {
           number_of_lessons
           number_of_video
@@ -46,6 +51,11 @@ export const GET_COURSE_WITH_PAGINATION = gql`
           createdAt
           updatedAt
         }
+        has_enrolled
+        overall_completion_percentage
+        has_course_complated
+        createdAt
+        updatedAt
       }
       paginator {
         slNo
@@ -112,9 +122,10 @@ export const CREATE_COURSE_ENROLLED = gql`
   }
 `;
 export const GET_COURSE_BY_ID = gql`
-  query GetCourseById($courseById: ID!) {
-    getCourseById(course_by_id: $courseById) {
+  query GetCourseById($courseId: ID!) {
+    getCourseById(course_id: $courseId) {
       _id
+      enrolled_id
       title
       thumbnail
       category_id {
@@ -251,36 +262,48 @@ export const VIDEO_PROCESS_STATUS = gql`
   }
 `;
 export const GET_VIDEO_CONTENT_WITH_PAGINATION = gql`
-query GetVideoContentWithPagination($contentSectionId: ID!, $page: Int, $limit: Int, $keyword: String, $pagination: Boolean) {
-  getVideoContentWithPagination(content_section_id: $contentSectionId, page: $page, limit: $limit, keyword: $keyword, pagination: $pagination) {
-    paginator {
-      slNo
-      prev
-      next
-      perPage
-      totalPosts
-      totalPages
-      currentPage
-      hasPrevPage
-      hasNextPage
-      totalDocs
-    }
-    data {
-      _id
-      content_section_id {
+  query GetVideoContentWithPagination(
+    $contentSectionId: ID!
+    $page: Int
+    $limit: Int
+    $keyword: String
+    $pagination: Boolean
+  ) {
+    getVideoContentWithPagination(
+      content_section_id: $contentSectionId
+      page: $page
+      limit: $limit
+      keyword: $keyword
+      pagination: $pagination
+    ) {
+      paginator {
+        slNo
+        prev
+        next
+        perPage
+        totalPosts
+        totalPages
+        currentPage
+        hasPrevPage
+        hasNextPage
+        totalDocs
+      }
+      data {
         _id
-        section_order
-        section_title
+        content_section_id {
+          _id
+          section_order
+          section_title
+          createdAt
+          updatedAt
+        }
+        video_content_order
+        video_content_name
+        video_src
+        resources
         createdAt
         updatedAt
       }
-      video_content_order
-      video_content_name
-      video_src
-      resources
-      createdAt
-      updatedAt
     }
   }
-}
 `;
