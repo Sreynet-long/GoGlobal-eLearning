@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons"; // Added for back icon
 import { useRouter } from "expo-router";
 import {
   Image,
@@ -14,7 +13,7 @@ import Flag_kh from "../../assets/flags/kh.png";
 import { useLanguage } from "../../context/LanguageContext";
 import Notification from "./Notification";
 
-const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 0) + 15;
+const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 60 : (StatusBar.currentHeight || 0) + 15;
 
 const COLORS = {
   primary: "#25375A",
@@ -43,13 +42,12 @@ export default function Topbar({ showBack = false }) {
     <View style={styles.topContainer}>
       <View style={styles.header}>
         
-        {/* Left Section: Back / Logo / Brand */}
         <View style={styles.leftSide}>
-          {showBack && (
+          {/* {showBack && (
             <TouchableOpacity onPress={handleBack} style={styles.backButton}>
               <Ionicons name="chevron-back" size={24} color={COLORS.white} />
             </TouchableOpacity>
-          )}
+          )} */}
 
           <View style={styles.brandGroup}>
             <View style={styles.logoBox}>
@@ -61,7 +59,6 @@ export default function Topbar({ showBack = false }) {
             <View style={styles.textContainer}>
               <Text style={styles.brandTitle}>GO <Text style={styles.lightText}>eLEARNING</Text></Text>
               <View style={styles.statusRow}>
-                {/* <View style={styles.pulseDot} /> */}
                 <Text style={styles.statusText}>
 Innovation • Education • Global</Text>
               </View>
@@ -69,7 +66,6 @@ Innovation • Education • Global</Text>
           </View>
         </View>
 
-        {/* Right Section: Utilities */}
         <View style={styles.rightSide}>
           <View style={styles.utilityBar}>
             <TouchableOpacity 
@@ -127,9 +123,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logoBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 54,
+    height: 54,
+    borderRadius: 50,
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
@@ -139,22 +135,22 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   logo: {
-    width: 32,
-    height: 32,
+    width: 42,
+    height: 42,
     resizeMode: "contain",
   },
   textContainer: {
     justifyContent: "center",
   },
   brandTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "900",
     color: COLORS.white,
     letterSpacing: -0.2,
   },
   lightText: {
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.8)",
+    fontWeight: "700",
+    color: "#D4AF37",
   },
   statusRow: {
     flexDirection: "row",
@@ -166,7 +162,7 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: "#4ade80", // Bright green
+    backgroundColor: "#4ade80", 
   },
   statusText: {
     fontSize: 9,
@@ -195,23 +191,23 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   flag: {
-    width: 18,
-    height: 12,
+    width: 20,
+    height: 15,
     borderRadius: 2,
   },
   langText: {
     color: COLORS.white,
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: "800",
   },
   divider: {
-    width: 1,
-    height: 20,
+    width: 2,
+    height: 25,
     backgroundColor: COLORS.border,
   },
   notifIcon: {
-    width: 36,
-    height: 36,
+    width: 35,
+    height: 35,
     justifyContent: "center",
     alignItems: "center",
   },

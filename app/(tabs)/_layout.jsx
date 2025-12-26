@@ -1,10 +1,9 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -17,19 +16,20 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: true, 
-        tabBarActiveTintColor: "#25375A", 
-        tabBarInactiveTintColor: "#94a3b8", 
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "#ffffff",
+        tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
-          backgroundColor: "#ffffff",
+          backgroundColor: "#14213bff",
           position: "absolute",
-          bottom: 25,
-          left: 20,
-          right: 20,
-          height: 75,
-          borderRadius: 24, 
-          paddingBottom: 12,
-          paddingTop: 10,
+          bottom: 40,
+          marginHorizontal:15,
+          left: 40,
+          right: 40,
+          height: 65,
+          borderRadius: 24,
+          paddingBottom: 2,
+          paddingTop: 5,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 10 },
           shadowOpacity: 0.1,
@@ -42,11 +42,11 @@ export default function TabsLayout() {
             android: { borderTopWidth: 0 },
           }),
         },
-        tabBarLabelStyle: { 
-          fontWeight: "700", 
-          fontSize: 10, 
-          marginTop: 2, 
-          textTransform: 'capitalize', 
+        tabBarLabelStyle: {
+          fontWeight: "700",
+          fontSize: 10,
+          marginTop: 2,
+          textTransform: "capitalize",
         },
       }}
     >
@@ -55,46 +55,45 @@ export default function TabsLayout() {
         options={{
           title: t("home", language),
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeTab : styles.inactiveTab}>
-              <FontAwesome6 name={focused ? "house-chimney" : "house"} size={22} color={color} />
-            </View>
+            <FontAwesome6
+              name={focused ? "house-chimney" : "house"}
+              size={25}
+              color={color}
+            />
           ),
         }}
       />
-
       <Tabs.Screen
         name="courses"
         options={{
           title: t("courses", language),
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeTab : styles.inactiveTab}>
-              <MaterialCommunityIcons 
-                name={focused ? "book-open-page-variant" : "book-education"} 
-                size={24} 
-                color={color} 
-              />
-            </View>
+            <MaterialCommunityIcons
+              name={focused ? "book-open-page-variant" : "book-education"}
+              size={30}
+              color={color}
+            />
           ),
         }}
       />
-
       <Tabs.Screen
         name="myCourses&Login"
         options={{
           title: isAuth ? t("my_courses", language) : t("login", language),
-          tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeTab : styles.inactiveTab}>
-              {isAuth ? (
-                <MaterialCommunityIcons 
-                  name={focused ? "book-open-page-variant" : "book-heart"} 
-                  size={24} 
-                  color={color} 
-                />
-              ) : (
-                <FontAwesome5 name={focused ? "door-open" : "door-closed"} size={20} color={color} />
-              )}
-            </View>
-          ),
+          tabBarIcon: ({ color, focused }) =>
+            isAuth ? (
+              <MaterialCommunityIcons
+                name={focused ? "book-open-page-variant" : "book-heart"}
+                size={30}
+                color={color}
+              />
+            ) : (
+              <FontAwesome5
+                name={focused ? "door-open" : "door-closed"}
+                size={25}
+                color={color}
+              />
+            ),
         }}
       />
 
@@ -102,20 +101,28 @@ export default function TabsLayout() {
         name="account&Aboutus"
         options={{
           title: isAuth ? t("account", language) : t("about_us", language),
-          tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeTab : styles.inactiveTab}>
-              {isAuth ? (
-                <FontAwesome6 name={focused ? "user-graduate" : "user-large"} size={20} color={color} />
-              ) : (
-                <FontAwesome name={focused ? "question-circle" : "question-circle-o"} size={22} color={color} />
-              )}
-            </View>
-          ),
+          tabBarIcon: ({ color, focused }) =>
+            isAuth ? (
+              <FontAwesome5
+                name={focused ? "user-graduate" : "user-alt"}
+                size={25}
+                color={color}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name={focused ? "book-open-page-variant" : "book-information-variant"}
+                size={30}
+                color={color}
+              />
+            ),
         }}
       />
     </Tabs>
   );
 }
+
+
+//==================== Styles ====================
 
 const styles = StyleSheet.create({
   activeTab: {

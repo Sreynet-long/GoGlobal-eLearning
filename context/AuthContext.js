@@ -6,9 +6,8 @@ import { Platform } from "react-native";
 
 const AuthContext = createContext();
 
-// ------------------- Mock API Call -------------------
+// ==================== Mock API Call ====================
 const fetchUserFromApi = async (token) => {
-  // Replace this with your real API call
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ id: "1", name: "John Doe", email: "john@example.com" });
@@ -16,7 +15,7 @@ const fetchUserFromApi = async (token) => {
   });
 };
 
-// ------------------- Auth Provider -------------------
+// ==================== Auth Provider ====================
 export const AuthProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -37,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     else await AsyncStorage.removeItem("token");
   };
 
-  // ------------------- Initialize Auth -------------------
+  // ==================== Initialize Auth ====================
   useEffect(() => {
     const initAuth = async () => {
       const token = await getToken();
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // ------------------- Login -------------------
+  // ==================== Login ====================
   const login = async (token, fetchedUser = null) => {
     await setToken(token);
     setIsAuth(true);
@@ -72,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     router.replace("/");
   };
 
-  // ------------------- Logout -------------------
+  // ==================== Logout ====================
   const logout = async () => {
     await removeToken();
     setIsAuth(false);

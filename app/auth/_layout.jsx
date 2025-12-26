@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     overflow: "hidden",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    // borderTopLeftRadius: 30,
+    // borderTopRightRadius: 30,
     backgroundColor: "#25375aff",
   },
 });

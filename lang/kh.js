@@ -53,7 +53,7 @@ export default {
   new_password: "ពាក្យសម្ងាត់ថ្មី",
   confirm_password: "បញ្ជាក់ពាក្យសម្ងាត់",
   set_new_password: "សូមកំណត់ពាក្យសម្ងាត់ថ្មី។",
-  update_password: "បន្ទាន់សម័យពាក្យសម្ងាត់",
+  update_password: "កែប្រែពាក្យសម្ងាត់",
   fill_both_fields: "សូមបំពេញទាំងពីរផ្ទាំង។",
   passwords_do_not_match: "ពាក្យសម្ងាត់មិនត្រូវគ្នា។",
   courses: "វគ្គសិក្សា",
@@ -111,5 +111,12 @@ export default {
   resend_code: "ផ្ញើកូដម្តងទៀត!",
   back_to_login: "ត្រឡប់ទៅចូលគណនី",
   back_to_forgot_password: "ត្រឡប់ទៅភ្លេចពាក្យសម្ងាត់",
-  RESUME_LEARNING: "បន្តការរៀន"
+  RESUME_LEARNING: "បន្តការរៀន",
+  personal_details:"ព័ត៌មានផ្ទាល់ខ្លួន",
+  settings:"ការកំណត់",
+  invalid_email_password:"អ៊ីមែល និងលេខសម្ងាត់មិនត្រឹមត្រូវ",
+  old_password:"ពាក្យសម្ងាត់ចាស់",
+  back_to_account:"ត្រឡប់ទៅគណនី",
+  NEW_CREDENTIALS:"ពាក្យសម្ងាត់ថ្មី",
+  Update_your_credentials_to_keep_your_account_secure:"កែប្រែពាក្យសម្ងាត់របស់អ្នក ដើម្បីរក្សាគណនីរបស់អ្នកឱ្យមានសុវត្ថិភាព"
 };

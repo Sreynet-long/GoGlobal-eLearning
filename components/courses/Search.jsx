@@ -38,6 +38,8 @@ export default function Search({ value, onChange }) {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,

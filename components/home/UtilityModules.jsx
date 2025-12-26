@@ -42,6 +42,9 @@ export default function UtilityModules() {
   );
 }
 
+//==================== Styles ====================
+
+
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,

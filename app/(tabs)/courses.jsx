@@ -7,7 +7,10 @@ import Topbar from "../../components/headers/Topbar";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
+
+
 export default function Courses() {
+  
   const { language } = useLanguage();
   const [searchText, setSearchText] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("All");
@@ -40,6 +43,8 @@ export default function Courses() {
     </View>
   );
 }
+
+//==================== Styles ====================
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375aff" },

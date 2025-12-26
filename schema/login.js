@@ -118,3 +118,15 @@ export const UPDATE_NEW_PASSWORD = gql`
     }
   }
 `;
+
+export const MOBILE_UPDATE_NEW_PASSWORD = gql`
+  mutation MobileUpdatePassword($oldPassword: String, $newPassword: String) {
+  mobileUpdatePassword(old_password: $oldPassword, new_password: $newPassword) {
+    status
+    message {
+      messageKh
+      messageEn
+    }
+  }
+}
+`;

@@ -252,6 +252,8 @@ export default function LoginScreen() {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   headerBlock: { paddingBottom: 10 },
@@ -303,15 +305,16 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
   },
-  row: { flexDirection: "row", gap: 12, marginBottom: 10 },
+  row: { flexDirection: "row", gap: 12, marginBottom: 0 },
   flexInput: { flex: 1, backgroundColor: COLORS.white },
-  inputSpacing: { marginBottom: 15, backgroundColor: COLORS.white },
+  inputSpacing: { marginBottom: 8, backgroundColor: COLORS.white },
   inputOutline: { borderRadius: 12, borderColor: COLORS.grey200 },
 
   genderContainer: {
     marginBottom: 10,
     backgroundColor: COLORS.background,
-    padding: 16,
+    paddingHorizontal: 10,
+    paddingVertical:5,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.grey200,

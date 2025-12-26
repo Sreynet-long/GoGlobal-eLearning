@@ -160,6 +160,8 @@ export default function UpdatePassword() {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   

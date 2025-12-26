@@ -33,6 +33,8 @@ export default function VideoCard() {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 0,

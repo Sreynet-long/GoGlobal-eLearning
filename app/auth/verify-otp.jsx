@@ -28,7 +28,7 @@ const COLORS = {
   bgLight: "#F8FAFC",
 };
 
-// ---------------------- OTP Mutation ----------------------
+// ==================== OTP Mutation ====================
 export const VERIFY_OTP = gql`
   mutation VerifyOTP($otp: String!, $token: String!) {
     verifyOTP(otp: $otp, token: $token) {
@@ -170,6 +170,8 @@ export default function VerifyOTP() {
     </KeyboardAvoidingView>
   );
 }
+
+//==================== Styles ====================
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },

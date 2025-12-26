@@ -120,6 +120,8 @@ export default function ForgotPassword() {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   

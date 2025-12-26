@@ -42,7 +42,7 @@ export default function AboutScreen() {
         <View style={styles.logoContainer}>
           <Image source={COMPANY_LOGO} style={styles.logo} resizeMode="contain" />
         </View>
-        <Text style={styles.heroTitle}>GO <Text style={{fontWeight: '300'}}>eLEARNING</Text></Text>
+        <Text style={styles.heroTitle}>GO <Text style={{fontWeight: '600', color:"#D4AF37"}}>eLEARNING</Text></Text>
         <Text style={styles.heroSubtitle}>Innovation • Education • Global</Text>
       </View>
 
@@ -92,6 +92,8 @@ export default function AboutScreen() {
   );
 }
 
+//==================== Styles ====================
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.primary },
   
@@ -133,10 +135,10 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: COLORS.white,
-    marginTop: -30,
+    marginTop: -40,
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
-    paddingTop:20
+    paddingTop:40
   },
   scrollContent: {
     paddingHorizontal: 25,
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
 
   centeredSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   iconCircleLarge: {
     width: 64,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
   missionVisionContainer: {
     width: '100%',
     gap: 15,
-    marginBottom: 40,
+    marginBottom: 10,
   },
   fullBento: {
     width: '100%',

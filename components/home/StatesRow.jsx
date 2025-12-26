@@ -54,6 +54,9 @@ export default function StatesRow() {
   );
 }
 
+//==================== Styles ====================
+
+
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 0,

@@ -1,68 +1,94 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useQuery } from "@apollo/client";
 import {
-  Image,
+  ActivityIndicator,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
+import { GET_COURSE_TRENDING_WITH_PAGINATION } from "../../schema/courseHomepage";
 
-const CourseCard = ({ title, image, category }) => (
-  <TouchableOpacity activeOpacity={0.7} style={styles.compactCard}>
-    <Image source={image} style={styles.compactImage} />
-    
-    <View style={styles.compactInfo}>
-      <Text style={styles.compactCategory}>{category.toUpperCase()}</Text>
-      <Text style={styles.compactTitle} numberOfLines={1}>{title}</Text>
-      
-      <View style={styles.compactFooter}>
-        <View style={styles.ratingRow}>
-          <Text style={styles.star}> <MaterialIcons
-        name="star"
-        size={19}
-        color="#FFD700"
-        style={{ marginTop: 13 }} 
-      /></Text>
-          <Text style={styles.ratingValue}>4.9</Text>
+// ==================== Course Card ====================
+const CourseCard = ({ title, thumbnail, category }) => {
+  const imageUri = thumbnail
+    ? `${IMAGE_BASE_URL}/file/${thumbnail}`
+    : `${IMAGE_BASE_URL}/default/course.png`;
+
+  return (
+    <TouchableOpacity activeOpacity={0.9} style={styles.cardWrapper}>
+      <ImageBackground
+        source={{ uri: imageUri }}
+        style={styles.cardImage}
+        imageStyle={{ borderRadius: 20 }}
+      >
+        <View style={styles.categoryBadge}>
+          <Text style={styles.categoryText}>{category?.toUpperCase() || "GENERAL"}</Text>
         </View>
-        <Text style={styles.freeBadge}>FREE</Text>
-      </View>
-    </View>
-  </TouchableOpacity>
-);
 
+        <View style={styles.glassFooter}>
+          <Text style={styles.courseTitle} numberOfLines={2}>
+            {title}
+          </Text>
+          
+          
+          <View style={styles.footerRow}>
+            <View style={styles.trendingIndicator}>
+              {/* <View style={styles.pulseDot} />
+              <Text style={styles.trendingText}>Trending</Text> */}
+            </View>
+            <Text style={styles.freeText}>Price $$</Text>
+          </View>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
+};
+
+// ==================== Main Component ====================
 export default function TrendingCourse() {
   const { language } = useLanguage();
 
-  const courses = [
-    { id: 1, key: "python_for_data_science", img: require("../../assets/courses/python.png"), cat: "Data" },
-    { id: 2, key: "CompTIA_Security", img: require("../../assets/courses/security.png"), cat: "Cyber" },
-    { id: 3, key: "React_Native_Mobile", img: require("../../assets/courses/react-native.png"), cat: "Dev" },
-  ];
+  const { data, loading, error } = useQuery(
+    GET_COURSE_TRENDING_WITH_PAGINATION,
+    { variables: { limit: 10 } }
+  );
+
+  if (loading) return <ActivityIndicator style={{ marginVertical: 20 }} />;
+  if (error || !data?.getHilightCourse?.length) return null;
+
+  const courses = data?.getHilightCourse ?? [];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t("trending_courses", language)}</Text>
+        <View style={styles.titleGroup}>
+          {/* <Text style={styles.headerTitle}>{t("trending_courses", language)}</Text> */}
+          {/* <Text style={styles.headerSubtitle}>Popular this week</Text> */}
+        </View>
+
         <TouchableOpacity style={styles.seeAllBtn}>
           <Text style={styles.seeAllText}>{t("view_all", language)}</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+      <ScrollView
+        horizontal
+        snapToInterval={170 + 16} 
+        decelerationRate="fast"
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       >
         {courses.map((course) => (
-          <CourseCard 
-            key={course.id} 
-            title={t(course.key, language)} 
-            image={course.img} 
-            category={course.cat} 
+          <CourseCard
+            key={course._id}
+            title={course.title}
+            thumbnail={course.thumbnail}
+            category={course.category_id?.category_name}
           />
         ))}
       </ScrollView>
@@ -70,65 +96,102 @@ export default function TrendingCourse() {
   );
 }
 
+// ==================== Styles ====================
 const styles = StyleSheet.create({
-  container: { marginVertical: 10 },
+  container: { marginVertical: 15 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0,
-    marginBottom: 10
+    paddingHorizontal: 20,
+    marginBottom: 16
   },
-  headerTitle: { fontSize: 16, fontWeight: '800', color: '#1e293b' },
-  seeAllBtn: { backgroundColor: '#f1f5f9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  seeAllText: { fontSize: 11, fontWeight: '700', color: '#6366f1' },
+  titleGroup: { flex: 1 },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: '#0f172a' },
+  headerSubtitle: { fontSize: 12, color: '#94a3b8', marginTop: 2 },
   
-  scrollContainer: { paddingLeft: 0, paddingRight: 0 },
+  seeAllBtn: { 
+    backgroundColor: '#f1f5f9', 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 12 
+  },
+  seeAllText: { fontSize: 12, fontWeight: '700', color: '#6366f1' },
   
-  compactCard: {
-    width: 160, 
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    marginRight: 12,
-    padding: 8, 
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
+  scrollContainer: { paddingLeft: 20, paddingRight: 4 },
+  
+  cardWrapper: {
+    width: 170,
+    height: 200,
+    marginRight: 16,
+    borderRadius: 20,
+    backgroundColor: '#f1f5f9',
     shadowColor: "#000",
-    shadowOpacity: 0.04,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  cardImage: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  categoryText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  glassFooter: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
     shadowRadius: 5,
-    elevation: 2,
   },
-  compactImage: {
-    width: '100%',
-    height: 80,
-    borderRadius: 10,
-    backgroundColor: '#f8fafc'
+  courseTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1e293b',
+    height: 26, 
   },
-  compactInfo: { marginTop: 8 },
-  compactCategory: { 
-    fontSize: 8, 
-    fontWeight: '800', 
-    color: '#94a3b8', 
-    letterSpacing: 0.5 
-  },
-  compactTitle: { 
-    fontSize: 13, 
-    fontWeight: '700', 
-    color: '#334155', 
-    marginTop: 2 
-  },
-  compactFooter: {
+  footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8
+    marginTop: 8,
   },
-  ratingRow: { flexDirection: 'row', alignItems: 'center',textAlign:"center", justifyContent:"center" },
-  star: { fontSize: 10, marginRight: 2 },
-  ratingValue: { fontSize: 11, fontWeight: '600', color: '#475569' },
-  freeBadge: { 
-    fontSize: 10, 
-    fontWeight: '900', 
-    color: '#22c55e' 
+  trendingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#f43f5e',
+    marginRight: 4,
+  },
+  trendingText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#f43f5e',
+  },
+  freeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#10b981',
   },
 });

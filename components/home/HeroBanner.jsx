@@ -1,3 +1,5 @@
+import { useQuery } from "@apollo/client";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -8,8 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
+import { GET_COURSE_BANNER_WITH_PAGINATION } from "../../schema/courseHomepage";
 
 const { width: screenWidth } = Dimensions.get("window");
 const SLIDE_MARGIN = 16;
@@ -17,41 +21,41 @@ const SLIDE_WIDTH = screenWidth - SLIDE_MARGIN * 2;
 const AUTOSCROLL_INTERVAL = 4000;
 
 const HeroBanner = () => {
+  const router = useRouter();
   const { language } = useLanguage();
-
-  const BANNER_DATA = [
-    {
-      id: 1,
-      title: t("tech_skill", language),
-      subtitle: t("explore_courses", language),
-      image: require("../../assets/banners/tech-skill.png"),
-    },
-    {
-      id: 2,
-      title: t("50_off_sale", language),
-      subtitle: t("cloud_sale_subtitle", language),
-      image: require("../../assets/banners/sale-off.png"),
-    },
-    {
-      id: 3,
-      title: t("new_c_class", language),
-      subtitle: t("cpp_subtitle", language),
-      image: require("../../assets/banners/cpp.png"),
-    },
-  ];
-
-  const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { data, loading } = useQuery(GET_COURSE_BANNER_WITH_PAGINATION, {
+    variables: {
+      page: 1,
+      limit: 10,
+      pagination: false,
+      isPublic: true,
+    },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const banners = data?.getCoverSliderPagination?.data ?? [];
 
   useEffect(() => {
+    if (!banners.length) return;
+
     const interval = setInterval(() => {
-      const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
-      scrollRef.current?.scrollTo({ x: nextIndex * SLIDE_WIDTH, animated: true });
+      const nextIndex = (activeIndex + 1) % banners.length;
+      scrollRef.current?.scrollTo({
+        x: nextIndex * SLIDE_WIDTH,
+        animated: true,
+      });
       setActiveIndex(nextIndex);
     }, AUTOSCROLL_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [activeIndex, BANNER_DATA.length]);
+  }, [activeIndex, banners.length]);
+
+  if (loading || !banners.length) {
+    return null;
+  }
 
   return (
     <View style={styles.carouselContainer}>
@@ -59,20 +63,36 @@ const HeroBanner = () => {
         ref={scrollRef}
         horizontal
         pagingEnabled
-        scrollEnabled={false} // Auto-scroll only
         showsHorizontalScrollIndicator={false}
+        onScroll={(event) => {
+          const x = event.nativeEvent.contentOffset.x;
+          const index = Math.round(x / SLIDE_WIDTH);
+          setActiveIndex(index);
+        }}
+        scrollEventThrottle={16}
       >
-        {BANNER_DATA.map((item) => (
+        {banners.map((item) => (
           <ImageBackground
-            key={item.id}
-            source={item.image}
+            key={item._id}
+            source={{
+              uri: item.image?.startsWith("http")
+                ? item.image
+                : `${IMAGE_BASE_URL}/file/${item.image}`,
+            }}
             style={[styles.slide, { width: SLIDE_WIDTH }]}
             imageStyle={{ borderRadius: 20 }}
           >
             <View style={styles.gradientOverlay}>
               <Text style={styles.slideTitle}>{item.title}</Text>
-              <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
-              <TouchableOpacity style={styles.slideButton}>
+
+              <Text style={styles.slideSubtitle}>
+                {item.description || t("explore_courses", language)}
+              </Text>
+
+              <TouchableOpacity
+                style={styles.slideButton}
+                onPress={() => router.push("/(tabs)/courses")}
+              >
                 <Text style={styles.slideButtonText}>
                   {t("explore_now", language)}
                 </Text>
@@ -83,19 +103,18 @@ const HeroBanner = () => {
       </ScrollView>
 
       <View style={styles.pagination}>
-        {BANNER_DATA.map((_, index) => (
+        {banners.map((_, index) => (
           <View
             key={index}
-            style={[
-              styles.dot,
-              index === activeIndex && styles.activeDot,
-            ]}
+            style={[styles.dot, index === activeIndex && styles.activeDot]}
           />
         ))}
       </View>
     </View>
   );
 };
+
+//==================== Styles ====================
 
 const styles = StyleSheet.create({
   carouselContainer: {
@@ -104,12 +123,11 @@ const styles = StyleSheet.create({
   },
   slide: {
     height: 200,
-    // marginHorizontal: SLIDE_MARGIN / 2,
     justifyContent: "flex-end",
     overflow: "hidden",
     borderRadius: 20,
     elevation: 5,
-    shadowColor: "#000", 
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -123,7 +141,7 @@ const styles = StyleSheet.create({
   slideTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#FFD700", 
+    color: "#FFD700",
     marginBottom: 4,
   },
   slideSubtitle: {
@@ -166,7 +184,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#3fe947ff", 
+    backgroundColor: "#3fe947ff",
     opacity: 1,
   },
 });

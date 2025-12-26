@@ -1,11 +1,8 @@
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from "expo-image-picker";
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import {
   Image,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StatusBar,
@@ -13,511 +10,272 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, RadioButton, Text, TextInput } from "react-native-paper";
+import { Button, Surface, Text } from "react-native-paper";
+
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
-import { GET_USER_BY_ID, MOBILE_UPDATE_USER } from "../../schema/login";
+import { GET_USER_BY_ID } from "../../schema/login";
 
 const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
-  background: "#F7F9FC",
   white: "#FFFFFF",
-  error: "#D32F2F",
-  textDark: "#212121",
-  textLight: "#FFFFFF",
-  grey300: "#E0E0E0",
-  grey600: "#757575",
-  cardBackground: "#FFFFFF",
-  borderLight: "#e9ecef",
+  error: "#E11D48",
+  grey50: "#F8FAFC",
+  grey100: "#F1F5F9",
+  grey200: "#E2E8F0",
+  grey600: "#64748B",
+  textDark: "#1E293B",
 };
 
-const UPLOAD_API = "http://192.168.5.36:6800/api/direct-upload/";
-const FILE_BASE_URL = "http://192.168.5.36:6800/api/file/";
-
 export default function AccountScreen() {
+  const router = useRouter();
   const { language } = useLanguage();
-  const { user: authUser, logout, setUser } = useAuth();
-  const [editing, setEditing] = useState(false);
-  const [localProfileImage, setLocalProfileImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("account");
+  const { user: authUser, logout } = useAuth();
 
-  useEffect(() => {
-    const loadProfileImage = async () => {
-      const cached = await AsyncStorage.getItem("localProfileImage");
-      if (cached) setLocalProfileImage(cached);
-    };
-    loadProfileImage();
-  }, []);
-
-  const {
-    data: userData,
-    refetch,
-    loading: userLoading,
-  } = useQuery(GET_USER_BY_ID, { fetchPolicy: "network-only" });
-
-  const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
-    onCompleted: (data) => {
-      refetch?.();
-      setEditing(false);
-      if (data?.mobileUpdateUser?.data) setUser(data.mobileUpdateUser.data);
-    },
-    onError: (err) => console.error(err),
+  const { data: userData, loading: userLoading } = useQuery(GET_USER_BY_ID, {
+    fetchPolicy: "network-only",
   });
 
   const user = userData?.getUserById || authUser || {};
 
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setLocalProfileImage(uri);
-      await AsyncStorage.setItem("localProfileImage", uri);
-    }
-  };
-
-  const uploadFiles = async (fileUri) => {
-    try {
-      if (!fileUri) return null;
-      const formData = new FormData();
-      const uri = fileUri.startsWith("file://") ? fileUri : "file://" + fileUri;
-      formData.append("files", {
-        uri,
-        name: uri.split("/").pop(),
-        type: "image/jpeg",
-      });
-      const response = await fetch(UPLOAD_API, {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      return result?.files?.[0]?.filename || null;
-    } catch (error) {
-      console.error("Upload error:", error);
-      return null;
-    }
-  };
-
-  const handleSave = async (formData) => {
-    let profileImageFilename = user.profile_image || "";
-    if (localProfileImage && !localProfileImage.startsWith("http")) {
-      const uploaded = await uploadFiles(localProfileImage);
-      if (uploaded) profileImageFilename = uploaded;
-    }
-    updateUser({
-      variables: {
-        id: user._id,
-        input: { ...formData, profile_image: profileImageFilename },
-      },
-    });
-  };
-
   if (userLoading) return null;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screenContainer}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <View style={styles.screenContainer}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.headerBackground}>
+      <View style={styles.headerWrapper}>
         <Topbar />
-        <View style={styles.profileSection}>
-          <View style={styles.avatarWrapper}>
+        <View style={styles.profileCard}>
+          <Surface style={styles.avatarSurface} elevation={4}>
             <Image
               source={{
-                uri: localProfileImage
-                  ? localProfileImage
-                  : user?.profile_image
-                  ? FILE_BASE_URL + user.profile_image
+                uri: user?.profile_image
+                  ? `http://192.168.5.36:6800/api/file/${user.profile_image}`
                   : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
               }}
               style={styles.avatar}
             />
-            {editing && (
-              <TouchableOpacity style={styles.cameraBadge} onPress={pickImage}>
-                <MaterialIcons
-                  name="photo-camera"
-                  size={18}
-                  color={COLORS.white}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          <Text style={styles.userNameText}>
+          </Surface>
+
+          <Text style={styles.userName}>
             {user?.first_name} {user?.last_name}
           </Text>
-          <Text style={styles.userEmailText}>{user?.email}</Text>
+          <View style={styles.emailBadge}>
+            <Text style={styles.userEmail}>{user?.email}</Text>
+          </View>
         </View>
       </View>
-
-      <View style={styles.contentCard}>
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            onPress={() => {
-              setEditing(false);
-              setActiveTab("account");
-            }}
-            style={[
-              styles.segmentBtn,
-              activeTab === "account" && styles.segmentBtnActive,
-            ]}
+      <View style={styles.accentBackgroundLayer}>
+        <Surface style={styles.contentContainer} elevation={0}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
           >
-            <Text
-              style={[
-                styles.segmentText,
-                activeTab === "account" && styles.segmentTextActive,
-              ]}
-            >
-              {t("account_information", language)}
+            <Text style={styles.menuTitle}>
+              {t("personal_details", language)}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setEditing(false);
-              setActiveTab("security");
-            }}
-            style={[
-              styles.segmentBtn,
-              activeTab === "security" && styles.segmentBtnActive,
-            ]}
-          >
-            <Text
-              style={[
-                styles.segmentText,
-                activeTab === "security" && styles.segmentTextActive,
-              ]}
-            >
-              {t("security", language)}
-            </Text>
-          </TouchableOpacity>
-        </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              {activeTab === "account"
-                ? t("personal_details", language)
-                : t("settings", language)}
-            </Text>
-            {activeTab === "account" && (
-              <TouchableOpacity onPress={() => setEditing(!editing)}>
-                <Text style={styles.editActionText}>
-                  {editing
-                    ? t("cancel", language)
-                    : t("edit_profile", language)}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {activeTab === "account" ? (
-            <AccountDetailsView
-              user={user}
-              editing={editing}
-              handleSave={handleSave}
-              updating={updating}
-              language={language}
-              pickImage={pickImage}
-              logout={logout}
-            />
-          ) : (
-            <SecurityView language={language} logout={logout} />
-          )}
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
-  );
-}
-
-function AccountDetailsView({
-  user,
-  editing,
-  handleSave,
-  updating,
-  language,
-  logout,
-}) {
-  if (editing) {
-    return (
-      <EditUser
-        initialData={user}
-        onSave={handleSave}
-        updating={updating}
-        language={language}
-      />
-    );
-  }
-  return (
-    <View>
-      <InfoRow
-        label={t("first_name", language)}
-        value={user?.first_name}
-        icon="person"
-      />
-      <InfoRow
-        label={t("last_name", language)}
-        value={user?.last_name}
-        icon="badge"
-      />
-      <InfoRow
-        label={t("phone", language)}
-        value={user?.phone_number}
-        icon="smartphone"
-      />
-      <InfoRow label={t("gender", language)} value={user?.gender} icon="face" />
-      <Button
-        mode="contained"
-        onPress={logout}
-        style={styles.logoutBtn}
-        labelStyle={{ fontWeight: "700" }}
-      >
-        {t("log_out", language)}
-      </Button>
-    </View>
-  );
-}
-
-function SecurityView({ language, logout }) {
-  const items = [
-    { key: "1", label: t("change_password", language), icon: "lock-reset" },
-    { key: "2", label: t("about_us", language), icon: "corporate-fare" },
-    { key: "3", label: t("contact_us", language), icon: "support-agent" },
-    { key: "4", label: t("terms_conditions", language), icon: "gavel" },
-  ];
-  return (
-    <View>
-      {items.map((item) => (
-        <TouchableOpacity key={item.key} style={styles.securityRow}>
-          <View style={styles.securityIconBox}>
-            <MaterialIcons name={item.icon} size={22} color={COLORS.primary} />
-          </View>
-          <Text style={styles.securityLabel}>{item.label}</Text>
-          <MaterialIcons
-            name="chevron-right"
-            size={24}
-            color={COLORS.grey300}
-          />
-        </TouchableOpacity>
-      ))}
-      <Button mode="contained" onPress={logout} style={styles.logoutBtn}>
-        {t("log_out", language)}
-      </Button>
-    </View>
-  );
-}
-
-function EditUser({ initialData, onSave, updating, language }) {
-  const [formData, setFormData] = useState({
-    first_name: initialData.first_name || "",
-    last_name: initialData.last_name || "",
-    phone_number: initialData.phone_number || "",
-    gender: initialData.gender || "male",
-  });
-
-  return (
-    <View style={styles.editForm}>
-      <View style={styles.row}>
-        <TextInput
-          label={t("first_name", language)}
-          value={formData.first_name}
-          onChangeText={(v) => setFormData({ ...formData, first_name: v })}
-          style={[styles.input, { marginRight: 8 }]}
-          mode="outlined"
-          activeOutlineColor={COLORS.primary}
-        />
-        <TextInput
-          label={t("last_name", language)}
-          value={formData.last_name}
-          onChangeText={(v) => setFormData({ ...formData, last_name: v })}
-          style={styles.input}
-          mode="outlined"
-          activeOutlineColor={COLORS.primary}
-        />
-      </View>
-      <TextInput
-        label={t("phone", language)}
-        value={formData.phone_number}
-        onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
-        style={styles.fullInput}
-        mode="outlined"
-        keyboardType="phone-pad"
-        activeOutlineColor={COLORS.primary}
-      />
-      <View style={styles.radioContainer}>
-        <RadioButton.Group
-          onValueChange={(val) => setFormData({ ...formData, gender: val })}
-          value={formData.gender}
-        >
-          <View style={styles.radioRow}>
-            <View style={styles.radioItem}>
-              <RadioButton value="male" color={COLORS.primary} />
-              <Text>{t("male", language)}</Text>
+            <View style={styles.menuGrid}>
+              <MenuItem
+                label={t("account_information", language)}
+                icon="manage-accounts"
+                onPress={() => router.push("/auth/account-information")}
+              />
+              <MenuItem
+                label={t("change_password", language)}
+                icon="lock-person"
+                onPress={() => router.push("/auth/change-password")}
+              />
+              <MenuItem
+                label={t("about_us", language)}
+                icon="help"
+                onPress={() => router.push("/auth/about-us")}
+              />
+              <MenuItem
+                label={t("contact_us", language)}
+                icon="support-agent"
+                onPress={() => router.push("/auth/contact-us")}
+              />
+              <MenuItem
+                label={t("terms_conditions", language)}
+                icon="description"
+                onPress={() => router.push("/auth/terms-conditions")}
+                isLast
+              />
             </View>
-            <View style={styles.radioItem}>
-              <RadioButton value="female" color={COLORS.primary} />
-              <Text>{t("female", language)}</Text>
-            </View>
-          </View>
-        </RadioButton.Group>
+
+            <Button
+              mode="contained"
+              onPress={logout}
+              style={styles.logoutButton}
+              labelStyle={styles.logoutLabel}
+              contentStyle={styles.logoutContent}
+            >
+              {t("log_out", language)}
+            </Button>
+
+            <Text style={styles.versionText}>
+              {t("version_tag", language, { version: "1.0.0", build: "22" })}
+            </Text>
+          </ScrollView>
+        </Surface>
       </View>
-      <Button
-        mode="contained"
-        loading={updating}
-        onPress={() => onSave(formData)}
-        style={styles.saveBtn}
-      >
-        {t("save_changes", language)}
-      </Button>
     </View>
   );
 }
 
-function InfoRow({ label, value, icon }) {
+function MenuItem({ label, icon, onPress, isLast }) {
   return (
-    <View style={styles.infoRow}>
-      <View style={styles.infoIconContainer}>
-        <MaterialIcons name={icon} size={20} color={COLORS.primary} />
+    <TouchableOpacity
+      style={[styles.menuItem, isLast && { borderBottomWidth: 0 }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={styles.menuIconBox}>
+        <MaterialIcons name={icon} size={30} color={COLORS.primary} />
       </View>
-      <View style={styles.infoTextContainer}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={styles.infoValue}>{value || "-"}</Text>
-      </View>
-    </View>
+      <Text style={styles.menuLabel}>{label}</Text>
+      <MaterialIcons name="chevron-right" size={24} color={COLORS.grey200} />
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  headerBackground: { paddingBottom: 50 },
-  profileSection: { alignItems: "center", marginTop: 20 },
-  avatarWrapper: { position: "relative" },
-  avatar: {
+  screenContainer: {
+    flex: 1,
+    backgroundColor: COLORS.primary,
+  },
+  headerWrapper: {
+    paddingBottom: 25,
+  },
+  profileCard: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+  avatarSurface: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.3)",
-  },
-  cameraBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.accent,
-    borderRadius: 15,
-    padding: 6,
-    elevation: 5,
-  },
-  userNameText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: COLORS.white,
-    marginTop: 10,
-  },
-  userEmailText: { color: "rgba(255,255,255,0.7)", fontSize: 14 },
-  contentCard: {
-    flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 25,
+    borderWidth: 4,
+    borderColor: COLORS.accent,
+    overflow: "hidden",
   },
-  segmentedControl: {
-    flexDirection: "row",
-    backgroundColor: "#F0F2F5",
-    borderRadius: 12,
-    padding: 2,
-    marginTop: -25,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+  avatar: {
+    width: "100%",
+    height: "100%",
   },
-  segmentBtn: {
+  userName: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: COLORS.white,
+    marginTop: 12,
+    letterSpacing: -0.5,
+  },
+  emailBadge: {
+    backgroundColor: "rgba(255,255,255,0.12)",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginTop: 6,
+  },
+  userEmail: {
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: "500",
+  },
+
+  accentBackgroundLayer: {
     flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderRadius: 10,
+    backgroundColor: COLORS.accent,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    overflow: "hidden",
   },
-  segmentBtnActive: { backgroundColor: COLORS.white },
-  segmentText: { fontWeight: "600", color: COLORS.grey600 },
-  segmentTextActive: { color: COLORS.primary },
-  sectionHeader: {
+  contentContainer: {
+    flex: 1,
+    backgroundColor: COLORS.grey50,
+    borderTopLeftRadius: 36,
+    borderTopRightRadius: 36,
+    marginTop: 6,
+  },
+
+  scrollContent: {
+    paddingHorizontal: 25,
+    paddingTop: 20,
+    paddingBottom: 80,
+  },
+  menuTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  menuGrid: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    marginBottom: 25,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+    overflow: "hidden",
+  },
+  menuItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 25,
-    marginBottom: 5,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grey100,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primary },
-  editActionText: { color: COLORS.accent, fontWeight: "700" },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F8F9FA",
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 12,
-  },
-  infoIconContainer: {
+  menuIconBox: {
     width: 40,
     height: 40,
-    backgroundColor: "rgba(37, 55, 90, 0.1)",
-    borderRadius: 10,
+    borderRadius: 12,
+    backgroundColor: COLORS.grey100,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
   },
-  infoTextContainer: { flex: 1 },
-  infoLabel: {
-    fontSize: 12,
-    color: COLORS.grey600,
-    textTransform: "uppercase",
-  },
-  infoValue: { fontSize: 16, fontWeight: "700", color: COLORS.textDark },
-  securityRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
-  },
-  securityIconBox: { marginRight: 15 },
-  securityLabel: {
+  menuLabel: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "600",
     color: COLORS.textDark,
   },
-  logoutBtn: {
-    marginTop: 0,
+  logoutButton: {
     backgroundColor: COLORS.error,
-    borderRadius: 12,
-    paddingVertical: 5,
-  },
-  editForm: { marginTop: 5 },
-  row: { flexDirection: "row", marginBottom: 12 },
-  input: { flex: 1, backgroundColor: COLORS.white },
-  fullInput: { marginBottom: 12, backgroundColor: COLORS.white },
-  radioContainer: { marginVertical: 10 },
-  radioRow: { flexDirection: "row", justifyContent: "space-around" },
-  radioItem: { flexDirection: "row", alignItems: "center" },
-  saveBtn: {
+    borderRadius: 16,
     marginTop: 10,
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingVertical: 5,
+    elevation: 0,
+  },
+  logoutContent: {
+    height: 54,
+  },
+  logoutLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  versionText: {
+    textAlign: "center",
+    color: COLORS.grey600,
+    fontSize: 11,
+    marginTop: 20,
+    opacity: 0.7,
   },
 });
