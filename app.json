@@ -40,16 +40,12 @@
         }
       ],
       "expo-font",
-<<<<<<< HEAD
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-=======
-      "expo-video"
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
     ],
     "experiments": {
       "typedRoutes": true,

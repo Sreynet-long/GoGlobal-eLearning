@@ -1,8 +1,5 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-<<<<<<< HEAD
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-=======
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { Tabs } from "expo-router";
@@ -20,16 +17,11 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-<<<<<<< HEAD
         tabBarActiveTintColor: "#ffffff",
-=======
-        tabBarActiveTintColor: "#25375A",
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
         tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
           backgroundColor: "#14213bff",
           position: "absolute",
-<<<<<<< HEAD
           bottom: 40,
           marginHorizontal:15,
           left: 40,
@@ -38,15 +30,6 @@ export default function TabsLayout() {
           borderRadius: 24,
           paddingBottom: 2,
           paddingTop: 5,
-=======
-          bottom: 25,
-          left: 20,
-          right: 20,
-          height: 75,
-          borderRadius: 24,
-          paddingBottom: 12,
-          paddingTop: 10,
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 10 },
           shadowOpacity: 0.1,
@@ -73,25 +56,14 @@ export default function TabsLayout() {
         options={{
           title: t("home", language),
           tabBarIcon: ({ color, focused }) => (
-<<<<<<< HEAD
             <FontAwesome6
               name={focused ? "house-chimney" : "house"}
               size={25}
-=======
-            <MaterialCommunityIcons
-              name={focused ? "home" : "home-outline"}
-              size={24}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
               color={color}
             />
           ),
         }}
       />
-<<<<<<< HEAD
-=======
-
-      {/* Courses */}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
       <Tabs.Screen
         name="courses"
         options={{
@@ -99,11 +71,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? "book-open-page-variant" : "book-education"}
-<<<<<<< HEAD
               size={30}
-=======
-              size={24}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
               color={color}
             />
           ),
@@ -117,21 +85,13 @@ export default function TabsLayout() {
             isAuth ? (
               <MaterialCommunityIcons
                 name={focused ? "book-open-page-variant" : "book-heart"}
-<<<<<<< HEAD
                 size={30}
-=======
-                size={24}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
                 color={color}
               />
             ) : (
               <FontAwesome5
                 name={focused ? "door-open" : "door-closed"}
-<<<<<<< HEAD
                 size={25}
-=======
-                size={22}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
                 color={color}
               />
             ),
@@ -145,7 +105,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) =>
             isAuth ? (
               <FontAwesome5
-<<<<<<< HEAD
                 name={focused ? "user-graduate" : "user-alt"}
                 size={25}
                 color={color}
@@ -154,16 +113,6 @@ export default function TabsLayout() {
               <MaterialCommunityIcons
                 name={focused ? "book-open-page-variant" : "book-information-variant"}
                 size={30}
-=======
-                name={focused ? "user-graduate" : "user"}
-                size={22}
-                color={color}
-              />
-            ) : (
-              <FontAwesome
-                name={focused ? "question-circle" : "question-circle-o"}
-                size={22}
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
                 color={color}
               />
             ),
@@ -173,10 +122,6 @@ export default function TabsLayout() {
   );
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
 //==================== Styles ====================
 
 const styles = StyleSheet.create({

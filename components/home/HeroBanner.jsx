@@ -42,11 +42,7 @@ const HeroBanner = () => {
     if (!banners.length) return;
 
     const interval = setInterval(() => {
-<<<<<<< HEAD
       const nextIndex = (activeIndex + 1) % banners.length;
-=======
-      const nextIndex = (activeIndex + 1) % BANNER_DATA.length;
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
       scrollRef.current?.scrollTo({
         x: nextIndex * SLIDE_WIDTH,
         animated: true,
@@ -67,10 +63,6 @@ const HeroBanner = () => {
         ref={scrollRef}
         horizontal
         pagingEnabled
-<<<<<<< HEAD
-=======
-        scrollEnabled={true} // Auto-scroll only
->>>>>>> 3f7d2b5201dc8a6c3989f99950cfb256bedf66e6
         showsHorizontalScrollIndicator={false}
         onScroll={(event) => {
           const x = event.nativeEvent.contentOffset.x;
