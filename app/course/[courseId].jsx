@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+// import { VideoView } from "expo-video";
 import { Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -27,6 +28,7 @@ export default function CoursePlayerScreen() {
   const [activeTab, setActiveTab] = useState("Course content");
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const { data, loading } = useQuery(GET_COURSE_BY_ID, {
     variables: { courseById: courseId },
@@ -48,7 +50,9 @@ export default function CoursePlayerScreen() {
   const renderTabContent = () => {
     switch (activeTab) {
       case "Course content":
-        return <CourseContent courseId={courseId} />;
+        return (
+          <CourseContent courseId={courseId} onSelectVideo={setSelectedVideo} />
+        );
       case "Overview":
         return renderOverview();
       default:
@@ -120,6 +124,22 @@ export default function CoursePlayerScreen() {
 
   /* ---------------- VIDEO RENDER ---------------- */
   const renderVideo = () => {
+    if (selectedVideo) {
+      return (
+        <View style={styles.videoWrapper}>
+          <Video
+            ref={videoRef}
+            source={{ uri: FILE_BASE_URL + selectedVideo.video_src }}
+            style={styles.videoWrapper}
+            useNativeControls
+            resizeMode="contain"
+            isLooping
+            onPlaybackStatusUpdate={(status) => setIsPlaying(status.isPlaying)}
+          />
+        </View>
+      );
+    }
+
     if (course?.video_url) {
       return (
         <View style={styles.videoWrapper}>
@@ -249,7 +269,7 @@ const styles = StyleSheet.create({
   tabBar: { flexDirection: "row", backgroundColor: "#FFF" },
   tab: { flex: 1, paddingVertical: 14, alignItems: "center" },
   activeTab: { borderBottomWidth: 3, borderBottomColor: "#3F51B5" },
-  tabText: { color: "#999", fontWeight: "600" },
+  tabText: { color: "#999", fontWeight: "700",fontSize: 16 },
   activeTabText: { color: "#3F51B5" },
 
   card: {

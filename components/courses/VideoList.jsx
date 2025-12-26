@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -7,9 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Linking from "expo-linking";
-import { GET_VIDEO_CONTENT_WITH_PAGINATION } from "../../schema/course";
 import { FILE_BASE_URL } from "../../config/env";
+import { GET_VIDEO_CONTENT_WITH_PAGINATION } from "../../schema/course";
+import DownloadButton from "./DownloadButton";
 
 export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
   const { data, loading, error } = useQuery(GET_VIDEO_CONTENT_WITH_PAGINATION, {
@@ -25,12 +26,15 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
   });
 
   if (loading) return <ActivityIndicator style={{ margin: 12 }} />;
-  if (error) return <Text style={{ color: "red", padding: 12 }}>Failed to load videos</Text>;
+  if (error)
+    return (
+      <Text style={{ color: "red", padding: 12 }}>Failed to load videos</Text>
+    );
 
   // REMOVE DUPLICATE VIDEOS
   const videos = Array.from(
     new Map(
-      (data?.getVideoContentWithPagination?.data || []).map(v => [v._id, v])
+      (data?.getVideoContentWithPagination?.data || []).map((v) => [v._id, v])
     ).values()
   );
 
@@ -39,10 +43,17 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
       {videos.map((video) => (
         <View key={video._id}>
           <TouchableOpacity
-            style={[styles.lessonRow, activeVideoId === video._id && styles.activeLessonRow]}
+            style={[
+              styles.lessonRow,
+              activeVideoId === video._id && styles.activeLessonRow,
+            ]}
             onPress={() => onSelectVideo(video)}
           >
-            <MaterialCommunityIcons name="play-circle-outline" size={20} color="#888" />
+            <MaterialCommunityIcons
+              name="play-circle-outline"
+              size={20}
+              color="#888"
+            />
 
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>
@@ -52,31 +63,61 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
             </View>
 
             {video.resources?.length > 0 && (
-              <MaterialCommunityIcons name="file-download-outline" size={18} color="#3F51B5" />
+              <MaterialCommunityIcons
+                name="file-download-outline"
+                size={18}
+                color="#3F51B5"
+              />
             )}
           </TouchableOpacity>
 
           {/* LIST ALL RESOURCES */}
           {video.resources?.length > 0 &&
-            video.resources.map((res, i) => (
-              <TouchableOpacity
-                key={i}
-                onPress={() => Linking.openURL(FILE_BASE_URL + res)}
-                style={{ paddingLeft: 40, paddingVertical: 4 }}
-              >
-                <Text style={{ color: "#3F51B5", fontSize: 12 }}>{res}</Text>
-              </TouchableOpacity>
-            ))}
+            video.resources.map((res, i) => {
+              const filename = res.split("/").pop().split("__")[0] + ".pdf";
+              const fileUrl = FILE_BASE_URL + res;
+              return (
+                <View key={i} style={styles.lessonPdfRow}>
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => Linking.openURL(FILE_BASE_URL + res)}
+                    style={{ paddingLeft: 30, paddingVertical: 4, marginRight: 1}}
+                  >
+                    <Text style={{ color: "#3F51B5", fontSize: 14 }}>
+                      {filename}
+                    </Text>
+                  </TouchableOpacity>
+                  <DownloadButton
+                    // style={{ marginRight: 10}}
+                    fileUrl={fileUrl}
+                    filename={filename}
+                  />
+                </View>
+              );
+            })}
         </View>
       ))}
     </View>
   );
 }
-
+//  Linking.openURL(FILE_BASE_URL + res)
 const styles = StyleSheet.create({
-  lessonRow: { flexDirection: "row", padding: 16, borderTopWidth: 1, borderTopColor: "#F8F9FA", alignItems: "center" },
-  activeLessonRow: { backgroundColor: "#F0F3FF" },
+  lessonRow: {
+    flexDirection: "row",
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#F8F9FA",
+    alignItems: "center",
+  },
+  lessonPdfRow: {
+    flexDirection: "row",
+    padding: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#F8F9FA",
+    alignItems: "center",
+  },
+  activeLessonRow: { backgroundColor: "#3b4d96ff" },
   lessonInfo: { flex: 1, marginLeft: 12 },
-  lessonTitle: { fontSize: 14, color: "#636E72", fontWeight: "500" },
+  lessonTitle: { fontSize: 15, color: "#636E72", fontWeight: "600" },
   lessonDuration: { fontSize: 11, color: "#B2BEC3", marginTop: 2 },
 });

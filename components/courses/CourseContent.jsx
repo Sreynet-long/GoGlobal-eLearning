@@ -14,7 +14,7 @@ import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
 import VideoList from "./VideoList";
 import VideoPlayer from "./VideoPlayer";
 
-export default function CourseContent({ courseId }) {
+export default function CourseContent({ courseId, onSelectVideo }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const scrollRef = useRef(null);
@@ -28,13 +28,13 @@ export default function CourseContent({ courseId }) {
   const sections = data?.getContentSectionWithPagination?.data || [];
 
   const handleSelectVideo = (video) => {
-    setSelectedVideo(video);
+   onSelectVideo(video);
     // scroll to top to show video player
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   };
 
   return (
-    <ScrollView ref={scrollRef} style={{ flex: 1, padding: 16 }}>
+    <ScrollView ref={scrollRef} style={{ flex: 1}}>
       {/* VIDEO PLAYER */}
       {selectedVideo && <VideoPlayer video={selectedVideo} />}
 
