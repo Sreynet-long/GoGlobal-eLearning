@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -73,14 +74,18 @@ export default function EnrolledCourses({ searchText }) {
       notifyOnNetworkStatusChange: true,
     }
   );
-
+    useFocusEffect(
+    useCallback(() => {
+      refetch({ page: 1 });
+    }, [refetch])
+  );
   // Update courses whenever new data is fetched
   useEffect(() => {
     if (data?.getCourseEnrolledWithPagination?.data) {
       const newCourses = data.getCourseEnrolledWithPagination.data;
-      setCourses(page === 1 ? newCourses : [...courses, ...newCourses]);
+      setCourses(prev => page === 1 ? newCourses : [...courses, ...newCourses]);
     }
-  }, [data]);
+  }, [data, page]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -115,7 +120,12 @@ export default function EnrolledCourses({ searchText }) {
           <CourseCard
             item={item}
             language={language}
-            onPress={() => router.push(`/course/${item.course_id}`)}
+            onPress={() =>
+              router.push({
+                pathname: `/course/${item.course_id}`,
+                params: { courseId: item.course_id, enrolledId: item._id },
+              })
+            }
           />
         )}
         ListHeaderComponent={
@@ -123,7 +133,7 @@ export default function EnrolledCourses({ searchText }) {
             {t("courses_enrolled_list", language)}
           </Text>
         }
-        ListEmptyComponent={!loading ? <EmptyCourseEnroll/> : null}
+        ListEmptyComponent={!loading ? <EmptyCourseEnroll /> : null}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -190,12 +200,13 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     width: "100%",
-    height: 6,
-    backgroundColor: "#eef2f6",
-    borderRadius: 3,
+    height: 10,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 5,
+    marginVertical: 8,
   },
-  progressBar: { backgroundColor: "#4A90E2", height: 6, borderRadius: 3 },
-  progressText: { fontSize: 11, fontWeight: "600", color: "#7f8c8d" },
+  progressBar: { backgroundColor: "#3F51B5", height: 10, borderRadius: 5 },
+  progressText: { fontSize: 16, fontWeight: "600", color: "#3F51B5" },
   cardFooter: { marginTop: 8, alignItems: "flex-end" },
   continueText: { fontSize: 12, fontWeight: "700", color: "#58589b" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

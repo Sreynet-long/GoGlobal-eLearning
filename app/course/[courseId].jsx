@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 // import { VideoView } from "expo-video";
 import { Video } from "expo-av";
@@ -18,22 +18,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import CourseContent from "../../components/courses/CourseContent";
 import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
-import { GET_COURSE_BY_ID } from "../../schema/course";
+import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
 
 const TABS = ["Course content", "Overview"];
 
 export default function CoursePlayerScreen() {
   const router = useRouter();
-  const { courseId } = useLocalSearchParams();
+  const { courseId, enrolledId } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("Course content");
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [completedVideo, setCompletedVideo] = useState([]);
 
   const { data, loading } = useQuery(GET_COURSE_BY_ID, {
-    variables: { courseById: courseId },
+    variables: { courseId },
     skip: !courseId,
   });
+
+  const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
 
   if (loading) {
     return (
@@ -46,12 +49,64 @@ export default function CoursePlayerScreen() {
   const course = data?.getCourseById;
   const includes = course?.course_includes;
 
+  const handleVideoComplete = async (video) => {
+    setCompletedVideo((prev) => [...prev, video._id]);
+
+    try {
+      const result = await videoProcessStatus({
+        variables: {
+          input: {
+            has_completed: true,
+            enrolled_id: enrolledId,
+            video_content_id: video._id,
+          },
+          optimisticResponse: {
+            videoProcessStatus: {
+              __typename: "ResponseMessage",
+              status: true,
+              message: {
+                __typename: "Message",
+                messageEn: "Marked complete (optimistic)",
+                messageKh: "បានបញ្ចប់ (optimistic)",
+              },
+            },
+          },
+          update: (caches, { data }) => {
+            if (data?.videoProcessStatus?.status) {
+              caches.modify({
+                id: caches.identify({
+                  __typename: "CourseEnrolled",
+                  id: courseId,
+                }),
+                fields: {
+                  overall_completion_percentage(exists = 0) {
+                    return exists + 1;
+                  },
+                  completedVideo(existing = []) {
+                    return [...existing, video._id];
+                  },
+                },
+              });
+            }
+          },
+        },
+      });
+      console.log("videoprocessStatus", result.data);
+    } catch (error) {
+      console.log("Video status failed", error);
+    }
+  };
+
   /* ---------------- TAB RENDER ---------------- */
   const renderTabContent = () => {
     switch (activeTab) {
       case "Course content":
         return (
-          <CourseContent courseId={courseId} onSelectVideo={setSelectedVideo} />
+          <CourseContent
+            courseId={courseId}
+            onSelectVideo={setSelectedVideo}
+            completedVideo={completedVideo}
+          />
         );
       case "Overview":
         return renderOverview();
@@ -119,6 +174,8 @@ export default function CoursePlayerScreen() {
           <IncludeItem text="Certificate of completion" />
         )}
       </View>
+        
+
     </View>
   );
 
@@ -133,8 +190,12 @@ export default function CoursePlayerScreen() {
             style={styles.videoWrapper}
             useNativeControls
             resizeMode="contain"
-            isLooping
-            onPlaybackStatusUpdate={(status) => setIsPlaying(status.isPlaying)}
+            isLooping={false}
+            onPlaybackStatusUpdate={(status) => {
+              if (status.didJustFinish) {
+                handleVideoComplete(selectedVideo);
+              }
+            }}
           />
         </View>
       );
@@ -269,7 +330,7 @@ const styles = StyleSheet.create({
   tabBar: { flexDirection: "row", backgroundColor: "#FFF" },
   tab: { flex: 1, paddingVertical: 14, alignItems: "center" },
   activeTab: { borderBottomWidth: 3, borderBottomColor: "#3F51B5" },
-  tabText: { color: "#999", fontWeight: "700",fontSize: 16 },
+  tabText: { color: "#999", fontWeight: "700", fontSize: 16 },
   activeTabText: { color: "#3F51B5" },
 
   card: {

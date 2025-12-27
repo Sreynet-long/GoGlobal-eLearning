@@ -12,10 +12,10 @@ import { FILE_BASE_URL } from "../../config/env";
 import { GET_VIDEO_CONTENT_WITH_PAGINATION } from "../../schema/course";
 import DownloadButton from "./DownloadButton";
 
-export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
+export default function VideoList({ sectionId, onSelectVideo, activeVideoId, completedVideo }) {
   const { data, loading, error } = useQuery(GET_VIDEO_CONTENT_WITH_PAGINATION, {
     variables: {
-      contentSectionId: sectionId,
+      contentSectionId: sectionId, 
       page: 1,
       limit: 50,
       pagination: false,
@@ -58,9 +58,9 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId }) {
             onPress={() => onSelectVideo(video)}
           >
             <MaterialCommunityIcons
-              name="play-circle-outline"
+              name={completedVideo?.includes(video._id) ? "check-circle" : "play-circle-outline"}
               size={20}
-              color="#888"
+              color={completedVideo?.includes(video._id) ? "#4CAF50" : "#888"}
             />
 
             <View style={styles.lessonInfo}>
