@@ -42,15 +42,17 @@ export const GET_COURSE_BANNER_WITH_PAGINATION = gql`
 `;
 export const GET_COURSE_TRENDING_WITH_PAGINATION = gql`
   query GetHilightCourse($limit: Int) {
-    getHilightCourse(limit: $limit) {
-      _id
-      title
-      thumbnail
-      category_id {
-        category_name
-      }
+  getHilightCourse(limit: $limit) {
+    _id
+    title
+    thumbnail
+    category_id {
+      category_name
     }
+    sell_price
+    original_price
   }
+}
 `;
 export const GET_COURSE_FREE_WITH_PAGINATION = gql`
   query GetFreeCourse($limit: Int) {

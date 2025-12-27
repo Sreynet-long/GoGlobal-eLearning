@@ -1,5 +1,4 @@
 export default {
-  home: "ទំព័រដើម",
   tech_skill: "ជំនាញបច្ចេកវិទ្យា",
   "50_off_sale": "បញ្ចុះតម្លៃ 50%!",
   new_c_class: "ថ្នាក់ C++ ថ្មី",
@@ -118,5 +117,23 @@ export default {
   old_password:"ពាក្យសម្ងាត់ចាស់",
   back_to_account:"ត្រឡប់ទៅគណនី",
   NEW_CREDENTIALS:"ពាក្យសម្ងាត់ថ្មី",
-  Update_your_credentials_to_keep_your_account_secure:"កែប្រែពាក្យសម្ងាត់របស់អ្នក ដើម្បីរក្សាគណនីរបស់អ្នកឱ្យមានសុវត្ថិភាព"
+  Update_your_credentials_to_keep_your_account_secure:"កែប្រែពាក្យសម្ងាត់របស់អ្នក ដើម្បីរក្សាគណនីរបស់អ្នកឱ្យមានសុវត្ថិភាព",
+
+  home: "ទំព័រដើម",
+  tech_skill: "ជំនាញបច្ចេកវិទ្យា",
+  "50_off_sale": "បញ្ចុះតម្លៃ 50%!",
+  new_c_class: "ថ្នាក់ C++ ថ្មី",
+  explore_courses: "ស្វែងរកវគ្គសិក្សា 240+ ទាំងអស់។",
+  explore_now: "ស្វែងរកឥឡូវនេះ",
+  view_all: "មើលទាំងអស់",
+  courses: "វគ្គសិក្សា",
+  my_courses: "វគ្គសិក្សារបស់ខ្ញុំ",
+  login: "ចូលគណនី",
+  account: "គណនី",
+  about_us: "អំពីពួកយើង",
+  gender: "ភេទ",
+  male: "ប្រុស",
+  female: "ស្រី",
+  other: "ផ្សេងទៀត",
+
 };

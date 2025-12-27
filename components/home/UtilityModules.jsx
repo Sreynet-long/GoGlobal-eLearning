@@ -31,11 +31,12 @@ export default function UtilityModules() {
       <View style={styles.moduleGrid}>
         {modules.map((mod, index) => (
           <ModuleTile
-            key={index}
-            title={t(mod.titleKey, language)}
-            iconName={mod.iconName}
-            color={mod.color}
-          />
+  key={index}
+  title={String(t(mod.titleKey, language) ?? "")}
+  iconName={mod.iconName}
+  color={mod.color}
+/>
+
         ))}
       </View>
     </View>

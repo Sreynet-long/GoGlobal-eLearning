@@ -93,11 +93,11 @@ export default function AccountScreen() {
     });
   };
 
-  const handleCancel = async ()=>{
-    setEditing(!editing)
-    await deleteImage(fileUpload[0]?.filename)
-    setFileUpload([])
-  }
+  const handleCancel = async () => {
+    setEditing(!editing);
+    await deleteImage(fileUpload[0]?.filename);
+    setFileUpload([]);
+  };
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -183,20 +183,24 @@ export default function AccountScreen() {
 
       <View style={styles.contentBody}>
         <View style={styles.titleRow}>
-            {/* <View> */}
-              <Text style={styles.contentTitle}>{t("account_information", language)}</Text>
-            {/* </View> */}
+          <Text style={styles.contentTitle}>
+            {t("account_information", language)}
+          </Text>
 
-            <TouchableOpacity
-              onPress={editing ? handleCancel : () => setEditing(true)}
-              style={[styles.editActionBtn, editing && styles.cancelActionBtn]}
-            >
-              <MaterialIcons name={editing ? "close" : "edit"} size={16} color={COLORS.white} />
-              <Text style={styles.editActionText}>
-                {editing ? t("cancel", language) : t("edit_profile", language)}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={editing ? handleCancel : () => setEditing(true)}
+            style={[styles.editActionBtn, editing && styles.cancelActionBtn]}
+          >
+            <MaterialIcons
+              name={editing ? "close" : "edit"}
+              size={16}
+              color={COLORS.white}
+            />
+            <Text style={styles.editActionText}>
+              {editing ? t("cancel", language) : t("edit_profile", language)}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         {editing ? (
           <EditUser
@@ -366,29 +370,29 @@ const styles = StyleSheet.create({
   },
   avatarWrapper: { marginBottom: 5 },
   avatarSurface: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    padding: 4,
-    backgroundColor: COLORS.white,
+    width: 130,
+    height: 130,
+    borderRadius: "50%",
+    // padding: 4,
+    // backgroundColor: COLORS.white,
     position: "relative",
     borderWidth: 5,
     borderColor: COLORS.accent,
   },
-  avatar: { width: "100%", height: "100%", borderRadius: 55 },
-  camera: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.accent,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: COLORS.primary,
-  },
+  avatar: { width: "100%", height: "100%", borderRadius: "50%" },
+  // camera: {
+  //   position: "absolute",
+  //   bottom: 0,
+  //   right: 0,
+  //   backgroundColor: COLORS.primary,
+  //   width: 40,
+  //   height: 40,
+  //   borderRadius: 20,
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   borderWidth: 3,
+  //   borderColor: COLORS.accent,
+  // },
   heroName: {
     color: COLORS.white,
     fontSize: 24,
@@ -396,10 +400,10 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   userEmailText: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 4 },
-titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 25,
   },
   contentTitle: {
@@ -417,8 +421,8 @@ titleRow: {
   //   borderRadius: 2,
   // },
   editActionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingVertical: 8,
     paddingHorizontal: 14,

@@ -15,7 +15,7 @@ import { t } from "../../lang";
 import { GET_COURSE_FREE_WITH_PAGINATION } from "../../schema/courseHomepage";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.4;
+const CARD_WIDTH = width * 0.55;
 
 // ==================== Course Card Component ====================
 const CourseCard = ({ title, thumbnail }) => {
@@ -27,9 +27,6 @@ const CourseCard = ({ title, thumbnail }) => {
     <TouchableOpacity activeOpacity={0.95} style={styles.cardContainer}>
       <View style={styles.imageWrapper}>
         <Image source={{ uri: imageUri }} style={styles.courseImage} />
-        <View style={styles.freeBadgeContainer}>
-          <Text style={styles.freeBadgeText}>FREE</Text>
-        </View>
       </View>
 
       <View style={styles.infoWrapper}>
@@ -38,11 +35,14 @@ const CourseCard = ({ title, thumbnail }) => {
         </Text>
 
         <View style={styles.footerRow}>
+          {/* <Text style={styles.difficultyText}>Beginner</Text> */}
+          <View style={styles.freeBadgeContainer}>
+            <Text style={styles.freeBadgeText}>FREE</Text>
+          </View>
+          <View style={styles.dotSeparator} />
           <View style={styles.lessonCount}>
             <Text style={styles.lessonCountText}>12 Lessons</Text>
           </View>
-          <View style={styles.dotSeparator} />
-          <Text style={styles.difficultyText}>Beginner</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -99,13 +99,13 @@ export default function FreeCourse() {
 
 // ==================== Redesigned Styles ====================
 const styles = StyleSheet.create({
-  mainWrapper: { marginVertical: 20 },
+  mainWrapper: { marginVertical: 15, marginHorizontal: 5 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 18,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   title: {
     fontSize: 22,
@@ -115,85 +115,92 @@ const styles = StyleSheet.create({
   },
   subtitle: { fontSize: 13, color: "#94a3b8", fontWeight: "500", marginTop: 2 },
   viewAllBtn: {
-    backgroundColor: "#f5f3ff",
+    backgroundColor: "#cbc0ff3f",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
   viewAllText: { fontSize: 13, color: "#6366f1", fontWeight: "800" },
 
-  scrollContent: { paddingLeft: 20, paddingRight: 4, paddingBottom: 15 },
+  scrollContent: { paddingLeft: 10, paddingRight: 4, paddingBottom: 15 },
 
   cardContainer: {
     width: CARD_WIDTH,
+    height: 220,
     backgroundColor: "#fff",
-    borderRadius: 24,
-    marginRight: 20,
+    borderRadius: 20,
+    marginRight: 16,
+    borderWidth: 1,
+    borderColor: "#e0e0e0ff",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 3,
+    padding: 5,
+    marginVertical: 10,
   },
   imageWrapper: {
     width: "100%",
-    height: 120,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    height: 140,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     overflow: "hidden",
-    position: "relative",
   },
   courseImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
+    // resizeMode: "cover",
   },
   freeBadgeContainer: {
-    position: "absolute",
-    top: 12,
-    left: 12,
-    backgroundColor: "#10b981",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    // position: "absolute",
+    // top: 12,
+    // left: 12,
+    backgroundColor: "#10b98123",
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 5,
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
   freeBadgeText: {
-    color: "#fff",
-    fontSize: 10,
+    color: "#10b981",
+    fontSize: 15,
     fontWeight: "900",
-    letterSpacing: 1,
+    letterSpacing: 0.1,
   },
   infoWrapper: {
-    padding: 16,
+    padding: 12,
+    justifyContent: "space-between",
+    flex: 1,
   },
   courseTitle: {
     fontSize: 16,
     fontWeight: "800",
     color: "#1e293b",
     lineHeight: 22,
-    marginBottom: 12,
+    marginBottom: 2,
     minHeight: 14,
   },
   footerRow: {
     flexDirection: "row",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#f1f5f9",
-    paddingTop: 12,
+    // borderTopWidth: 1,
+    // borderTopColor: "#f1f5f9",
+    paddingTop: 2,
   },
   lessonCount: {
-    backgroundColor: "#eff6ff",
+    backgroundColor: "#7db5ff59",
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
   },
   lessonCountText: {
-    fontSize: 11,
+    fontSize: 15,
     color: "#3b82f6",
-    fontWeight: "700",
+    fontWeight: "800",
+    letterSpacing: -0.4,
   },
   dotSeparator: {
     width: 4,

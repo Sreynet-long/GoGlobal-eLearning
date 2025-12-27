@@ -76,15 +76,15 @@ export default {
   log_out: "Log Out",
   about_go_elearning: "About Go eLEARNING",
   our_story: "Our Story",
-  our_story_text1:
-    "Our company was first created within the company circles supervised by Go Global School. It initially started as an office focusing on IT & Marketing.",
-  our_story_text2:
-    "Later, in 2022, it evolved to become a dedicated company. We offer two main services: developing secure programmes and advanced algorithms to help our clients protect and efficiently store their critical information and data.",
-  our_vision: "Our Vision",
-  our_vision_text: '"Let\'s move to the digital area."',
+  // our_story_text1:
+  //   "Our company was first created within the company circles supervised by Go Global School. It initially started as an office focusing on IT & Marketing.",
+  // our_story_text2:
+  //   "Later, in 2022, it evolved to become a dedicated company. We offer two main services: developing secure programmes and advanced algorithms to help our clients protect and efficiently store their critical information and data.",
+  // our_vision: "Our Vision",
+  // our_vision_text: '"Let\'s move to the digital area."',
   our_mission: "Our Mission",
-  our_mission_text:
-    '"Innovate, promote, and encourage using technology in digital lifestyle."',
+  // our_mission_text:
+  //   '"Innovate, promote, and encourage using technology in digital lifestyle."',
   contact_us: "Contact Us",
   call_us: "Call Us",
   website: "Website",
@@ -137,4 +137,6 @@ export default {
   your_message:"Your Message",
   send_message:"Send Message",
   follow_us_on_social_media:"FOLLOW US ON SOCIAL MEDIA",
+  enroll_today:"Enroll and study with us today!",
+  version_tag:"Version 1.0.0.0"
 };
