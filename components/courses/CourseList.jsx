@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client/react";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -36,6 +37,7 @@ const CourseSkeleton = () => (
 );
 
 export default function CourseList({ selectedCategoryId, searchText }) {
+  const router = useRouter();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -61,8 +63,12 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const courses = data?.getCourseWithPagination?.data ?? [];
 
   const handleOpenDetails = (course) => {
-    setSelectedCourse(course);
-    setModalVisible(true);
+    if (course.has_enrolled) {
+      router.push(`/course/${course._id}`);
+    } else {
+      setSelectedCourse(course);
+      setModalVisible(true);
+    }
   };
 
   const renderItem = useCallback(
@@ -85,25 +91,52 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             <Text style={styles.textTitle} numberOfLines={2}>
               {item.title}
             </Text>
-
-            <View style={styles.priceContainer}>
-              <Text style={styles.textSellPrice}>
-                ${item.sell_price?.toFixed(2)}
-              </Text>
-              {hasDiscount && (
-                <Text style={styles.textOldPrice}>
-                  ${item.original_price?.toFixed(2)}
-                </Text>
-              )}
-            </View>
-
-            <View style={styles.cardFooter}>
-              <View style={styles.enrollBadge}>
-                <Text style={styles.textEnroll}>
-                 View Detail
-                </Text>
-              </View>
-            </View>
+            {item.has_enrolled ? (
+              <>
+                {item.has_course_complated ? (
+                  <View style={styles.completedBadge}>
+                    <Text style={styles.completedText}>Completed</Text>
+                  </View>
+                ) : (
+                  <>
+                    <Text style={styles.progressText}>
+                      Progress: {item.overall_completion_percentage}%
+                    </Text>
+                    <View style={styles.progressBarContainer}>
+                      <View
+                        style={[
+                          styles.progressBar,
+                          { width: `${item.overall_completion_percentage}%` },
+                        ]}
+                      />
+                    </View>
+                    <View style={styles.cardFooter}>
+                      <View style={styles.enrollBadge}>
+                        <Text style={styles.textContinue}>Continue</Text>
+                      </View>
+                    </View>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.textSellPrice}>
+                    ${item.sell_price?.toFixed(2)}
+                  </Text>
+                  {hasDiscount && (
+                    <Text style={styles.textOldPrice}>
+                      ${item.original_price?.toFixed(2)}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.cardFooter}>
+                  <View style={styles.enrollBadge}>
+                    <Text style={styles.textEnroll}>View Detail</Text>
+                  </View>
+                </View>
+              </>
+            )}
           </View>
         </TouchableOpacity>
       );
@@ -152,43 +185,76 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             <View style={styles.modalHandle} />
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              {selectedCourse && (
+              {selectedCourse ? (
                 <>
+                  {/* Title + Thumbnail */}
                   <Image
                     source={{
                       uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
                     }}
                     style={styles.modalImage}
                   />
-
                   <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
 
-                  <View style={styles.modalPriceRow}>
-                    <Text style={styles.modalSellPrice}>
-                      ${selectedCourse.sell_price?.toFixed(2)}
-                    </Text>
-                    {selectedCourse.original_price >
-                      selectedCourse.sell_price && (
-                      <Text style={styles.modalOldPrice}>
-                        ${selectedCourse.original_price?.toFixed(2)}
-                      </Text>
-                    )}
-                  </View>
+                  {/* ✅ Conditional rendering */}
+                  {selectedCourse.has_enrolled ? (
+                    <>
+                      {selectedCourse.has_course_complated ? (
+                        <View style={styles.completedBadge}>
+                          <Text style={styles.completedText}>Completed</Text>
+                        </View>
+                      ) : (
+                        <>
+                          <Text style={styles.progressText}>
+                            Progress:{" "}
+                            {selectedCourse.overall_completion_percentage}%
+                          </Text>
+                          <View style={styles.progressBarContainer}>
+                            <View
+                              style={[
+                                styles.progressBar,
+                                {
+                                  width: `${selectedCourse.overall_completion_percentage}%`,
+                                },
+                              ]}
+                            />
+                          </View>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Show price only if not enrolled */}
+                      {selectedCourse.sell_price ? (
+                        <View style={styles.modalPriceRow}>
+                          <Text style={styles.modalSellPrice}>
+                            ${selectedCourse.sell_price?.toFixed(2)}
+                          </Text>
+                          {selectedCourse.original_price >
+                            selectedCourse.sell_price && (
+                            <Text style={styles.modalOldPrice}>
+                              ${selectedCourse.original_price?.toFixed(2)}
+                            </Text>
+                          )}
+                        </View>
+                      ) : null}
 
-                  <EnrolledButton
-                    course={selectedCourse}
-                    onSuccess={() => setModalVisible(false)}
-                  />
+                      {/* Enroll button */}
+                      <EnrolledButton
+                        course={selectedCourse}
+                        onSuccess={() => setModalVisible(false)}
+                      />
+                    </>
+                  )}
 
+                  {/* Course Includes */}
                   <View style={styles.sectionDivider}>
-                    <Text style={styles.includesTitle}>
-                      Course Includes:
-                    </Text>
+                    <Text style={styles.includesTitle}>Course Includes:</Text>
                     <Divider style={{ marginVertical: 10 }} />
                     <CourseIncludes course={selectedCourse} />
                   </View>
                 </>
-              )}
+              ) : null}
             </ScrollView>
           </Pressable>
         </Pressable>
@@ -251,6 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
+  textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
 
   // Modal UI (Bottom Sheet Style)
   modalOverlay: {
@@ -300,6 +367,36 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   includesTitle: { fontWeight: "700", fontSize: 16, color: "#444" },
+  progressText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 10,
+    color: "#3F51B5",
+  },
+  progressBarContainer: {
+    height: 10,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 5,
+    marginVertical: 8,
+  },
+  progressBar: {
+    height: 10,
+    backgroundColor: "#3F51B5",
+    borderRadius: 5,
+  },
+  completedBadge: {
+    backgroundColor: "#E6F7E6",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignSelf: "flex-start",
+    marginTop: 8,
+  },
+  completedText: {
+    color: "#2E7D32",
+    fontWeight: "700",
+    fontSize: 14,
+  },
 
   // Skeleton UI
   cardSkeleton: {

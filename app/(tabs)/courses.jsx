@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     backgroundColor: "white",
+    paddingBottom: 30,
   },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 80 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 80, paddingTop: 12 },
 });
