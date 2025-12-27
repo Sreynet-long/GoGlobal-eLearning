@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
@@ -38,6 +39,7 @@ const CourseSkeleton = () => (
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const router = useRouter();
+  const { isAuth } = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -253,6 +255,56 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     <Divider style={{ marginVertical: 10 }} />
                     <CourseIncludes course={selectedCourse} />
                   </View>
+                  <View style={styles.sectionBox}>
+                    <Text style={styles.includesTitle}>What you'll learn:</Text>
+                    <Divider style={{ marginVertical: 8 }} />
+                    <View
+                    // style={styles.bulletRow}
+                    >
+                      {/* <Text style={styles.bullet}>•</Text> */}
+                      <Text style={styles.sectionText}>
+                        {selectedCourse?.what_you_learn}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.sectionBox}>
+                    <Text style={styles.includesTitle}>
+                      Who this course is for:
+                    </Text>
+                    <Divider style={{ marginVertical: 8 }} />
+                    <View
+                    // style={styles.bulletRow}
+                    >
+                      {/* <Text style={styles.bullet}>•</Text> */}
+                      <Text style={styles.sectionText}>
+                        {selectedCourse?.who_this_course_is_for}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.sectionBox}>
+                    <Text style={styles.includesTitle}>Requirements:</Text>
+                    <Divider style={{ marginVertical: 8 }} />
+                    <View
+                    // style={styles.bulletRow}
+                    >
+                      {/* <Text style={styles.bullet}>•</Text> */}
+                      <Text style={styles.sectionText}>
+                        {selectedCourse?.requirements}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.sectionBox}>
+                    <Text style={styles.includesTitle}>Description:</Text>
+                    <Divider style={{ marginVertical: 8 }} />
+                    <View
+                    // style={styles.bulletRow}
+                    >
+                      {/* <Text style={styles.bullet}>•</Text> */}
+                      <Text style={styles.sectionText}>
+                        {selectedCourse?.description}
+                      </Text>
+                    </View>
+                  </View>
                 </>
               ) : null}
             </ScrollView>
@@ -366,6 +418,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
   },
+  sectionWhatULearn: {
+    marginTop: 10,
+    marginLeft: 15,
+  },
   includesTitle: { fontWeight: "700", fontSize: 16, color: "#444" },
   progressText: {
     fontSize: 16,
@@ -422,5 +478,31 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10,
     borderRadius: 4,
+  },
+  sectionBox: {
+    marginTop: 5,
+    padding: 15,
+    borderRadius: 12,
+  },
+
+  sectionText: {
+    fontSize: 14,
+    color: "#444",
+    lineHeight: 20,
+    fontWeight: "500",
+    flex: 1,
+  },
+
+  bulletRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 6,
+  },
+
+  bullet: {
+    marginRight: 8,
+    fontSize: 16,
+    lineHeight: 20,
+    color: "#3F51B5",
   },
 });

@@ -1,19 +1,21 @@
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
 import { Divider } from "react-native-paper";
-import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
+import {
+  GET_CONTENT_SECTION_WITH_PAGINATION
+} from "../../schema/course";
 import VideoList from "./VideoList";
 
-export default function CourseContent({ courseId, onSelectVideo }) {
+export default function CourseContent({ courseId, onSelectVideo, completedVideo }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(false);
   const scrollRef = useRef(null);
@@ -26,15 +28,15 @@ export default function CourseContent({ courseId, onSelectVideo }) {
 
   const sections = data?.getContentSectionWithPagination?.data || [];
 
-  const handleSelectVideo = (video) => {
+  const handleSelectVideo = async (video) => {
     setSelectedVideo(video);
-   onSelectVideo(video);
+    onSelectVideo(video);
     // scroll to top to show video player
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   };
 
   return (
-    <ScrollView ref={scrollRef} style={{ flex: 1}}>
+    <ScrollView ref={scrollRef} style={{ flex: 1 }}>
       {/* VIDEO PLAYER */}
       {/* {selectedVideo && <VideoPlayer video={selectedVideo} />} */}
 
@@ -78,6 +80,7 @@ export default function CourseContent({ courseId, onSelectVideo }) {
                 sectionId={section._id}
                 onSelectVideo={handleSelectVideo}
                 activeVideoId={selectedVideo?._id}
+                completedVideo={completedVideo}
               />
             )}
           </View>

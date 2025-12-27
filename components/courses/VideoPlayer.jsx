@@ -1,9 +1,9 @@
-import { View, StyleSheet } from "react-native";
 import { Video } from "expo-av";
+import { useEffect, useRef } from "react";
+import { StyleSheet, View } from "react-native";
 import { FILE_BASE_URL } from "../../config/env";
-import { useRef, useEffect } from "react";
 
-export default function VideoPlayer({ video }) {
+export default function VideoPlayer({ video, onComplete }) {
   const videoRef = useRef(null);
   useEffect(() => {
     if (videoRef.current) {
@@ -26,6 +26,12 @@ export default function VideoPlayer({ video }) {
           style={styles.video}
           shouldPlay
           onError={(err) => console.log("Video error:", err)}
+          onPlaybackStatusUpdate={(status) => {
+            if (status.didJustFinish) {
+              // notify parent when video completes
+              onComplete?.(video);
+            }
+          }}
         />
       </View>
     </View>
