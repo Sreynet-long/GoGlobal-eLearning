@@ -53,7 +53,7 @@ export const GET_COURSE_WITH_PAGINATION = gql`
         }
         has_enrolled
         overall_completion_percentage
-        has_course_complated
+        has_course_completed
         createdAt
         updatedAt
       }
@@ -91,7 +91,7 @@ export const GET_COURSE_ENROLLED_WITH_PAGINATION = gql`
         title
         thumbnail
         overall_completion_percentage
-        has_course_complated
+        has_course_completed
         createdAt
         updatedAt
       }
@@ -122,51 +122,51 @@ export const CREATE_COURSE_ENROLLED = gql`
   }
 `;
 export const GET_COURSE_BY_ID = gql`
-query GetCourseById($courseId: ID!) {
-  getCourseById(course_id: $courseId) {
-    _id
-    title
-    thumbnail
-    category_id {
+  query GetCourseById($courseId: ID!) {
+    getCourseById(course_id: $courseId) {
       _id
-      category_name
-      icon_src
+      title
+      thumbnail
+      category_id {
+        _id
+        category_name
+        icon_src
+        createdAt
+        updatedAt
+      }
+      is_free_course
+      original_price
+      sell_price
+      what_you_learn
+      who_this_course_is_for
+      requirements
+      description
+      course_includes {
+        number_of_lessons
+        number_of_video
+        number_of_hours
+        number_quizzes
+        number_of_projects_practices
+        number_of_downloadable_resources
+        is_full_lifetime_access
+        period_of_access_as_month
+        has_certificate_of_completion
+      }
+      content_section {
+        _id
+        section_order
+        section_title
+        createdAt
+        updatedAt
+      }
+      has_enrolled
+      overall_completion_percentage
+      has_course_completed
+      enrolled_id
       createdAt
       updatedAt
     }
-    is_free_course
-    original_price
-    sell_price
-    what_you_learn
-    who_this_course_is_for
-    requirements
-    description
-    course_includes {
-      number_of_lessons
-      number_of_video
-      number_of_hours
-      number_quizzes
-      number_of_projects_practices
-      number_of_downloadable_resources
-      is_full_lifetime_access
-      period_of_access_as_month
-      has_certificate_of_completion
-    }
-    content_section {
-      _id
-      section_order
-      section_title
-      createdAt
-      updatedAt
-    }
-    has_enrolled
-    overall_completion_percentage
-    has_course_complated
-    enrolled_id
-    createdAt
-    updatedAt
   }
-}
 `;
 
 export const GET_COURSE_PROCESS_WITH_PAGINATION = gql`
@@ -319,6 +319,7 @@ export const GET_VIDEO_CONTENT_WITH_PAGINATION = gql`
         video_content_name
         video_src
         resources
+        has_completed
         createdAt
         updatedAt
       }

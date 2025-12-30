@@ -48,7 +48,10 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
 
   return (
     <View>
-      {videos.map((video) => (
+      {videos.map((video) => {
+        const isCompleted = video.has_completed || completedVideo?.includes(video._id);
+        console.log("completed", isCompleted);
+        return (
         <View key={video._id}>
           <TouchableOpacity
             style={[
@@ -58,16 +61,16 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
             onPress={() => onSelectVideo(video)}
           >
             <MaterialCommunityIcons
-              name={completedVideo?.includes(video._id) ? "check-circle" : "play-circle-outline"}
+              name={isCompleted ? "check-circle" : "play-circle-outline"}
               size={20}
-              color={completedVideo?.includes(video._id) ? "#4CAF50" : "#888"}
+              color={isCompleted ? "#4CAF50" : "#888"}
             />
 
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>
                 Lesson {video.video_content_order}. {video.video_content_name}
               </Text>
-              <Text style={styles.lessonDuration}>Video</Text>
+              <Text style={styles.lessonDuration}>{isCompleted ? "Completed" : "Video"}</Text>
             </View>
 
             {/* {video.resources?.length > 0 && (
@@ -108,7 +111,8 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
               );
             })}
         </View>
-      ))}
+        );
+      })}
     </View>
   );
 }
