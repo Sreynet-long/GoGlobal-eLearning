@@ -137,7 +137,8 @@ function MenuItem({ label, icon, onPress, isLast }) {
       <View style={styles.menuIconBox}>
         <MaterialIcons name={icon} size={30} color={COLORS.primary} />
       </View>
-      <Text style={styles.menuLabel}>{label}</Text>
+     <Text style={styles.menuLabel}>{String(label)}</Text>
+
       <MaterialIcons name="chevron-right" size={24} color={COLORS.grey200} />
     </TouchableOpacity>
   );

@@ -60,11 +60,8 @@ export default function TermsScreen() {
   ];
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace("/(tabs)/account&Aboutus");
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace("/(tabs)/account&Aboutus");
   };
 
   return (
@@ -119,7 +116,9 @@ export default function TermsScreen() {
                   <View style={styles.idCircle}>
                     <Text style={styles.idText}>{item.id}</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>{item.title}</Text>
+                  <Text style={[styles.sectionTitle, { marginLeft: 12 }]}>
+                    {item.title}
+                  </Text>
                 </View>
                 <Text style={styles.sectionContent}>{item.content}</Text>
               </Surface>
@@ -139,7 +138,7 @@ export default function TermsScreen() {
                 size={24}
                 color={COLORS.white}
               />
-              <Text style={styles.contactBtnText}>
+              <Text style={[styles.contactBtnText, { marginLeft: 10 }]}>
                 {t("contact_support", language)}
               </Text>
             </TouchableOpacity>
@@ -251,7 +250,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
-    gap: 12,
   },
   idCircle: {
     width: 32,
@@ -290,7 +288,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingVertical: 16,
     borderRadius: 18,
-    gap: 10,
     ...Platform.select({
       ios: {
         shadowColor: COLORS.primary,

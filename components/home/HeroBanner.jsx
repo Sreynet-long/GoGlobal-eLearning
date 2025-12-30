@@ -24,15 +24,11 @@ const HeroBanner = () => {
   const router = useRouter();
   const { language } = useLanguage();
   const scrollRef = useRef(null);
+  const indexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const { data, loading } = useQuery(GET_COURSE_BANNER_WITH_PAGINATION, {
-    variables: {
-      page: 1,
-      limit: 10,
-      pagination: false,
-      isPublic: true,
-    },
+    variables: { page: 1, limit: 10, pagination: false, isPublic: true },
     fetchPolicy: "cache-and-network",
   });
 
@@ -42,20 +38,18 @@ const HeroBanner = () => {
     if (!banners.length) return;
 
     const interval = setInterval(() => {
-      const nextIndex = (activeIndex + 1) % banners.length;
+      indexRef.current = (indexRef.current + 1) % banners.length;
       scrollRef.current?.scrollTo({
-        x: nextIndex * SLIDE_WIDTH,
+        x: indexRef.current * SLIDE_WIDTH,
         animated: true,
       });
-      setActiveIndex(nextIndex);
+      setActiveIndex(indexRef.current);
     }, AUTOSCROLL_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [activeIndex, banners.length]);
+  }, [banners.length]);
 
-  if (loading || !banners.length) {
-    return null;
-  }
+  if (loading || !banners.length) return null;
 
   return (
     <View style={styles.carouselContainer}>
@@ -67,13 +61,13 @@ const HeroBanner = () => {
         onScroll={(event) => {
           const x = event.nativeEvent.contentOffset.x;
           const index = Math.round(x / SLIDE_WIDTH);
-          setActiveIndex(index);
+          if (index !== activeIndex) setActiveIndex(index);
         }}
         scrollEventThrottle={16}
       >
         {banners.map((item) => (
           <ImageBackground
-            key={item._id}
+            key={String(item._id)}
             source={{
               uri: item.image?.startsWith("http")
                 ? item.image
@@ -83,18 +77,22 @@ const HeroBanner = () => {
             imageStyle={{ borderRadius: 20 }}
           >
             <View style={styles.gradientOverlay}>
-              <Text style={styles.slideTitle}>{item.title}</Text>
+              <Text style={styles.slideTitle}>
+                {String(item.title ?? "Course Title")}
+              </Text>
 
               <Text style={styles.slideSubtitle}>
-                {item.description || t("explore_courses", language)}
+                {String(item.description ?? t("explore_courses", language))}
               </Text>
 
               <TouchableOpacity
                 style={styles.slideButton}
-                onPress={() => router.push("/(tabs)/courses")}
+                onPress={() =>
+                  router.push(String(item.link ?? "/(tabs)/courses"))
+                }
               >
                 <Text style={styles.slideButtonText}>
-                  {t("explore_now", language)}
+                  {String(t("explore_now", language))}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -105,7 +103,7 @@ const HeroBanner = () => {
       <View style={styles.pagination}>
         {banners.map((_, index) => (
           <View
-            key={index}
+            key={String(index)}
             style={[styles.dot, index === activeIndex && styles.activeDot]}
           />
         ))}
@@ -113,8 +111,6 @@ const HeroBanner = () => {
     </View>
   );
 };
-
-//==================== Styles ====================
 
 const styles = StyleSheet.create({
   carouselContainer: {
@@ -150,7 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   slideButton: {
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#fff",
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 25,

@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Text as RNText,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -64,7 +65,9 @@ export default function ForgotPassword() {
           </View>
         </View>
         <Text style={styles.heroTitle}>{t("forgot_password", language)}</Text>
-        <Text style={styles.heroSubtitle}>{t("enter_email_for_reset", language)}</Text>
+        <Text style={styles.heroSubtitle}>
+          {t("enter_email_for_reset", language)}
+        </Text>
       </View>
 
       <View style={styles.mainContainer}>
@@ -75,8 +78,12 @@ export default function ForgotPassword() {
         >
           {error ? (
             <View style={styles.errorBanner}>
-              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
-              <Text style={styles.errorText}>{error}</Text>
+              <MaterialIcons
+                name="error-outline"
+                size={18}
+                color={COLORS.error}
+              />
+              <RNText style={styles.errorText}>{error}</RNText>
             </View>
           ) : null}
 
@@ -91,7 +98,9 @@ export default function ForgotPassword() {
               style={styles.input}
               outlineStyle={styles.inputOutline}
               activeOutlineColor={COLORS.primary}
-              left={<TextInput.Icon icon="email-outline" color={COLORS.grey600} />}
+              left={
+                <TextInput.Icon icon="email-outline" color={COLORS.grey600} />
+              }
             />
 
             <Button
@@ -102,7 +111,7 @@ export default function ForgotPassword() {
               contentStyle={styles.sendButtonContent}
               labelStyle={styles.sendButtonLabel}
             >
-              {t("send_code", language)}
+              <RNText>{t("send_code", language)}</RNText>
             </Button>
           </View>
 
@@ -111,8 +120,14 @@ export default function ForgotPassword() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
-            <Text style={styles.backButtonText}>{t("back_to_login", language)}</Text>
+            <MaterialIcons
+              name="keyboard-backspace"
+              size={20}
+              color={COLORS.grey600}
+            />
+            <RNText style={styles.backButtonText}>
+              {t("back_to_login", language)}
+            </RNText>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -120,11 +135,9 @@ export default function ForgotPassword() {
   );
 }
 
-//==================== Styles ====================
-
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  
+
   heroSection: {
     paddingTop: Platform.OS === "ios" ? 70 : 50,
     paddingBottom: 60,
@@ -181,7 +194,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 30,
     width: "100%",
-    gap: 10,
     borderWidth: 1,
     borderColor: "#FEE2E2",
   },
@@ -189,31 +201,21 @@ const styles = StyleSheet.create({
     color: COLORS.error,
     fontWeight: "600",
     fontSize: 13,
+    marginLeft: 8,
     flex: 1,
   },
 
   formArea: { width: "100%" },
-  input: {
-    backgroundColor: COLORS.white,
-    marginBottom: 25,
-  },
-  inputOutline: {
-    borderRadius: 12,
-    borderColor: COLORS.grey200,
-  },
+  input: { backgroundColor: COLORS.white, marginBottom: 25 },
+  inputOutline: { borderRadius: 12, borderColor: COLORS.grey200 },
 
   sendButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 16,
     elevation: 0,
   },
-  sendButtonContent: {
-    height: 56,
-  },
-  sendButtonLabel: {
-    fontSize: 16,
-    fontWeight: "800",
-  },
+  sendButtonContent: { height: 56 },
+  sendButtonLabel: { fontSize: 16, fontWeight: "800" },
 
   backButton: {
     flexDirection: "row",
@@ -221,11 +223,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 30,
     padding: 10,
-    gap: 8,
   },
   backButtonText: {
     color: COLORS.grey600,
     fontWeight: "700",
     fontSize: 14,
+    marginLeft: 8,
   },
 });

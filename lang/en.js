@@ -1,7 +1,7 @@
 export default {
   home: "Home",
   tech_skill: "Tech Skill",
-  "50_off_sale": "50% Off Sale!",
+  off_sale: "50% Off Sale!",
   new_c_class: "New C++ Class",
   explore_courses: "Explore All 240+ Courses",
   cloud_sale_subtitle: "On All Cloud Certifications Until Friday",
@@ -19,7 +19,7 @@ export default {
   React_Native_Mobile: "React Native Mobile",
   DevOps_with_Docker: "DevOps with Docker",
   CONTINUE_LEARNING_AWS_Architect: "Continue Learning AWS Architect",
-  "14_day_streak": "14-Day Streak",
+  day_streak: "14-Day Streak",
   badges_earned: "Badges Earned",
   hours_this_month: "Hours This Month",
   cert_ready: "Cert Ready",
@@ -76,15 +76,15 @@ export default {
   log_out: "Log Out",
   about_go_elearning: "About Go eLEARNING",
   our_story: "Our Story",
-  // our_story_text1:
-  //   "Our company was first created within the company circles supervised by Go Global School. It initially started as an office focusing on IT & Marketing.",
-  // our_story_text2:
-  //   "Later, in 2022, it evolved to become a dedicated company. We offer two main services: developing secure programmes and advanced algorithms to help our clients protect and efficiently store their critical information and data.",
-  // our_vision: "Our Vision",
-  // our_vision_text: '"Let\'s move to the digital area."',
+  our_story_text1:
+    "Our company was first created within the company circles supervised by Go Global School. It initially started as an office focusing on IT & Marketing.",
+  our_story_text2:
+    "Later, in 2022, it evolved to become a dedicated company. We offer two main services: developing secure programmes and advanced algorithms to help our clients protect and efficiently store their critical information and data.",
+  our_vision: "Our Vision",
+  our_vision_text: '"Let\'s move to the digital area."',
   our_mission: "Our Mission",
-  // our_mission_text:
-  //   '"Innovate, promote, and encourage using technology in digital lifestyle."',
+  our_mission_text:
+    '"Innovate, promote, and encourage using technology in digital lifestyle."',
   contact_us: "Contact Us",
   call_us: "Call Us",
   website: "Website",
@@ -130,7 +130,7 @@ export default {
   Update_your_credentials_to_keep_your_account_secure:"Update your credentials to keep your account secure.",
   are_you_sure_logout:"Are you sure you want to Log Out?",
   fill_all_fields:"Please fill all the fields",
-  "we'll_provide_u_with_the_best_service_possible":"We will provide you with the best service possible. Open 24/7.",
+  well_provide_u_with_the_best_service_possible:"We will provide you with the best service possible. Open 24/7.",
   send_a_message:"Send a Message",
   full_name:"Full Name",
   email_address:"Email Address",

@@ -1,6 +1,6 @@
 export default {
   tech_skill: "ជំនាញបច្ចេកវិទ្យា",
-  "50_off_sale": "បញ្ចុះតម្លៃ 50%!",
+  off_sale: "បញ្ចុះតម្លៃ 50%!",
   new_c_class: "ថ្នាក់ C++ ថ្មី",
   explore_courses: "ស្វែងរកវគ្គសិក្សា 240+ ទាំងអស់។",
   cloud_sale_subtitle: "នៅលើ Cloud Certifications ទាំងអស់ រហូតដល់ថ្ងៃសុក្រ។",
@@ -18,7 +18,7 @@ export default {
   React_Native_Mobile: "React Native នៅលើទូរស័ព្ទ",
   DevOps_with_Docker: "អភិវឌ្ឍជាមួយ Docker",
   CONTINUE_LEARNING_AWS_Architect: "បន្តការរៀន AWS Architect",
-  "14_day_streak": "១៤ ថ្ងៃត្រៀមខ្សែ",
+  day_streak: "១៤ ថ្ងៃត្រៀមខ្សែ",
   badges_earned: "សញ្ញាប័ត្រ​បានទទួល",
   hours_this_month: "ម៉ោងខែនេះ",
   cert_ready: "ត្រៀមសញ្ញាប័ត្រ",
@@ -121,7 +121,7 @@ export default {
 
   home: "ទំព័រដើម",
   tech_skill: "ជំនាញបច្ចេកវិទ្យា",
-  "50_off_sale": "បញ្ចុះតម្លៃ 50%!",
+  off_sale: "បញ្ចុះតម្លៃ 50%!",
   new_c_class: "ថ្នាក់ C++ ថ្មី",
   explore_courses: "ស្វែងរកវគ្គសិក្សា 240+ ទាំងអស់។",
   explore_now: "ស្វែងរកឥឡូវនេះ",

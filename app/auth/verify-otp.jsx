@@ -66,7 +66,8 @@ export default function VerifyOTP() {
         setError(
           language === "kh"
             ? data?.verifyOTP?.message?.messageKh
-            : data?.verifyOTP?.message?.messageEn || t("incorrect_code", language)
+            : data?.verifyOTP?.message?.messageEn ||
+                t("incorrect_code", language)
         );
       }
     },
@@ -113,7 +114,11 @@ export default function VerifyOTP() {
         >
           {error ? (
             <View style={styles.errorBanner}>
-              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
+              <MaterialIcons
+                name="error-outline"
+                size={18}
+                color={COLORS.error}
+              />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
@@ -144,7 +149,9 @@ export default function VerifyOTP() {
           <Button
             mode="contained"
             loading={loading}
-            onPress={() => verifyOtp({ variables: { otp: otp.join(""), token } })}
+            onPress={() =>
+              verifyOtp({ variables: { otp: otp.join(""), token } })
+            }
             style={styles.actionButton}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}
@@ -154,15 +161,28 @@ export default function VerifyOTP() {
 
           <View style={styles.footerCenter}>
             <View style={styles.resendRow}>
-              <Text style={styles.resendPrompt}>{t("didnt_receive_code", language)}</Text>
+              <Text style={styles.resendPrompt}>
+                {t("didnt_receive_code", language)}
+              </Text>
               <TouchableOpacity onPress={() => {}}>
-                <Text style={styles.resendAction}>{t("resend_code", language)}</Text>
+                <Text style={styles.resendAction}>
+                  {t("resend_code", language)}
+                </Text>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.backLink} onPress={() => router.back()}>
-              <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
-              <Text style={styles.backLinkText}>{t("back_to_forgot_password", language)}</Text>
+            <TouchableOpacity
+              style={styles.backLink}
+              onPress={() => router.back()}
+            >
+              <MaterialIcons
+                name="keyboard-backspace"
+                size={20}
+                color={COLORS.grey600}
+              />
+              <Text style={styles.backLinkText}>
+                {t("back_to_forgot_password", language)}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -195,8 +215,20 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 8,
   },
-  heroTitle: { fontSize: 26, fontWeight: "900", color: COLORS.white, textAlign: "center", letterSpacing: -0.5 },
-  heroSubtitle: { fontSize: 15, color: "rgba(255,255,255,0.6)", textAlign: "center", marginTop: 8, lineHeight: 22 },
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: "900",
+    color: COLORS.white,
+    textAlign: "center",
+    letterSpacing: -0.5,
+  },
+  heroSubtitle: {
+    fontSize: 15,
+    color: "rgba(255,255,255,0.6)",
+    textAlign: "center",
+    marginTop: 8,
+    lineHeight: 22,
+  },
 
   mainContainer: {
     flex: 1,
@@ -205,7 +237,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 40,
     marginTop: -30,
   },
-  scrollContent: { paddingHorizontal: 30, paddingTop: 40, paddingBottom: 40, alignItems: "center" },
+  scrollContent: {
+    paddingHorizontal: 30,
+    paddingTop: 40,
+    paddingBottom: 40,
+    alignItems: "center",
+  },
 
   errorBanner: {
     flexDirection: "row",
@@ -221,16 +258,44 @@ const styles = StyleSheet.create({
 
   otpWrapper: { width: "100%", alignItems: "center", marginBottom: 40 },
   otpGrid: { flexDirection: "row", justifyContent: "center", gap: 10 },
-  otpInput: { width: 46, height: 58, borderWidth: 1.5, borderColor: COLORS.grey200, borderRadius: 14, fontSize: 22, fontWeight: "800", textAlign: "center", backgroundColor: COLORS.bgLight, color: COLORS.primary },
-  otpInputFocused: { borderColor: COLORS.primary, backgroundColor: COLORS.white, borderWidth: 2 },
-  otpInputFilled: { borderColor: COLORS.primary, backgroundColor: COLORS.white },
+  otpInput: {
+    width: 46,
+    height: 58,
+    borderWidth: 1.5,
+    borderColor: COLORS.grey200,
+    borderRadius: 14,
+    fontSize: 22,
+    fontWeight: "800",
+    textAlign: "center",
+    backgroundColor: COLORS.bgLight,
+    color: COLORS.primary,
+  },
+  otpInputFocused: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+    borderWidth: 2,
+  },
+  otpInputFilled: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+  },
 
-  actionButton: { width: "100%", borderRadius: 16, backgroundColor: COLORS.primary, marginBottom: 30 },
+  actionButton: {
+    width: "100%",
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    marginBottom: 30,
+  },
   actionButtonContent: { height: 56 },
   actionButtonLabel: { fontSize: 16, fontWeight: "800" },
 
   footerCenter: { alignItems: "center", width: "100%" },
-  resendRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 25 },
+  resendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 25,
+  },
   resendPrompt: { color: COLORS.grey600, fontSize: 14 },
   resendAction: { color: COLORS.primary, fontWeight: "800", fontSize: 14 },
   backLink: { flexDirection: "row", alignItems: "center", gap: 8, padding: 10 },

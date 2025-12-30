@@ -39,8 +39,7 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else
-            Alert.alert(t("error", language), t("cannot_open_url", language));
+          else Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -57,8 +56,7 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else
-            Alert.alert(t("error", language), t("cannot_open_url", language));
+          else Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -75,8 +73,7 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else
-            Alert.alert(t("error", language), t("cannot_open_url", language));
+          else Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -93,8 +90,7 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else
-            Alert.alert(t("error", language), t("cannot_open_url", language));
+          else Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -136,7 +132,9 @@ export default function AboutScreen() {
               color={COLORS.accent}
             />
           </View>
-          <Title style={styles.mainTitle}>{t("our_story", language)}</Title>
+          <Title style={styles.mainTitle}>
+            <Text>{t("our_story", language)}</Text>
+          </Title>
           <Text style={styles.brandDescription}>
             {t("our_story_text1", language)}
           </Text>
@@ -229,9 +227,9 @@ export default function AboutScreen() {
   );
 }
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.primary },
-
   backBtn: {
     position: "absolute",
     top: Platform.OS === "ios" ? 25 : 10,
@@ -241,17 +239,14 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 15,
   },
-
   brandHeader: {
     paddingTop: Platform.OS === "ios" ? 40 : 60,
     paddingBottom: 100,
     alignItems: "center",
     paddingHorizontal: 30,
   },
-
   logoWrapper: {
     width: 80,
     height: 80,
@@ -263,14 +258,12 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: COLORS.accent,
   },
-
   mainTitle: {
     color: COLORS.white,
     fontSize: 28,
     fontWeight: "900",
     marginBottom: 8,
   },
-
   brandDescription: {
     color: "rgba(255,255,255,0.6)",
     textAlign: "center",
@@ -291,7 +284,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingHorizontal: 20,
   },
-
   hoverContainer: {
     flexDirection: "row",
     gap: 15,
@@ -356,7 +348,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "center",
   },
-
   contactContainer: {
     marginTop: 10,
   },

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
@@ -10,37 +10,50 @@ import {
   View,
 } from "react-native";
 import { Divider } from "react-native-paper";
-import {
-  GET_CONTENT_SECTION_WITH_PAGINATION
-} from "../../schema/course";
+import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
 import VideoList from "./VideoList";
 
-export default function CourseContent({ courseId, onSelectVideo, completedVideo }) {
+export default function CourseContent({
+  courseId,
+  onSelectVideo,
+  completedVideo,
+}) {
   const [expandedSection, setExpandedSection] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const scrollRef = useRef(null);
 
   const { data, loading } = useQuery(GET_CONTENT_SECTION_WITH_PAGINATION, {
     variables: { page: 1, limit: 50, pagination: false, keyword: "", courseId },
   });
 
-  if (loading) return <ActivityIndicator size="large" color="#3F51B5" />;
+  if (loading)
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#3F51B5"
+        style={{ marginTop: 20 }}
+      />
+    );
 
   const sections = data?.getContentSectionWithPagination?.data || [];
 
-  const handleSelectVideo = async (video) => {
+  if (sections.length === 0)
+    return (
+      <Text style={styles.noContentText}>No course content available.</Text>
+    );
+
+  const handleSelectVideo = (video) => {
     setSelectedVideo(video);
     onSelectVideo(video);
-    // scroll to top to show video player
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   };
 
   return (
-    <ScrollView ref={scrollRef} style={{ flex: 1 }}>
-      {/* VIDEO PLAYER */}
-      {/* {selectedVideo && <VideoPlayer video={selectedVideo} />} */}
-
-      {/* COURSE CURRICULUM */}
+    <ScrollView
+      ref={scrollRef}
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    >
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Course Curriculum:</Text>
 
@@ -53,12 +66,13 @@ export default function CourseContent({ courseId, onSelectVideo, completedVideo 
                   expandedSection === section._id ? null : section._id
                 )
               }
+              activeOpacity={0.7}
             >
-              <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap" }}>
                 <Text style={styles.sectionTitleText}>
-                  Section {section.section_order}:{" "}
+                  Section {section.section_order}:
                 </Text>
-                <Text style={styles.sectionTitleText}>
+                <Text style={[styles.sectionTitleText, { marginLeft: 4 }]}>
                   {section.section_title}
                 </Text>
               </View>
@@ -97,7 +111,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  cardTitle: { fontSize: 16, fontWeight: "700", marginBottom: 12 },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: "#2D3436",
+  },
   sectionCard: {
     backgroundColor: "#FFF",
     borderRadius: 12,
@@ -115,4 +134,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   sectionTitleText: { fontSize: 15, fontWeight: "700", color: "#2D3436" },
+  noContentText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#999",
+    fontSize: 14,
+  },
 });

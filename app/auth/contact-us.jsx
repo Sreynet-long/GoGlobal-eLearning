@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
+  Text as RNText,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -36,12 +37,18 @@ export default function ContactUsScreen() {
 
   const handleSendMessage = () => {
     if (!name || !email || !message) {
-      return Alert.alert(t("error", language), t("fill_all_fields", language));
+      return Alert.alert(
+        t("error", language) || "Error",
+        t("fill_all_fields", language) || "Please fill all fields"
+      );
     }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(t("success", language), t("message_sent_success", language));
+      Alert.alert(
+        t("success", language) || "Success",
+        t("message_sent_success", language) || "Message sent successfully"
+      );
       setName("");
       setEmail("");
       setMessage("");
@@ -51,21 +58,21 @@ export default function ContactUsScreen() {
   const contactMethods = [
     {
       icon: "phone",
-      label: t("call_us", language),
+      label: t("call_us", language) || "Call Us",
       val: "012 660 981",
       link: "tel:012660981",
       color: "#3b82f6",
     },
     {
       icon: "email",
-      label: t("email", language),
+      label: t("email", language) || "Email",
       val: "IT Support",
       link: "mailto:goglobalit2022@gmail.com",
       color: "#ef4444",
     },
     {
       icon: "location-on",
-      label: t("office", language),
+      label: t("office", language) || "Office",
       val: "Siem Reap",
       link: "https://maps.google.com",
       color: "#10b981",
@@ -83,7 +90,6 @@ export default function ContactUsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -104,9 +110,12 @@ export default function ContactUsScreen() {
                 color={COLORS.accent}
               />
             </View>
-            <Text style={styles.headerTitle}>{t("contact_us", language)}</Text>
+            <Text style={styles.headerTitle}>
+              {t("contact_us", language) || "Contact Us"}
+            </Text>
             <Text style={styles.heroSubtitle}>
-              {t("we'll_provide_u_with_the_best_service_possible", language)}
+              {t("we'll_provide_u_with_the_best_service_possible", language) ||
+                "We'll provide you with the best service possible"}
             </Text>
           </View>
         </View>
@@ -125,7 +134,12 @@ export default function ContactUsScreen() {
                 {contactMethods.map((item, index) => (
                   <TouchableOpacity
                     key={index}
-                    style={styles.methodCard}
+                    style={[
+                      styles.methodCard,
+                      index < contactMethods.length - 1
+                        ? { marginRight: 12 }
+                        : null,
+                    ]}
                     onPress={() => Linking.openURL(item.link)}
                     activeOpacity={0.8}
                   >
@@ -141,19 +155,19 @@ export default function ContactUsScreen() {
                         color={item.color}
                       />
                     </View>
-                    <Text style={styles.methodLabel}>{item.label}</Text>
-                    <Text style={styles.methodValue}>{item.val}</Text>
+                    <Text style={styles.methodLabel}>{item.label || ""}</Text>
+                    <Text style={styles.methodValue}>{item.val || ""}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
               <Surface style={styles.formSurface} elevation={0}>
                 <Text style={styles.formTitle}>
-                  {t("send_a_message", language)}
+                  {t("send_a_message", language) || "Send a Message"}
                 </Text>
 
                 <TextInput
-                  label={t("full_name", language)}
+                  label={t("full_name", language) || "Full Name"}
                   value={name}
                   onChangeText={setName}
                   mode="outlined"
@@ -163,7 +177,7 @@ export default function ContactUsScreen() {
                 />
 
                 <TextInput
-                  label={t("email_address", language)}
+                  label={t("email_address", language) || "Email Address"}
                   value={email}
                   onChangeText={setEmail}
                   mode="outlined"
@@ -174,7 +188,7 @@ export default function ContactUsScreen() {
                 />
 
                 <TextInput
-                  label={t("your_message", language)}
+                  label={t("your_message", language) || "Your Message"}
                   value={message}
                   onChangeText={setMessage}
                   mode="outlined"
@@ -193,13 +207,16 @@ export default function ContactUsScreen() {
                   contentStyle={styles.buttonContent}
                   labelStyle={styles.buttonLabel}
                 >
-                  {t("send_message", language)}
+                  <RNText>
+                    {t("send_message", language) || "Send Message"}
+                  </RNText>
                 </Button>
               </Surface>
 
               <View style={styles.socialContainer}>
                 <Text style={styles.socialText}>
-                  {t("follow_us_on_social_media", language)}
+                  {t("follow_us_on_social_media", language) ||
+                    "Follow us on social media"}
                 </Text>
                 <View style={styles.socialIcons}>
                   <TouchableOpacity
@@ -254,9 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  headerCenteredContent: {
-    alignItems: "center",
-  },
+  headerCenteredContent: { alignItems: "center" },
   iconGlow: {
     width: 75,
     height: 75,
@@ -291,7 +306,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     lineHeight: 18,
   },
-
   accentBackgroundLayer: {
     flex: 1,
     backgroundColor: COLORS.accent,
@@ -306,32 +320,15 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 36,
     marginTop: 6,
   },
-
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 25,
-    paddingBottom: 40,
-  },
-  methodGrid: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 25, paddingBottom: 40 },
+  methodGrid: { flexDirection: "row", marginBottom: 20 },
   methodCard: {
     flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 12,
     alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-      },
-      android: { elevation: 2 },
-    }),
+    marginRight: 0,
   },
   iconCircle: {
     width: 44,
@@ -359,6 +356,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 24,
     padding: 20,
+    marginTop: 10,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -375,30 +373,16 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     marginBottom: 15,
   },
-  input: {
-    marginBottom: 12,
-    backgroundColor: COLORS.white,
-  },
-  inputOutline: {
-    borderRadius: 14,
-    borderColor: COLORS.grey200,
-  },
+  input: { marginBottom: 12, backgroundColor: COLORS.white },
+  inputOutline: { borderRadius: 14, borderColor: COLORS.grey200 },
   sendButton: {
     borderRadius: 14,
     backgroundColor: COLORS.primary,
     marginTop: 8,
   },
-  buttonContent: {
-    height: 54,
-  },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  socialContainer: {
-    alignItems: "center",
-    marginTop: 35,
-  },
+  buttonContent: { height: 54 },
+  buttonLabel: { fontSize: 16, fontWeight: "700" },
+  socialContainer: { alignItems: "center", marginTop: 35 },
   socialText: {
     fontSize: 12,
     fontWeight: "700",
@@ -407,10 +391,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
   },
-  socialIcons: {
-    flexDirection: "row",
-    gap: 15,
-  },
+  socialIcons: { flexDirection: "row" },
   socialBtn: {
     width: 50,
     height: 50,
@@ -418,5 +399,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 15,
   },
 });
