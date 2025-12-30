@@ -93,22 +93,22 @@ const CourseCard = ({
               <MaterialIcons name="live-tv" size={14} color="#dc2626" />
             </View>
 
-            <View style={[styles.iconWrapper, { backgroundColor: "#fefce8" }]}>
+            {/* <View style={[styles.iconWrapper, { backgroundColor: "#fefce8" }]}>
               <MaterialIcons
                 name="workspace-premium"
                 size={14}
                 color="#ca8a04"
               />
-            </View>
+            </View> */}
           </View>
-        </View>
+        </View> 
       </View>
     </TouchableOpacity>
   );
 };
 
 export default function TrendingCourse() {
-    const router = useRouter();
+  const router = useRouter();
   const { language } = useLanguage();
   const { data, loading, error } = useQuery(
     GET_COURSE_TRENDING_WITH_PAGINATION,
@@ -130,8 +130,10 @@ export default function TrendingCourse() {
             {t("enroll_today", language)}
           </Text>
         </View>
-        <TouchableOpacity style={styles.seeAllBtn} onPress={() => router.push("/(tabs)/courses")}>
-
+        <TouchableOpacity
+          style={styles.seeAllBtn}
+          onPress={() => router.push("/(tabs)/courses")}
+        >
           <Text style={styles.seeAllText}>{t("view_all", language)}</Text>
         </TouchableOpacity>
       </View>
