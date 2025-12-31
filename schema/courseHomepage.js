@@ -67,13 +67,15 @@ export const GET_COURSE_TRENDING_WITH_PAGINATION = gql`
 `;
 export const GET_COURSE_FREE_WITH_PAGINATION = gql`
   query GetFreeCourse($limit: Int) {
-    getFreeCourse(limit: $limit) {
-      _id
-      title
-      thumbnail
-      category_id {
-        category_name
-      }
+  getFreeCourse(limit: $limit) {
+    _id
+    title
+    thumbnail
+    category_id {
+      category_name
     }
+    overall_completion_percentage
+    is_free_course
   }
+}
 `;

@@ -130,14 +130,14 @@ const CourseIconsPreview = ({ includes }) => {
         ))}
       </TouchableOpacity>
 
-     {tooltipVisible && (
+{tooltipVisible && (
   <View
     style={{
       position: "absolute",
       bottom: 50,
       left: -17,
-      width: 266,
-      height: 150,
+      width: 267,
+      height: 160, // Increased height slightly to accommodate larger text
       backgroundColor: "#ffffff",
       borderRadius: 20,
       paddingHorizontal: 10,
@@ -152,7 +152,7 @@ const CourseIconsPreview = ({ includes }) => {
       elevation: 5,
     }}
   >
-    
+    {/* --- BACKGROUND ACCENTS --- */}
     <View style={{
       position: 'absolute',
       top: -15,
@@ -160,7 +160,7 @@ const CourseIconsPreview = ({ includes }) => {
       width: 100,
       height: 100,
       borderRadius: 50,
-      backgroundColor: 'rgba(99, 102, 241, 0.12)', 
+      // backgroundColor: 'rgba(99, 102, 241, 0.12)', 
     }} />
     <View style={{
       position: 'absolute',
@@ -169,28 +169,27 @@ const CourseIconsPreview = ({ includes }) => {
       width: 120,
       height: 120,
       borderRadius: 60,
-      backgroundColor: 'rgba(236, 72, 153, 0.08)', 
+      // backgroundColor: 'rgba(236, 72, 153, 0.08)', 
     }} />
     <View style={{
       position: 'absolute',
-      top: 30,
+      top: 10,
       left: -40,
       width: 300,
       height: 30,
-      backgroundColor: 'rgba(99, 102, 241, 0.03)', 
+      // backgroundColor: 'rgba(99, 102, 241, 0.03)', 
       transform: [{ rotate: '-15deg' }], 
     }} />
 
-    
     <View style={{ 
       alignItems: "center", 
-      marginTop: 8,
-      marginBottom: 6,
+      marginTop: 2,
+      marginBottom: 2,
       borderBottomWidth: 1,
-      borderBottomColor: 'rgba(0,0,0,0.03)',
-      paddingBottom: 4,
+      // borderBottomColor: 'rgba(0,0,0,0.03)',
+      paddingBottom: 2,
     }}>
-      <Text style={{ fontWeight: "900", fontSize: 10, color: "#1e293b", opacity: 0.6, letterSpacing: 1 }}>
+      <Text style={{ fontWeight: "900", fontSize: 13, color: "#1e293b", opacity: 0.7, letterSpacing: 1 }}>
         COURSE CONTENTS
       </Text>
     </View>
@@ -199,7 +198,8 @@ const CourseIconsPreview = ({ includes }) => {
       <View style={{ 
         flexDirection: "row", 
         flexWrap: "wrap", 
-        justifyContent: "space-between" 
+        justifyContent: "space-between",
+        paddingBottom: 2
       }}>
         {tooltipItems.map((item, index) => item.show && (
           <View
@@ -208,17 +208,17 @@ const CourseIconsPreview = ({ includes }) => {
               flexDirection: "row",
               alignItems: "center",
               width: "48%",
-              paddingVertical: 0,
-              paddingHorizontal: 6,
-              marginBottom: 6,
-              backgroundColor: "rgba(248, 249, 250, 0.75)", 
+              paddingVertical: 0, 
+              paddingHorizontal: 2,
+              marginBottom: 0,
+              backgroundColor: "rgba(248, 249, 250, 0.85)", 
               borderRadius: 10,
+              minHeight: 32,
             }}
           >
-            
             <View style={{ 
-              width: 22, 
-              height: 22, 
+              width: 24, 
+              height: 24, 
               borderRadius: 6, 
               backgroundColor: item.bg || '#fff', 
               justifyContent: 'center', 
@@ -230,10 +230,11 @@ const CourseIconsPreview = ({ includes }) => {
             <Text
               numberOfLines={1}
               style={{
-                marginLeft: 6,
-                color: "#334155",
-                fontSize: 9, 
-                fontWeight: "700",
+                marginLeft: 3,
+                color: "#1e293b",
+                fontSize: 12,  
+                fontWeight: "700", 
+                letterSpacing: -0.2, 
                 flex: 1,
               }}
             >
@@ -475,7 +476,7 @@ const styles = StyleSheet.create({
   },
   discountPillText: { color: "#fff", fontSize: 13, fontWeight: "900" },
   infoWrapper: { padding: 12, flex: 1 },
-  courseTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
+  courseTitle: { fontSize: 18, fontWeight: "800", color: "#1e293b" },
   priceRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -502,7 +503,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "900",
     color: "#10b981",
-    paddingTop: 15,
+    marginTop: 15,
+    backgroundColor: "#10b98123",
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   iconGrid: {
     position: "absolute",

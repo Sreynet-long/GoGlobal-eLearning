@@ -42,7 +42,7 @@ const CourseCard = ({ title, thumbnail }) => {
           <View style={styles.dotSeparator} />
 
           <View style={styles.lessonCount}>
-            <Text style={styles.lessonCountText}>{String(12) + " Lessons"}</Text>
+            {/* <Text style={styles.lessonCountText}>{String(12) + " Lessons"}</Text> */}
           </View>
         </View>
       </View>
