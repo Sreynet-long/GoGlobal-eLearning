@@ -96,7 +96,7 @@ export default function CoursePlayerScreen() {
     }
   };
 
-  /* ---------------- TAB RENDER ---------------- */
+  //==================== TAB RENDER ====================//
   const renderTabContent = () => {
     switch (activeTab) {
       case "Course content":
@@ -114,7 +114,7 @@ export default function CoursePlayerScreen() {
     }
   };
 
-  /* ---------------- OVERVIEW ---------------- */
+  // ==================== OVERVIEW ==================== //
   const renderOverview = () => (
     <View>
       <View style={styles.card}>
@@ -202,7 +202,7 @@ export default function CoursePlayerScreen() {
     </View>
   );
 
-  /* ---------------- VIDEO RENDER ---------------- */
+  // ==================== VIDEO RENDER ==================== //
   const renderVideo = () => {
     if (selectedVideo) {
       return (
@@ -250,7 +250,6 @@ export default function CoursePlayerScreen() {
       );
     }
 
-    // fallback thumbnail if no video exists
     return (
       <View style={styles.videoWrapper}>
         <Image
@@ -277,7 +276,6 @@ export default function CoursePlayerScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <MaterialCommunityIcons name="chevron-left" size={30} color="#000" />
@@ -287,10 +285,8 @@ export default function CoursePlayerScreen() {
         </Text>
       </View>
 
-      {/* VIDEO */}
       {renderVideo()}
 
-      {/* TABS */}
       <View style={styles.tabBar}>
         {TABS.map((tab) => (
           <TouchableOpacity
@@ -312,7 +308,6 @@ export default function CoursePlayerScreen() {
 
       <Divider />
 
-      {/* CONTENT */}
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {renderTabContent()}
       </ScrollView>
@@ -320,7 +315,7 @@ export default function CoursePlayerScreen() {
   );
 }
 
-/* ---------------- SMALL COMPONENTS ---------------- */
+// ==================== SMALL COMPONENTS ==================== //
 const InfoRow = ({ icon, label, value }) => (
   <View style={styles.row}>
     <MaterialCommunityIcons name={icon} size={20} color="#3F51B5" />
@@ -336,7 +331,7 @@ const IncludeItem = ({ text }) => (
   </View>
 );
 
-/* ---------------- STYLES ---------------- */
+// ==================== STYLES ==================== //
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F7FA" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

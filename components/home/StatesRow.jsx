@@ -3,14 +3,20 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
-const StatItem = ({ label, value, icon, color }) => (
+const StatItem = ({ label, icon, color }) => (
   <View style={styles.statBox}>
-    <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
-      <Ionicons name={icon} size={22} color={color} />
+    {/* Concentric Circle Design */}
+    <View style={styles.iconOuterRing}>
+      <View style={[styles.iconInnerCircle, { backgroundColor: `${color}15` }]}>
+        <Ionicons name={icon} size={25} color={color} />
+      </View>
     </View>
-    <View style={styles.textContainer}>
-      <Text style={styles.statValue}>{String(value)}</Text>
-      <Text style={styles.statLabel}>{String(label).toUpperCase()}</Text>
+    
+    <View style={styles.textWrapper}>
+      <Text style={styles.statLabel} numberOfLines={2}>
+        {label}
+      </Text>
+      <View style={[styles.dot, { backgroundColor: color }]} />
     </View>
   </View>
 );
@@ -19,20 +25,19 @@ export default function StatesRow() {
   const { language } = useLanguage();
 
   const stats = [
-    { labelKey: "14_day_streak", value: "14", icon: "flame", color: "#f97316" },
-    { labelKey: "badges_earned", value: "3", icon: "medal", color: "#eab308" },
-    { labelKey: "hours_this_month", value: "20h", icon: "time", color: "#06b6d4" },
-    { labelKey: "cert_ready", value: "85%", icon: "checkmark-circle", color: "#22c55e" },
+    { label: "Easy to learn", icon: "book-outline", color: "#6366f1" },
+    { label: "Modern Tech", icon: "rocket-outline", color: "#f97316" },
+    { label: "Active Projects", icon: "layers-outline", color: "#22c55e" },
+    { label: "Skills Built", icon: "construct-outline", color: "#0ea5e9" },
   ];
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.mainContainer}>
+      <View style={styles.glassContainer}>
         {stats.map((stat, index) => (
           <StatItem
             key={index}
-            label={t(stat.labelKey, language)}
-            value={stat.value}
+            label={(t(stat.label, language) || stat.label).toUpperCase()}
             icon={stat.icon}
             color={stat.color}
           />
@@ -44,49 +49,62 @@ export default function StatesRow() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 10,
-    marginVertical: 10,
+    paddingHorizontal: 16,
+    marginVertical: 0,
   },
-  mainContainer: {
+  glassContainer: {
     flexDirection: "row",
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.8)", 
+    paddingVertical: 16,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: "#f1f5f9",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    justifyContent: "space-around",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.03,
+    shadowRadius: 20,
+    elevation: 1,
   },
   statBox: {
-    flex: 1,
     alignItems: "center",
+    flex: 1,
   },
-  iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+  iconOuterRing: {
+    width: 54,
+    height: 54,
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
   },
-  textContainer: {
+  iconInnerCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 28,
+    justifyContent: "center",
     alignItems: "center",
   },
-  statValue: {
-    fontSize: 17,
-    fontWeight: "900",
-    color: "#1e293b",
+  textWrapper: {
+    alignItems: 'center',
+    gap: 4,
   },
   statLabel: {
-    fontSize: 8,
-    fontWeight: "700",
-    color: "#64748b",
+    fontSize: 9,
+    fontWeight: "900",
+    color: "#334155",
     textAlign: "center",
+    letterSpacing: 0.8,
+    lineHeight: 10,
+    maxWidth: 60,
+  },
+  dot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
     marginTop: 2,
-    letterSpacing: 0.5,
   },
 });

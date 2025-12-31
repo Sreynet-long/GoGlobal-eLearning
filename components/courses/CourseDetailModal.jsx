@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import {
-    Animated,
-    Dimensions,
-    Image,
-    Modal,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Animated,
+  Dimensions,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
@@ -21,12 +21,16 @@ const renderText = (value) => {
   if (!value) return null;
 
   if (Array.isArray(value)) {
-    return value.map((item, index) => (
-      <Text key={index} style={styles.sectionText}>
-        • {String(item)}
-      </Text>
-    ));
-  }
+     return (
+    <View>
+      {includes.map((item, index) => (
+        <Text key={index} style={{ fontSize: 14, marginBottom: 5 }}>
+          • {item}
+        </Text>
+      ))}
+    </View>
+  );
+}
 
   if (typeof value === "object") return null;
 
