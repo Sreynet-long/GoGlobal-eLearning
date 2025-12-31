@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import CourseContent from "../../components/courses/CourseContent";
 import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
 import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
@@ -128,12 +127,12 @@ export default function CoursePlayerScreen() {
         <InfoRow
           icon="cash"
           label="Original price"
-          value={`$${course?.original_price}`}
+          value={course?.original_price ? `$${course?.original_price}` : "-"}
         />
         <InfoRow
           icon="sale"
           label="Sell price"
-          value={`$${course?.sell_price}`}
+          value={course?.sell_price ? `$${course.sell_price}` : "Free"}
         />
         <InfoRow
           icon="play-circle-outline"
@@ -157,6 +156,32 @@ export default function CoursePlayerScreen() {
         />
       </View>
       <View style={styles.card}>
+        <Text style={styles.cardTitle}>What you will learn:</Text>
+        <ParagraphList
+          text={course?.what_you_learn}
+          icon="check-circle-outline"
+        />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Who this course is for:</Text>
+        <ParagraphList
+          text={course?.who_this_course_is_for}
+          icon="account-outline"
+        />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Requirements:</Text>
+        <ParagraphList text={course?.requirements} icon="tools" />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Description:</Text>
+        <ParagraphList text={course?.description}  />
+      </View>
+
+      <View style={styles.card}>
         <Text style={styles.cardTitle}>This course includes:</Text>
         <IncludeItem
           text={`${includes?.number_of_hours} hours on-demand video`}
@@ -174,8 +199,6 @@ export default function CoursePlayerScreen() {
           <IncludeItem text="Certificate of completion" />
         )}
       </View>
-        
-
     </View>
   );
 
@@ -237,6 +260,19 @@ export default function CoursePlayerScreen() {
         />
       </View>
     );
+  };
+
+  const ParagraphList = ({ text, icon }) => {
+    if (typeof text !== "string" || text.trim() === "") {
+      return <Text style={styles.emptyText}>No content available</Text>;
+    }
+
+    return text.split("\n").map((line, index) => (
+      <View key={index} style={styles.listItem}>
+        <MaterialCommunityIcons name={icon} size={18} color="#3F51B5" />
+        <Text style={styles.listText}>{line}</Text>
+      </View>
+    ));
   };
 
   return (
@@ -339,7 +375,31 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
+  cardSection: {
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
   cardTitle: { fontSize: 16, fontWeight: "700", marginBottom: 12 },
+  paragraph: { fontSize: 16, lineHeight: 24, marginBottom: 6, color: "#333" },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  listText: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: "#444",
+    marginLeft: 8,
+    flex: 1,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontStyle: "italic",
+    color: "#999",
+  },
 
   row: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   rowLabel: { flex: 1, marginLeft: 10, color: "#555" },

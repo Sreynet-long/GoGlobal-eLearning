@@ -359,7 +359,6 @@ export default function TrendingCourse() {
             {t("enroll_today", language)}
           </Text>
         </View>
-
         <TouchableOpacity
           style={styles.seeAllBtn}
           onPress={() => router.push("/(tabs)/courses")}

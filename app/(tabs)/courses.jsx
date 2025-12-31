@@ -25,7 +25,7 @@ export default function Courses() {
           placeholder={t("search_courses", language)}
         />
 
-        <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
+        <View style={{ paddingHorizontal: 16 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 

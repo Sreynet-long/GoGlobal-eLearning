@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
-import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
@@ -47,11 +46,10 @@ const CourseSkeleton = () => (
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const router = useRouter();
-  const { isAuth } = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
+  
   const { data, loading, refetch } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
@@ -70,6 +68,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const courses = data?.getCourseWithPagination?.data ?? [];
 
   const handleOpenDetails = (course) => {
+    console.log("select course:", course);
     if (course.has_enrolled) {
       router.push(`/course/${course._id}`);
     } else {
@@ -99,30 +98,32 @@ export default function CourseList({ selectedCategoryId, searchText }) {
               {renderText(item.title)}
             </Text>
             {item.has_enrolled ? (
-              item.has_course_complated ? (
-                <View style={styles.completedBadge}>
-                  <Text style={styles.completedText}>Completed</Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.progressText}>
-                    Progress: {Number(item.overall_completion_percentage) || 0}%
-                  </Text>
-                  <View style={styles.progressBarContainer}>
-                    <View
-                      style={[
-                        styles.progressBar,
-                        { width: `${item.overall_completion_percentage || 0}%` },
-                      ]}
-                    />
+              <>
+                {item.has_course_completed ? (
+                  <View style={styles.completedBadge}>
+                    <Text style={styles.completedText}>Completed</Text>
                   </View>
-                  <View style={styles.cardFooter}>
-                    <View style={styles.enrollBadge}>
-                      <Text style={styles.textContinue}>Continue</Text>
+                ) : (
+                  <>
+                    <Text style={styles.progressText}>
+                     {item.overall_completion_percentage}% Completed
+                    </Text>
+                    <View style={styles.progressBarContainer}>
+                      <View
+                        style={[
+                          styles.progressBar,
+                          { width: `${item.overall_completion_percentage}%` },
+                        ]}
+                      />
                     </View>
-                  </View>
-                </>
-              )
+                    <View style={styles.cardFooter}>
+                      <View style={styles.enrollBadge}>
+                        <Text style={styles.textContinue}>Continue</Text>
+                      </View>
+                    </View>
+                  </>
+                )}
+              </>
             ) : (
               <>
                 <View style={styles.priceContainer}>
@@ -166,10 +167,19 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
+        removeClippedSubviews
+        initialNumToRender={6}
+        windowSize={10}
+        maxToRenderPerBatch={6}
+        updateCellsBatchingPeriod={50}
         ListHeaderComponent={
           <Text style={styles.textHeader}>{t("courses_list", language)}</Text>
         }
-        contentContainerStyle={styles.contentContainerStyle}
+        contentContainerStyle={[
+          styles.contentContainerStyle,
+          courses.length === 0 && { flex: 1 },
+        ]}
         ListEmptyComponent={<EmptyCourse />}
       />
 
@@ -189,8 +199,13 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHandle} />
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {selectedCourse && (
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 40 }}
+              // bounces={false}
+            >
+              {selectedCourse ? (
                 <>
                   <Image
                     source={{
@@ -203,28 +218,30 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                   </Text>
 
                   {selectedCourse.has_enrolled ? (
-                    selectedCourse.has_course_complated ? (
-                      <View style={styles.completedBadge}>
-                        <Text style={styles.completedText}>Completed</Text>
-                      </View>
-                    ) : (
-                      <>
-                        <Text style={styles.progressText}>
-                          Progress:{" "}
-                          {Number(selectedCourse.overall_completion_percentage) || 0}%
-                        </Text>
-                        <View style={styles.progressBarContainer}>
-                          <View
-                            style={[
-                              styles.progressBar,
-                              {
-                                width: `${selectedCourse.overall_completion_percentage || 0}%`,
-                              },
-                            ]}
-                          />
+                    <>
+                      {selectedCourse.has_course_completed ? (
+                        <View style={styles.completedBadge}>
+                          <Text style={styles.completedText}>Completed</Text>
                         </View>
-                      </>
-                    )
+                      ) : (
+                        <>
+                          <Text style={styles.progressText}>
+                            Progress:{" "}
+                            {selectedCourse.overall_completion_percentage}%
+                          </Text>
+                          <View style={styles.progressBarContainer}>
+                            <View
+                              style={[
+                                styles.progressBar,
+                                {
+                                  width: `${selectedCourse.overall_completion_percentage}%`,
+                                },
+                              ]}
+                            />
+                          </View>
+                        </>
+                      )}
+                    </>
                   ) : (
                     <>
                       {selectedCourse.sell_price != null && (
@@ -253,43 +270,71 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     <CourseIncludes course={selectedCourse} />
                   </View>
 
-                  <View style={styles.sectionBox}>
-                    <Text style={styles.includesTitle}>What you'll learn:</Text>
-                    <Divider style={{ marginVertical: 8 }} />
-                    <Text style={styles.sectionText}>
-                      {renderText(selectedCourse?.what_you_learn)}
-                    </Text>
-                  </View>
+                  <View style={styles.sectionWhatULearn}>
+                    <Text style={styles.title}>What you'll learn:</Text>
+                    {selectedCourse?.what_you_learn?.trim() ? (
+                      <>
+                        {selectedCourse?.what_you_learn
+                          ?.split("\n")
+                          .map((line, index) => (
+                            <Text key={index} style={styles.paragraph}>
+                              • {line}
+                            </Text>
+                          ))}
+                      </>
+                    ) : (
+                      <Text style={styles.emptyText}>No content here.</Text>
+                    )}
 
-                  <View style={styles.sectionBox}>
-                    <Text style={styles.includesTitle}>
-                      Who this course is for:
-                    </Text>
-                    <Divider style={{ marginVertical: 8 }} />
-                    <Text style={styles.sectionText}>
-                      {renderText(selectedCourse?.who_this_course_is_for)}
-                    </Text>
-                  </View>
+                    <Text style={styles.title}>Who this course is for:</Text>
+                    {selectedCourse?.who_this_course_is_for?.trim() ? (
+                      <>
+                        {selectedCourse?.who_this_course_is_for
+                          ?.split("\n")
+                          .map((line, index) => (
+                            <Text key={index} style={styles.paragraph}>
+                              • {line}
+                            </Text>
+                          ))}
+                      </>
+                    ) : (
+                      <Text style={styles.emptyText}>No content here.</Text>
+                    )}
 
-                  <View style={styles.sectionBox}>
-                    <Text style={styles.includesTitle}>Requirements:</Text>
-                    <Divider style={{ marginVertical: 8 }} />
-                    <Text style={styles.sectionText}>
-                      {renderText(selectedCourse?.requirements)}
-                    </Text>
-                  </View>
+                    <Text style={styles.title}>Requirements:</Text>
+                    {selectedCourse?.requirements?.trim() ? (
+                      <>
+                        {selectedCourse?.requirements
+                          ?.split("\n")
+                          .map((line, index) => (
+                            <Text key={index} style={styles.paragraph}>
+                              • {line}
+                            </Text>
+                          ))}
+                      </>
+                    ) : (
+                      <Text style={styles.emptyText}>No content here.</Text>
+                    )}
 
-                  <View style={styles.sectionBox}>
-                    <Text style={styles.includesTitle}>Description:</Text>
-                    <Divider style={{ marginVertical: 8 }} />
-                    <Text style={styles.sectionText}>
-                      {renderText(selectedCourse?.description)}
-                    </Text>
+                    <Text style={styles.title}>Description:</Text>
+                    {selectedCourse?.description?.trim() ? (
+                      <>
+                        {selectedCourse?.description
+                          ?.split("\n")
+                          .map((line, index) => (
+                            <Text key={index} style={styles.paragraph}>
+                              • {line}
+                            </Text>
+                          ))}
+                      </>
+                    ) : (
+                      <Text style={styles.emptyText}>No content here.</Text>
+                    )}
                   </View>
 
                   <View style={{ height: 30 }} />
                 </>
-              )}
+              ) : null}
             </ScrollView>
           </Pressable>
         </Pressable>
@@ -338,9 +383,10 @@ const styles = StyleSheet.create({
   textSellPrice: { fontSize: 17, fontWeight: "800", color: "#3F51B5" },
   textOldPrice: {
     fontSize: 12,
-    color: "#999",
+    color: "#e61111ff",
     textDecorationLine: "line-through",
     marginLeft: 6,
+    fontWeight: "700",
   },
 
   cardFooter: { alignItems: "flex-end" },
@@ -411,10 +457,11 @@ const styles = StyleSheet.create({
   },
 
   progressText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     marginTop: 10,
     color: "#3F51B5",
+    marginLeft: 100
   },
   progressBarContainer: {
     height: 10,
@@ -457,4 +504,42 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 4,
   },
+  sectionBox: {
+    marginTop: 5,
+    padding: 15,
+    borderRadius: 12,
+  },
+
+  sectionText: {
+    fontSize: 14,
+    color: "#444",
+    lineHeight: 20,
+    fontWeight: "500",
+    flex: 1,
+  },
+
+  bulletRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 6,
+  },
+
+  bullet: {
+    marginRight: 8,
+    fontSize: 16,
+    lineHeight: 20,
+    color: "#3F51B5",
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginVertical: 10,
+  },
+  emptyText: {
+    fontSize: 13,
+    marginBottom: 10,
+    color: "rgba(0, 0, 0, 1)",
+    fontStyle: "italic",
+  },
+  paragraph: { fontSize: 16, lineHeight: 24, marginBottom: 6, color: "#333" },
 });
