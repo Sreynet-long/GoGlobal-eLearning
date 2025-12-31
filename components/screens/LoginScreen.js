@@ -52,7 +52,9 @@ export default function LoginScreen() {
   const router = useRouter();
   const [fetchUser] = useLazyQuery(GET_USER_BY_ID, {
     fetchPolicy: "network-only",
-    onCompleted: (data) => { if (data?.getUserById) setUser(data.getUserById); },
+    onCompleted: (data) => {
+      if (data?.getUserById) setUser(data.getUserById);
+    },
   });
 
   const [loginMutation] = useMutation(MOBILE_LOGIN, {
@@ -62,10 +64,14 @@ export default function LoginScreen() {
         await fetchUser();
         resetForm();
       } else {
-        setError(data?.mobileLogin?.message?.[`message${language.toUpperCase()}`] || t("invalid_email_password", language));
+        setError(
+          data?.mobileLogin?.message?.[`message${language.toUpperCase()}`] ||
+            t("invalid_email_password", language)
+        );
       }
     },
-    onError: (err) => setError(err.message || t("invalid_email_password", language)),
+    onError: (err) =>
+      setError(err.message || t("invalid_email_password", language)),
   });
 
   const [signupMutation] = useMutation(MOBILE_REGISTER_ACCOUNT, {
@@ -75,30 +81,56 @@ export default function LoginScreen() {
         await fetchUser();
         resetForm();
       } else {
-        setError(data?.mobileRegisterAccount?.message?.[`message${language.toUpperCase()}`]);
+        setError(
+          data?.mobileRegisterAccount?.message?.[
+            `message${language.toUpperCase()}`
+          ]
+        );
       }
     },
     onError: (err) => setError(err.message),
   });
 
   const resetForm = () => {
-    setFirstName(""); setLastName(""); setPhone(""); setGender("");
-    setEmail(""); setPassword(""); setAgreeTerms(false); setError("");
+    setFirstName("");
+    setLastName("");
+    setPhone("");
+    setGender("");
+    setEmail("");
+    setPassword("");
+    setAgreeTerms(false);
+    setError("");
   };
 
   const handleAuth = () => {
     setError("");
-    if (!email || !password) return setError(t("email_password_required", language));
+    if (!email || !password)
+      return setError(t("email_password_required", language));
     if (isSignUp) {
-      if (!firstName || !lastName || !phone || !gender) return setError(t("complete_all_fields", language));
+      if (!firstName || !lastName || !phone || !gender)
+        return setError(t("complete_all_fields", language));
       if (!agreeTerms) return setError(t("agree_terms_required", language));
-      signupMutation({ variables: { input: { first_name: firstName, last_name: lastName, phone_number: phone, email, password, gender: gender.toLowerCase() } } });
+      signupMutation({
+        variables: {
+          input: {
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: phone,
+            email,
+            password,
+            gender: gender.toLowerCase(),
+          },
+        },
+      });
     } else {
       loginMutation({ variables: { email, password } });
     }
   };
 
-  const toggleForm = () => { setIsSignUp(!isSignUp); resetForm(); };
+  const toggleForm = () => {
+    setIsSignUp(!isSignUp);
+    resetForm();
+  };
 
   if (loading || isAuth) return null;
 
@@ -108,7 +140,9 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <StatusBar barStyle="light-content" />
-      <View style={styles.headerBlock}><Topbar /></View>
+      <View style={styles.headerBlock}>
+        <Topbar />
+      </View>
 
       <View style={styles.mainContainer}>
         <ScrollView
@@ -118,10 +152,14 @@ export default function LoginScreen() {
         >
           <View style={styles.headerInfo}>
             <Text style={styles.headerTitle}>
-              {isSignUp ? t("create_account", language) : t("welcome_back", language)}
+              {isSignUp
+                ? t("create_account", language)
+                : t("welcome_back", language)}
             </Text>
             <Text style={styles.headerSubtitle}>
-              {isSignUp ? t("join_us_today", language) : t("please_login_to_continue", language)}
+              {isSignUp
+                ? t("join_us_today", language)
+                : t("please_login_to_continue", language)}
             </Text>
           </View>
 
@@ -164,17 +202,20 @@ export default function LoginScreen() {
                 />
 
                 <View style={styles.genderContainer}>
-                  <Text style={styles.genderLabel}>{t("gender", language)}</Text>
+                  <Text style={styles.genderLabel}>
+                    {t("gender", language)}
+                  </Text>
                   <RadioButton.Group value={gender} onValueChange={setGender}>
                     <View style={styles.radioRow}>
                       {["MALE", "FEMALE", "OTHER"].map((g) => (
-                        <TouchableOpacity 
-                          key={g} 
-                          style={styles.radioItem} 
+                        <TouchableOpacity
                           onPress={() => setGender(g)}
+                          style={styles.radioItem}
                         >
                           <RadioButton value={g} color={COLORS.primary} />
-                          <Text style={styles.radioText}>{t(g.toLowerCase(), language)}</Text>
+                          <Text style={styles.radioText}>
+                            {t(g.toLowerCase(), language)}
+                          </Text>
                         </TouchableOpacity>
                       ))}
                     </View>
@@ -191,7 +232,9 @@ export default function LoginScreen() {
               style={styles.inputSpacing}
               autoCapitalize="none"
               outlineStyle={styles.inputOutline}
-              left={<TextInput.Icon icon="email-outline" color={COLORS.grey600} />}
+              left={
+                <TextInput.Icon icon="email-outline" color={COLORS.grey600} />
+              }
             />
 
             <TextInput
@@ -202,7 +245,9 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               style={styles.inputSpacing}
               outlineStyle={styles.inputOutline}
-              left={<TextInput.Icon icon="lock-outline" color={COLORS.grey600} />}
+              left={
+                <TextInput.Icon icon="lock-outline" color={COLORS.grey600} />
+              }
             />
 
             {isSignUp && (
@@ -211,8 +256,13 @@ export default function LoginScreen() {
                 onPress={() => setAgreeTerms(!agreeTerms)}
                 activeOpacity={0.7}
               >
-                <Checkbox status={agreeTerms ? "checked" : "unchecked"} color={COLORS.primary} />
-                <Text style={styles.checkboxText}>{t("agree_terms", language)}</Text>
+                <Checkbox
+                  status={agreeTerms ? "checked" : "unchecked"}
+                  color={COLORS.primary}
+                />
+                <Text style={styles.checkboxText}>
+                  {t("agree_terms", language)}
+                </Text>
               </TouchableOpacity>
             )}
 
@@ -237,11 +287,20 @@ export default function LoginScreen() {
               </Button>
             )}
 
-            <TouchableOpacity onPress={toggleForm} style={styles.toggleTextContainer}>
+            <TouchableOpacity
+              onPress={toggleForm}
+              style={styles.toggleTextContainer}
+            >
               <Text style={styles.greyText}>
-                {isSignUp ? t("already_have_account", language) : t("dont_have_account", language)}{" "}
+                {String(
+                  isSignUp
+                    ? t("already_have_account", language)
+                    : t("dont_have_account", language)
+                )}{" "}
                 <Text style={styles.accentText}>
-                  {isSignUp ? t("log_in", language) : t("sign_up", language)}
+                  {String(
+                    isSignUp ? t("log_in", language) : t("sign_up", language)
+                  )}
                 </Text>
               </Text>
             </TouchableOpacity>
@@ -257,7 +316,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   headerBlock: { paddingBottom: 10 },
-  
+
   mainContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
@@ -271,7 +330,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     paddingBottom: 90,
     flexGrow: 1,
-    justifyContent: "center", 
+    justifyContent: "center",
   },
 
   headerInfo: {
@@ -314,7 +373,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: COLORS.background,
     paddingHorizontal: 10,
-    paddingVertical:5,
+    paddingVertical: 5,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.grey200,

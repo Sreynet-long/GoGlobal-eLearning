@@ -9,7 +9,7 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
@@ -38,15 +38,13 @@ export default function UpdatePassword() {
 
   const [updatePassword, { loading }] = useMutation(UPDATE_NEW_PASSWORD, {
     onCompleted: (data) => {
-      if (data?.updateNewPassword?.status) {
-        router.replace("/myCourses&Login");
-      } else {
+      if (data?.updateNewPassword?.status) router.replace("/myCourses&Login");
+      else
         setError(
           language === "kh"
             ? data?.updateNewPassword?.message?.messageKh
             : data?.updateNewPassword?.message?.messageEn
         );
-      }
     },
     onError: (err) => setError(err.message),
   });
@@ -74,11 +72,17 @@ export default function UpdatePassword() {
       <View style={styles.heroSection}>
         <View style={styles.iconContainer}>
           <View style={styles.iconSoftSquare}>
-            <MaterialIcons name="verified-user" size={42} color={COLORS.primary} />
+            <MaterialIcons
+              name="verified-user"
+              size={42}
+              color={COLORS.primary}
+            />
           </View>
         </View>
         <Text style={styles.heroTitle}>{t("new_password", language)}</Text>
-        <Text style={styles.heroSubtitle}>{t("set_new_password", language)}</Text>
+        <Text style={styles.heroSubtitle}>
+          {t("set_new_password", language)}
+        </Text>
       </View>
 
       <View style={styles.mainContainer}>
@@ -89,7 +93,11 @@ export default function UpdatePassword() {
         >
           {error ? (
             <View style={styles.errorBanner}>
-              <MaterialIcons name="error-outline" size={18} color={COLORS.error} />
+              <MaterialIcons
+                name="error-outline"
+                size={18}
+                color={COLORS.error}
+              />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
@@ -104,7 +112,9 @@ export default function UpdatePassword() {
               style={styles.input}
               outlineStyle={styles.inputOutline}
               activeOutlineColor={COLORS.primary}
-              left={<TextInput.Icon icon="lock-outline" color={COLORS.grey600} />}
+              left={
+                <TextInput.Icon icon="lock-outline" color={COLORS.grey600} />
+              }
               right={
                 <TextInput.Icon
                   icon={showPass ? "eye-off" : "eye"}
@@ -123,7 +133,12 @@ export default function UpdatePassword() {
               style={styles.input}
               outlineStyle={styles.inputOutline}
               activeOutlineColor={COLORS.primary}
-              left={<TextInput.Icon icon="shield-check-outline" color={COLORS.grey600} />}
+              left={
+                <TextInput.Icon
+                  icon="shield-check-outline"
+                  color={COLORS.grey600}
+                />
+              }
             />
 
             <Button
@@ -142,29 +157,36 @@ export default function UpdatePassword() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <MaterialIcons name="keyboard-backspace" size={20} color={COLORS.grey600} />
-            <Text style={styles.backButtonText}>{t("back_to_forgot_password", language)}</Text>
+            <MaterialIcons
+              name="keyboard-backspace"
+              size={20}
+              color={COLORS.grey600}
+            />
+            <Text style={[styles.backButtonText, { marginLeft: 8 }]}>
+              {t("back_to_forgot_password", language)}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.tipBox}>
-            <MaterialIcons name="lightbulb-outline" size={18} color={COLORS.accent} />
-            <Text style={styles.tipText}>
+            <MaterialIcons
+              name="lightbulb-outline"
+              size={18}
+              color={COLORS.accent}
+            />
+            <Text style={[styles.tipText, { marginLeft: 10 }]}>
               Make sure your password is at least 8 characters long for better
               security.
             </Text>
           </View>
-
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-//==================== Styles ====================
-
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
-  
+
   heroSection: {
     paddingTop: Platform.OS === "ios" ? 70 : 50,
     paddingBottom: 60,
@@ -221,7 +243,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 25,
     width: "100%",
-    gap: 10,
     borderWidth: 1,
     borderColor: "#FEE2E2",
   },
@@ -246,7 +267,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 20,
     padding: 10,
-    gap: 8,
   },
   backButtonText: { color: COLORS.grey600, fontWeight: "700", fontSize: 14 },
 
@@ -256,17 +276,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     alignItems: "center",
-    gap: 12,
     marginTop: 30,
     borderWidth: 1,
     borderColor: COLORS.grey200,
-    width: '100%',
+    width: "100%",
   },
   tipText: {
     color: COLORS.grey600,
     fontSize: 13,
     flex: 1,
     lineHeight: 18,
-    fontWeight: '500'
+    fontWeight: "500",
   },
 });

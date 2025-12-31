@@ -31,17 +31,18 @@ const CourseCard = ({ title, thumbnail }) => {
 
       <View style={styles.infoWrapper}>
         <Text style={styles.courseTitle} numberOfLines={2}>
-          {title}
+          {String(title ?? "Untitled Course")}
         </Text>
 
         <View style={styles.footerRow}>
-          {/* <Text style={styles.difficultyText}>Beginner</Text> */}
           <View style={styles.freeBadgeContainer}>
             <Text style={styles.freeBadgeText}>FREE</Text>
           </View>
+
           <View style={styles.dotSeparator} />
+
           <View style={styles.lessonCount}>
-            <Text style={styles.lessonCountText}>12 Lessons</Text>
+            <Text style={styles.lessonCountText}>{String(12) + " Lessons"}</Text>
           </View>
         </View>
       </View>
@@ -59,6 +60,7 @@ export default function FreeCourse() {
 
   if (loading)
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
+
   if (error || !data?.getFreeCourse?.length) return null;
 
   const freeCourses = data?.getFreeCourse ?? [];
@@ -68,13 +70,17 @@ export default function FreeCourse() {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>
-            {t("start_learning_for_free", language)}
+            {String(t("start_learning_for_free", language))}
           </Text>
-          <Text style={styles.subtitle}>Unlock your potential today</Text>
+          <Text style={styles.subtitle}>
+            {String("Unlock your potential today")}
+          </Text>
         </View>
 
         <TouchableOpacity style={styles.viewAllBtn}>
-          <Text style={styles.viewAllText}>{t("view_all", language)}</Text>
+          <Text style={styles.viewAllText}>
+            {String(t("view_all", language))}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -87,8 +93,8 @@ export default function FreeCourse() {
       >
         {freeCourses.map((course) => (
           <CourseCard
-            key={course._id}
-            title={course.title}
+            key={String(course._id)}
+            title={String(course.title ?? "Untitled Course")}
             thumbnail={course.thumbnail}
           />
         ))}
@@ -97,7 +103,7 @@ export default function FreeCourse() {
   );
 }
 
-// ==================== Redesigned Styles ====================
+// ==================== Styles ====================
 const styles = StyleSheet.create({
   mainWrapper: { marginVertical: 15, marginHorizontal: 5 },
   header: {
@@ -138,7 +144,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
     padding: 5,
-    marginVertical: 10,
+    marginTop:10,
+    marginBottom: 20,
   },
   imageWrapper: {
     width: "100%",
@@ -150,12 +157,8 @@ const styles = StyleSheet.create({
   courseImage: {
     width: "100%",
     height: "100%",
-    // resizeMode: "cover",
   },
   freeBadgeContainer: {
-    // position: "absolute",
-    // top: 12,
-    // left: 12,
     backgroundColor: "#10b98123",
     paddingHorizontal: 5,
     paddingVertical: 2,
@@ -186,8 +189,6 @@ const styles = StyleSheet.create({
   footerRow: {
     flexDirection: "row",
     alignItems: "center",
-    // borderTopWidth: 1,
-    // borderTopColor: "#f1f5f9",
     paddingTop: 2,
   },
   lessonCount: {
@@ -208,10 +209,5 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "#cbd5e1",
     marginHorizontal: 10,
-  },
-  difficultyText: {
-    fontSize: 12,
-    color: "#64748b",
-    fontWeight: "600",
   },
 });

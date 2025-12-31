@@ -1,9 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
-
-const { width } = Dimensions.get("window");
 
 const StatItem = ({ label, value, icon, color }) => (
   <View style={styles.statBox}>
@@ -11,8 +9,8 @@ const StatItem = ({ label, value, icon, color }) => (
       <Ionicons name={icon} size={22} color={color} />
     </View>
     <View style={styles.textContainer}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label.toUpperCase()}</Text>
+      <Text style={styles.statValue}>{String(value)}</Text>
+      <Text style={styles.statLabel}>{String(label).toUpperCase()}</Text>
     </View>
   </View>
 );
@@ -23,18 +21,8 @@ export default function StatesRow() {
   const stats = [
     { labelKey: "14_day_streak", value: "14", icon: "flame", color: "#f97316" },
     { labelKey: "badges_earned", value: "3", icon: "medal", color: "#eab308" },
-    {
-      labelKey: "hours_this_month",
-      value: "20h",
-      icon: "time",
-      color: "#06b6d4",
-    },
-    {
-      labelKey: "cert_ready",
-      value: "85%",
-      icon: "checkmark-circle",
-      color: "#22c55e",
-    },
+    { labelKey: "hours_this_month", value: "20h", icon: "time", color: "#06b6d4" },
+    { labelKey: "cert_ready", value: "85%", icon: "checkmark-circle", color: "#22c55e" },
   ];
 
   return (
@@ -54,12 +42,9 @@ export default function StatesRow() {
   );
 }
 
-//==================== Styles ====================
-
-
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 10,
     marginVertical: 10,
   },
   mainContainer: {
@@ -94,7 +79,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 17,
     fontWeight: "900",
-    color: "#1e293b", 
+    color: "#1e293b",
   },
   statLabel: {
     fontSize: 8,

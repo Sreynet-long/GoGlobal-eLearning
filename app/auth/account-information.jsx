@@ -45,19 +45,6 @@ export default function AccountScreen() {
   const [editing, setEditing] = useState(false);
   const [fileUpload, setFileUpload] = useState([]);
 
-  // useEffect(async () => {
-  //   const getFileUpload = await AsyncStorage.getItem('uploadLocalFiles');
-  //   console.log(getFileUpload, "getFileUpload")
-  //   if (value !== null) {
-  //     // value previously stored
-  //     setLocalProfileImage(uri);
-  //   }
-  //   // AsyncStorage.getItem("uploadLocalFiles").then((uri) => {
-  //   //   console.log(uri, "AsyncStorage getItem")
-  //   //   if (uri) setLocalProfileImage(uri);
-  //   // });
-  // }, []);
-  // console.log(fileUpload,"fileUpload")
   const {
     data: userData,
     refetch,
@@ -66,7 +53,6 @@ export default function AccountScreen() {
 
   const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
     onCompleted: (data) => {
-      console.log(data, "data");
       setFileUpload([]);
       refetch?.();
       setEditing(false);
@@ -77,8 +63,6 @@ export default function AccountScreen() {
   const user = userData?.getUserById || authUser || {};
   if (userLoading) return null;
 
-  console.log(user);
-  // console.log(fileUpload, "fileUpload");
   const handleSave = (formData) => {
     updateUser({
       variables: {
@@ -100,21 +84,15 @@ export default function AccountScreen() {
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-      // router.replace("/(tabs)/account&Aboutus");
-    } else {
-      router.replace("/(tabs)/account&Aboutus");
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace("/(tabs)/account&Aboutus");
   };
+
   function getGenderIcon(gender) {
     if (!gender) return "wc";
-
     const normalized = gender.toLowerCase();
-
     if (normalized === "male") return "male";
     if (normalized === "female") return "female";
-
     return "wc";
   }
 
@@ -133,31 +111,8 @@ export default function AccountScreen() {
             color={COLORS.white}
           />
         </TouchableOpacity>
-        {/* {editing ? (
-           <TouchableOpacity
-            onPress={handleCancel}
-            style={styles.editBtn}
-          >
-            <Text
-              style={[styles.editBtnText, editing && { color: COLORS.error }]}
-            >
-              {t("cancel", language)}
-            </Text>
-          </TouchableOpacity>
-         
-        ) : (
-          <TouchableOpacity
-            onPress={() => setEditing(!editing)}
-            style={styles.editBtn}
-          >
-            <Text
-              style={[styles.editBtnText, editing && { color: COLORS.error }]}
-            >
-              { t("edit_profile", language)}
-            </Text>
-          </TouchableOpacity>
-        )} */}
       </View>
+
       <View style={styles.headerHero}>
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface} elevation={editing ? 8 : 2}>
@@ -197,7 +152,7 @@ export default function AccountScreen() {
               color={COLORS.white}
             />
             <Text style={styles.editActionText}>
-              {editing ? t("cancel", language) : t("edit_profile", language)}
+              {editing ? t("cancel", language) || "Cancel" : t("edit_profile", language) || "Edit"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -248,13 +203,13 @@ function EditUser({ initialData, onSave, updating, language }) {
 
   return (
     <View style={styles.formContainer}>
-      <View style={{ flexDirection: "row", gap: 12 }}>
+      <View style={{ flexDirection: "row", marginBottom: 10 }}>
         <TextInput
           label={t("first_name", language)}
           value={formData.first_name}
           onChangeText={(v) => setFormData({ ...formData, first_name: v })}
           mode="outlined"
-          style={[styles.input, { flex: 1 }]}
+          style={[styles.input, { flex: 1, marginRight: 8 }]}
           contentStyle={styles.inputContent}
           outlineColor={COLORS.grey200}
           activeOutlineColor={COLORS.primary}
@@ -271,6 +226,7 @@ function EditUser({ initialData, onSave, updating, language }) {
           activeOutlineColor={COLORS.primary}
         />
       </View>
+
       <TextInput
         label={t("phone", language)}
         value={formData.phone_number}
@@ -293,21 +249,21 @@ function EditUser({ initialData, onSave, updating, language }) {
               onPress={() => setFormData({ ...formData, gender: g })}
               style={[
                 styles.genderOption,
-                formData.gender === g && styles.genderOptionActive,
+                formData.gender.toLowerCase() === g && styles.genderOptionActive,
               ]}
             >
               <RadioButton.Android
                 value={g}
-                status={formData.gender === g ? "checked" : "unchecked"}
+                status={formData.gender.toLowerCase() === g ? "checked" : "unchecked"}
                 color={COLORS.primary}
               />
               <Text
                 style={[
                   styles.genderText,
-                  formData.gender === g && styles.genderTextActive,
+                  formData.gender.toLowerCase() === g && styles.genderTextActive,
                 ]}
               >
-                {t(g, language)}
+                {t(g, language) || g.charAt(0).toUpperCase() + g.slice(1)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -320,7 +276,7 @@ function EditUser({ initialData, onSave, updating, language }) {
         loading={updating}
         style={styles.saveBtn}
       >
-        {t("save_changes", language)}
+        <Text>{t("save_changes", language) || "Save Changes"}</Text>
       </Button>
     </View>
   );
@@ -349,179 +305,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "ios" ? 25 : 10,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  editBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
-  editBtnText: { color: COLORS.white, fontWeight: "700", fontSize: 17 },
-
-  headerHero: {
-    paddingTop: Platform.OS === "ios" ? 0 : 0,
-    paddingBottom: 30,
-    alignItems: "center",
-  },
+  backButton: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
+  headerHero: { paddingBottom: 30, alignItems: "center" },
   avatarWrapper: { marginBottom: 5 },
-  avatarSurface: {
-    width: 130,
-    height: 130,
-    borderRadius: "50%",
-    // padding: 4,
-    // backgroundColor: COLORS.white,
-    position: "relative",
-    borderWidth: 5,
-    borderColor: COLORS.accent,
-  },
-  avatar: { width: "100%", height: "100%", borderRadius: "50%" },
-  // camera: {
-  //   position: "absolute",
-  //   bottom: 0,
-  //   right: 0,
-  //   backgroundColor: COLORS.primary,
-  //   width: 40,
-  //   height: 40,
-  //   borderRadius: 20,
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  //   borderWidth: 3,
-  //   borderColor: COLORS.accent,
-  // },
-  heroName: {
-    color: COLORS.white,
-    fontSize: 24,
-    fontWeight: "900",
-    letterSpacing: -0.5,
-  },
+  avatarSurface: { width: 130, height: 130, borderRadius: 65, position: "relative", borderWidth: 5, borderColor: COLORS.accent },
+  avatar: { width: "100%", height: "100%", borderRadius: 65 },
+  heroName: { color: COLORS.white, fontSize: 24, fontWeight: "900", letterSpacing: -0.5 },
   userEmailText: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 4 },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 25,
-  },
-  contentTitle: {
-    fontSize: 37,
-    fontWeight: "900",
-    color: COLORS.grey600,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  // goldBar: {
-  //   width: 25,
-  //   height: 3,
-  //   backgroundColor: COLORS.accent,
-  //   marginTop: 4,
-  //   borderRadius: 2,
-  // },
-  editActionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: COLORS.primary,
-  },
+  titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 25 },
+  contentTitle: { fontSize: 14, fontWeight: "800", color: COLORS.grey600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 20 },
+  editActionBtn: { flexDirection: "row", alignItems: "center", paddingVertical: 8, paddingHorizontal: 14, borderRadius: 12, backgroundColor: COLORS.primary },
   cancelActionBtn: { backgroundColor: COLORS.error },
   editActionText: { color: COLORS.white, fontWeight: "800", fontSize: 13 },
-  contentBody: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    paddingTop: 20,
-    paddingVertical: 25,
-    paddingHorizontal: 25,
-    borderTopWidth: 5,
-    borderColor: COLORS.accent,
-  },
-  contentTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: COLORS.grey600,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 20,
-  },
-
-  infoGrid: { gap: 12 },
-  tile: {
-    backgroundColor: COLORS.white,
-    padding: 10,
-    borderRadius: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: COLORS.grey200,
-  },
-  tileIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: COLORS.background,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  tileLabel: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: COLORS.grey600,
-    textTransform: "uppercase",
-  },
-  tileValue: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.textDark,
-    marginTop: 2,
-  },
-
-  formContainer: { gap: 9 },
-  input: {
-    backgroundColor: COLORS.white,
-    borderRadius: 10,
-  },
-  inputContent: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-  },
-
+  contentBody: { flex: 1, backgroundColor: COLORS.background, borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingVertical: 25, paddingHorizontal: 25, borderTopWidth: 5, borderColor: COLORS.accent },
+  infoGrid: { marginBottom: 20 },
+  tile: { backgroundColor: COLORS.white, padding: 10, borderRadius: 20, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: COLORS.grey200, marginBottom: 12 },
+  tileIconBg: { width: 44, height: 44, borderRadius: 14, backgroundColor: COLORS.background, justifyContent: "center", alignItems: "center", marginRight: 16 },
+  tileLabel: { fontSize: 11, fontWeight: "700", color: COLORS.grey600, textTransform: "uppercase" },
+  tileValue: { fontSize: 16, fontWeight: "700", color: COLORS.textDark, marginTop: 2 },
+  formContainer: { marginBottom: 20 },
+  input: { backgroundColor: COLORS.white, borderRadius: 10 },
+  inputContent: { paddingVertical: 10, paddingHorizontal: 15 },
   genderBox: { marginTop: 0 },
-  genderLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: COLORS.grey600,
-    marginBottom: 12,
-  },
-  radioGroup: { flexDirection: "row", gap: 12 },
-  genderOption: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 5,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: COLORS.grey200,
-    backgroundColor: COLORS.white,
-  },
-  genderOptionActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: "#F0F4FF",
-  },
+  genderLabel: { fontSize: 13, fontWeight: "700", color: COLORS.grey600, marginBottom: 12 },
+  radioGroup: { flexDirection: "row" },
+  genderOption: { flex: 1, flexDirection: "row", alignItems: "center", padding: 5, borderRadius: 15, borderWidth: 1, borderColor: COLORS.grey200, backgroundColor: COLORS.white, marginRight: 8 },
+  genderOptionActive: { borderColor: COLORS.primary, backgroundColor: "#F0F4FF" },
   genderText: { fontWeight: "600", color: COLORS.grey600 },
   genderTextActive: { color: COLORS.primary },
-  saveBtn: {
-    borderRadius: 16,
-    marginTop: 10,
-    backgroundColor: COLORS.primary,
-    padding: 7,
-    fontWeight: "800",
-  },
+  saveBtn: { borderRadius: 16, marginTop: 10, backgroundColor: COLORS.primary, padding: 7, fontWeight: "800" },
 });

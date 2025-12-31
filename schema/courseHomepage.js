@@ -51,6 +51,17 @@ export const GET_COURSE_TRENDING_WITH_PAGINATION = gql`
     }
     sell_price
     original_price
+    course_includes {
+      number_of_lessons
+      number_of_video
+      number_of_hours
+      number_quizzes
+      number_of_projects_practices
+      number_of_downloadable_resources
+      is_full_lifetime_access
+      period_of_access_as_month
+      has_certificate_of_completion
+    }
   }
 }
 `;

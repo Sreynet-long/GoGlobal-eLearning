@@ -24,7 +24,15 @@ import EnrolledButton from "./EnrolledButton";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-/* ---------------- Skeleton Loader ---------------- */
+// Helper to safely render text strings
+const renderText = (value) => {
+  if (!value) return "";
+  if (Array.isArray(value)) return "• " + value.join("\n• ");
+  if (typeof value === "object") return "";
+  return String(value);
+};
+
+// Skeleton placeholder component
 const CourseSkeleton = () => (
   <View style={styles.cardSkeleton}>
     <View style={styles.skeletonImage} />
@@ -41,7 +49,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
+  
   const { data, loading, refetch } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
@@ -87,7 +95,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
 
           <View style={styles.cardBody}>
             <Text style={styles.textTitle} numberOfLines={2}>
-              {item.title}
+              {renderText(item.title)}
             </Text>
             {item.has_enrolled ? (
               <>
@@ -120,11 +128,11 @@ export default function CourseList({ selectedCategoryId, searchText }) {
               <>
                 <View style={styles.priceContainer}>
                   <Text style={styles.textSellPrice}>
-                    ${item.sell_price?.toFixed(2)}
+                    ${Number(item.sell_price)?.toFixed(2)}
                   </Text>
                   {hasDiscount && (
                     <Text style={styles.textOldPrice}>
-                      ${item.original_price?.toFixed(2)}
+                      ${Number(item.original_price)?.toFixed(2)}
                     </Text>
                   )}
                 </View>
@@ -175,6 +183,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ListEmptyComponent={<EmptyCourse />}
       />
 
+      {/* Modal for unenrolled courses */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -198,14 +207,15 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             >
               {selectedCourse ? (
                 <>
-                  {/* Title + Thumbnail */}
                   <Image
                     source={{
                       uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
                     }}
                     style={styles.modalImage}
                   />
-                  <Text style={styles.modalTitle}>{selectedCourse.title}</Text>
+                  <Text style={styles.modalTitle}>
+                    {renderText(selectedCourse.title)}
+                  </Text>
 
                   {selectedCourse.has_enrolled ? (
                     <>
@@ -234,22 +244,19 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     </>
                   ) : (
                     <>
-                      {/* Show price only if not enrolled */}
-                      {selectedCourse.sell_price ? (
+                      {selectedCourse.sell_price != null && (
                         <View style={styles.modalPriceRow}>
                           <Text style={styles.modalSellPrice}>
-                            ${selectedCourse.sell_price?.toFixed(2)}
+                            ${Number(selectedCourse.sell_price).toFixed(2)}
                           </Text>
                           {selectedCourse.original_price >
                             selectedCourse.sell_price && (
                             <Text style={styles.modalOldPrice}>
-                              ${selectedCourse.original_price?.toFixed(2)}
+                              ${Number(selectedCourse.original_price).toFixed(2)}
                             </Text>
                           )}
                         </View>
-                      ) : null}
-
-                      {/* Enroll button */}
+                      )}
                       <EnrolledButton
                         course={selectedCourse}
                         onSuccess={() => setModalVisible(false)}
@@ -257,7 +264,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     </>
                   )}
 
-                  {/* Course Includes */}
                   <View style={styles.sectionDivider}>
                     <Text style={styles.includesTitle}>Course Includes:</Text>
                     <Divider style={{ marginVertical: 10 }} />
@@ -325,6 +331,8 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                       <Text style={styles.emptyText}>No content here.</Text>
                     )}
                   </View>
+
+                  <View style={{ height: 30 }} />
                 </>
               ) : null}
             </ScrollView>
@@ -344,7 +352,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
-  // Card UI
   card: {
     flexDirection: "row",
     backgroundColor: "#FFF",
@@ -392,7 +399,6 @@ const styles = StyleSheet.create({
   textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
   textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
 
-  // Modal UI (Bottom Sheet Style)
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
@@ -433,17 +439,23 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     marginLeft: 10,
   },
+
   sectionDivider: {
     marginTop: 20,
     backgroundColor: "#F9F9F9",
     padding: 15,
     borderRadius: 12,
   },
-  sectionWhatULearn: {
-    marginTop: 10,
-    marginLeft: 15,
-  },
   includesTitle: { fontWeight: "700", fontSize: 16, color: "#444" },
+  sectionBox: { marginTop: 5, padding: 15, borderRadius: 12 },
+  sectionText: {
+    fontSize: 14,
+    color: "#444",
+    lineHeight: 20,
+    fontWeight: "500",
+    flex: 1,
+  },
+
   progressText: {
     fontSize: 14,
     fontWeight: "600",
@@ -457,11 +469,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 8,
   },
-  progressBar: {
-    height: 10,
-    backgroundColor: "#3F51B5",
-    borderRadius: 5,
-  },
+  progressBar: { height: 10, backgroundColor: "#3F51B5", borderRadius: 5 },
   completedBadge: {
     backgroundColor: "#E6F7E6",
     paddingHorizontal: 10,
@@ -470,13 +478,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: 8,
   },
-  completedText: {
-    color: "#2E7D32",
-    fontWeight: "700",
-    fontSize: 14,
-  },
+  completedText: { color: "#2E7D32", fontWeight: "700", fontSize: 14 },
 
-  // Skeleton UI
   cardSkeleton: {
     flexDirection: "row",
     height: 110,
