@@ -70,7 +70,7 @@ export default function VideoCard() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 20,
     marginBottom: 10,
   },
   loaderContainer: {

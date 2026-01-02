@@ -16,14 +16,18 @@ const ModuleTile = ({ title, iconName, color }) => (
 
 export default function UtilityModules() {
   const { language } = useLanguage();
-  
+
   const modules = [
     { titleKey: "my_enrollments", iconName: "book", color: "#6366f1" },
     { titleKey: "cert_tracks", iconName: "ribbon", color: "#f59e0b" },
     { titleKey: "community", iconName: "chatbubbles", color: "#10b981" },
     { titleKey: "live_sessions", iconName: "videocam", color: "#ef4444" },
     { titleKey: "knowledge_base", iconName: "library", color: "#8b5cf6" },
-    { titleKey: "skill_quizzes", iconName: "extension-puzzle", color: "#06b6d4" },
+    {
+      titleKey: "skill_quizzes",
+      iconName: "extension-puzzle",
+      color: "#06b6d4",
+    },
   ];
 
   return (
@@ -31,12 +35,11 @@ export default function UtilityModules() {
       <View style={styles.moduleGrid}>
         {modules.map((mod, index) => (
           <ModuleTile
-  key={index}
-  title={String(t(mod.titleKey, language) ?? "")}
-  iconName={mod.iconName}
-  color={mod.color}
-/>
-
+            key={index}
+            title={String(t(mod.titleKey, language) ?? "")}
+            iconName={mod.iconName}
+            color={mod.color}
+          />
         ))}
       </View>
     </View>
@@ -44,7 +47,6 @@ export default function UtilityModules() {
 }
 
 //==================== Styles ====================
-
 
 const styles = StyleSheet.create({
   container: {
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
   moduleTitle: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#475569", 
+    color: "#475569",
     textAlign: "center",
     lineHeight: 14,
     paddingHorizontal: 4,
