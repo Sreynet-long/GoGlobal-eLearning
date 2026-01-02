@@ -12,7 +12,7 @@ import { FILE_BASE_URL } from "../../config/env";
 import { GET_VIDEO_CONTENT_WITH_PAGINATION } from "../../schema/course";
 import DownloadButton from "./DownloadButton";
 
-export default function VideoList({ sectionId, onSelectVideo, activeVideoId, completedVideo }) {
+export default function VideoList({ sectionId, onSelectVideo, activeVideoId, completedVideo=[]}) {
   const { data, loading, error } = useQuery(GET_VIDEO_CONTENT_WITH_PAGINATION, {
     variables: {
       contentSectionId: sectionId, 
@@ -22,7 +22,7 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
       keyword: "",
     },
     skip: !sectionId,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
   });
 
   if (loading)
@@ -49,7 +49,7 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
   return (
     <View>
       {videos.map((video) => {
-        const isCompleted = video.has_completed || completedVideo?.includes(video._id);
+        const isCompleted = completedVideo?.includes(video._id) || video.has_completed === true;
         console.log("completed", isCompleted);
         return (
         <View key={video._id}>
@@ -95,7 +95,6 @@ export default function VideoList({ sectionId, onSelectVideo, activeVideoId, com
                     filename={filename}
                   />
                   <TouchableOpacity
-                    key={i}
                     onPress={() => Linking.openURL(FILE_BASE_URL + res)}
                     style={{
                       paddingLeft: 10,
