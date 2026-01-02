@@ -17,6 +17,7 @@ export default function CourseContent({
   courseId,
   onSelectVideo,
   completedVideo,
+  onToggleComplete,
 }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -95,6 +96,7 @@ export default function CourseContent({
                 onSelectVideo={handleSelectVideo}
                 activeVideoId={selectedVideo?._id}
                 completedVideo={completedVideo}
+                onToggleComplete={onToggleComplete}
               />
             )}
           </View>

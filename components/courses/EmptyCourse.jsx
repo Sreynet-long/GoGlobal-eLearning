@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
   },
-  image: { marginTop: 100, width: 60, height: 60, alignSelf: "center" },
-  text: { textAlign: "center", marginTop: 20, fontSize: 14, color: "#333" },
+  image: {  width: 60, height: 60, alignSelf: "center", marginBottom: 10 },
+  text: { textAlign: "center", fontSize: 14, color: "#333", marginBottom: 120},
 });

@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-// import { VideoView } from "expo-video";
 import { Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -23,19 +22,140 @@ const TABS = ["Course content", "Overview"];
 
 export default function CoursePlayerScreen() {
   const router = useRouter();
-  const { courseId, enrolledId } = useLocalSearchParams();
+  const { courseId } = useLocalSearchParams(); // ONLY courseId
+  const videoRef = useRef(null);
+
   const [activeTab, setActiveTab] = useState("Course content");
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [completedVideo, setCompletedVideo] = useState([]);
 
   const { data, loading } = useQuery(GET_COURSE_BY_ID, {
     variables: { courseId },
     skip: !courseId,
+    fetchPolicy: "cache-and-network",
   });
 
+  const enrolledId = data?.getCourseById?.enrolled_id;
+
+  const [completedVideoIds, setCompletedVideoIds] = useState([]);
+
   const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
+
+  // Sync backend completed videos
+  useEffect(() => {
+    const backendCompleted = data?.getCourseById?.completedVideo || [];
+    setCompletedVideoIds((prev) => [
+      ...new Set([...(prev || []), ...backendCompleted]),
+    ]);
+  }, [data]);
+
+  const toggleVideoComplete = async (videoId, completed) => {
+    if (!enrolledId) return;
+
+    setCompletedVideoIds((prev) =>
+      completed
+        ? [...new Set([...prev, videoId])]
+        : prev.filter((id) => id !== videoId)
+    );
+
+    try {
+      await videoProcessStatus({
+        variables: {
+          input: {
+            has_completed: completed,
+            enrolled_id: enrolledId,
+            video_content_id: videoId,
+          },
+        },
+        optimisticResponse: {
+          videoProcessStatus: {
+            __typename: "ResponseMessage",
+            status: true,
+            message: {
+              __typename: "Message",
+              messageEn: completed ? "Completed" : "Uncompleted",
+              messageKh: completed ? "បានបញ្ចប់" : "មិនទាន់បញ្ចប់",
+            },
+          },
+        },
+        update: (cache) => {
+          cache.modify({
+            id: cache.identify({
+              __typename: "CourseEnrolled",
+              id: enrolledId,
+            }),
+            fields: {
+              completedVideo(existing = []) {
+                return completed
+                  ? [...new Set([...existing, videoId])]
+                  : existing.filter((id) => id !== videoId);
+              },
+            },
+          });
+        },
+      });
+    } catch (error) {
+      console.log("Toggle failed", error);
+    }
+  };
+
+  const handleVideoFinish = (video) => {
+    if(!completedVideoIds.includes(video._id))
+      toggleVideoComplete(video._id, true);
+  }
+
+  // const markVideoComplete = async (videoId) => {
+  //   if (!enrolledId) return;
+
+  //   setCompletedVideoIds((prev) => [...new Set([...prev, videoId])]);
+
+  //   try {
+  //     await videoProcessStatus({
+  //       variables: {
+  //         input: {
+  //           has_completed: true,
+  //           enrolled_id: enrolledId,
+  //           video_content_id: videoId,
+  //         },
+  //       },
+  //       optimisticResponse: {
+  //         videoProcessStatus: {
+  //           __typename: "ResponseMessage",
+  //           status: true,
+  //           message: {
+  //             __typename: "Message",
+  //             messageEn: "Marked complete (optimistic)",
+  //             messageKh: "បានបញ្ចប់ (optimistic)",
+  //           },
+  //         },
+  //       },
+  //       update: (cache, { data }) => {
+  //         if (data?.videoProcessStatus?.status) {
+  //           cache.modify({
+  //             id: cache.identify({
+  //               __typename: "CourseEnrolled",
+  //               id: enrolledId,
+  //             }),
+  //             fields: {
+  //               overall_completion_percentage(existing = 0) {
+  //                 return existing + 1;
+  //               },
+  //               completedVideo(existing = []) {
+  //                 return [...new Set([...existing, videoId])];
+  //               },
+  //             },
+  //           });
+  //         }
+  //       },
+  //     });
+  //   } catch (err) {
+  //     console.error("Video status failed", err);
+  //   }
+  // };
+
+  // const handleVideoComplete = async (video) => {
+  //   markVideoComplete(video._id);
+  // };
 
   if (loading) {
     return (
@@ -48,55 +168,6 @@ export default function CoursePlayerScreen() {
   const course = data?.getCourseById;
   const includes = course?.course_includes;
 
-  const handleVideoComplete = async (video) => {
-    setCompletedVideo((prev) => [...prev, video._id]);
-
-    try {
-      const result = await videoProcessStatus({
-        variables: {
-          input: {
-            has_completed: true,
-            enrolled_id: enrolledId,
-            video_content_id: video._id,
-          },
-          optimisticResponse: {
-            videoProcessStatus: {
-              __typename: "ResponseMessage",
-              status: true,
-              message: {
-                __typename: "Message",
-                messageEn: "Marked complete (optimistic)",
-                messageKh: "បានបញ្ចប់ (optimistic)",
-              },
-            },
-          },
-          update: (caches, { data }) => {
-            if (data?.videoProcessStatus?.status) {
-              caches.modify({
-                id: caches.identify({
-                  __typename: "CourseEnrolled",
-                  id: courseId,
-                }),
-                fields: {
-                  overall_completion_percentage(exists = 0) {
-                    return exists + 1;
-                  },
-                  completedVideo(existing = []) {
-                    return [...existing, video._id];
-                  },
-                },
-              });
-            }
-          },
-        },
-      });
-      console.log("videoprocessStatus", result.data);
-    } catch (error) {
-      console.log("Video status failed", error);
-    }
-  };
-
-  //==================== TAB RENDER ====================//
   const renderTabContent = () => {
     switch (activeTab) {
       case "Course content":
@@ -104,7 +175,8 @@ export default function CoursePlayerScreen() {
           <CourseContent
             courseId={courseId}
             onSelectVideo={setSelectedVideo}
-            completedVideo={completedVideo}
+            completedVideo={completedVideoIds || []}
+            onToggleComplete={toggleVideoComplete}
           />
         );
       case "Overview":
@@ -114,9 +186,8 @@ export default function CoursePlayerScreen() {
     }
   };
 
-  // ==================== OVERVIEW ==================== //
   const renderOverview = () => (
-    <View>
+    <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>About this course:</Text>
         <InfoRow
@@ -178,7 +249,7 @@ export default function CoursePlayerScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Description:</Text>
-        <ParagraphList text={course?.description}  />
+        <ParagraphList text={course?.description} />
       </View>
 
       <View style={styles.card}>
@@ -199,10 +270,9 @@ export default function CoursePlayerScreen() {
           <IncludeItem text="Certificate of completion" />
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 
-  // ==================== VIDEO RENDER ==================== //
   const renderVideo = () => {
     if (selectedVideo) {
       return (
@@ -215,9 +285,7 @@ export default function CoursePlayerScreen() {
             resizeMode="contain"
             isLooping={false}
             onPlaybackStatusUpdate={(status) => {
-              if (status.didJustFinish) {
-                handleVideoComplete(selectedVideo);
-              }
+              if (status.didJustFinish) handleVideoFinish(selectedVideo);
             }}
           />
         </View>
@@ -262,10 +330,8 @@ export default function CoursePlayerScreen() {
   };
 
   const ParagraphList = ({ text, icon }) => {
-    if (typeof text !== "string" || text.trim() === "") {
+    if (!text)
       return <Text style={styles.emptyText}>No content available</Text>;
-    }
-
     return text.split("\n").map((line, index) => (
       <View key={index} style={styles.listItem}>
         <MaterialCommunityIcons name={icon} size={18} color="#3F51B5" />
@@ -307,7 +373,6 @@ export default function CoursePlayerScreen() {
       </View>
 
       <Divider />
-
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {renderTabContent()}
       </ScrollView>
@@ -323,7 +388,6 @@ const InfoRow = ({ icon, label, value }) => (
     <Text style={styles.rowValue}>{value}</Text>
   </View>
 );
-
 const IncludeItem = ({ text }) => (
   <View style={styles.includeRow}>
     <MaterialCommunityIcons name="check-circle" size={18} color="#4CAF50" />
@@ -342,7 +406,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   headerTitle: { fontSize: 16, fontWeight: "700", marginLeft: 10 },
-
   videoWrapper: { width: "100%", aspectRatio: 16 / 9, backgroundColor: "#000" },
   playOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -357,32 +420,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   tabBar: { flexDirection: "row", backgroundColor: "#FFF" },
   tab: { flex: 1, paddingVertical: 14, alignItems: "center" },
   activeTab: { borderBottomWidth: 3, borderBottomColor: "#3F51B5" },
   tabText: { color: "#999", fontWeight: "700", fontSize: 16 },
   activeTabText: { color: "#3F51B5" },
-
   card: {
     backgroundColor: "#FFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
   },
-  cardSection: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
   cardTitle: { fontSize: 16, fontWeight: "700", marginBottom: 12 },
-  paragraph: { fontSize: 16, lineHeight: 24, marginBottom: 6, color: "#333" },
-  listItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 8,
-  },
+  listItem: { flexDirection: "row", alignItems: "flex-start", marginBottom: 8 },
   listText: {
     fontSize: 16,
     lineHeight: 22,
@@ -390,12 +440,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
   },
-  emptyText: {
-    fontSize: 16,
-    fontStyle: "italic",
-    color: "#999",
-  },
-
+  emptyText: { fontSize: 16, fontStyle: "italic", color: "#999" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   rowLabel: { flex: 1, marginLeft: 10, color: "#555" },
   rowValue: { fontWeight: "700" },
