@@ -138,5 +138,7 @@ export default {
   send_message:"Send Message",
   follow_us_on_social_media:"FOLLOW US ON SOCIAL MEDIA",
   enroll_today:"Enroll and study with us today!",
-  version_tag:"Version 1.0.0.0"
+  version_tag:"Version 1.0.0.0",
+  Your_Learning_Journey:"Your Learning Journey",
+  NO_CURRENT_LESSON:"No Current Lesson."
 };

@@ -152,7 +152,9 @@ export default function AccountScreen() {
               color={COLORS.white}
             />
             <Text style={styles.editActionText}>
-              {editing ? t("cancel", language) || "Cancel" : t("edit_profile", language) || "Edit"}
+              {editing
+                ? t("cancel", language) || "Cancel"
+                : t("edit_profile", language) || "Edit"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -249,18 +251,22 @@ function EditUser({ initialData, onSave, updating, language }) {
               onPress={() => setFormData({ ...formData, gender: g })}
               style={[
                 styles.genderOption,
-                formData.gender.toLowerCase() === g && styles.genderOptionActive,
+                formData.gender.toLowerCase() === g &&
+                  styles.genderOptionActive,
               ]}
             >
               <RadioButton.Android
                 value={g}
-                status={formData.gender.toLowerCase() === g ? "checked" : "unchecked"}
+                status={
+                  formData.gender.toLowerCase() === g ? "checked" : "unchecked"
+                }
                 color={COLORS.primary}
               />
               <Text
                 style={[
                   styles.genderText,
-                  formData.gender.toLowerCase() === g && styles.genderTextActive,
+                  formData.gender.toLowerCase() === g &&
+                    styles.genderTextActive,
                 ]}
               >
                 {t(g, language) || g.charAt(0).toUpperCase() + g.slice(1)}
@@ -274,9 +280,10 @@ function EditUser({ initialData, onSave, updating, language }) {
         mode="contained"
         onPress={() => onSave(formData)}
         loading={updating}
+        textColor="white"
         style={styles.saveBtn}
       >
-        <Text>{t("save_changes", language) || "Save Changes"}</Text>
+        {t("save_changes", language)}
       </Button>
     </View>
   );
@@ -305,33 +312,129 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "ios" ? 25 : 10,
   },
-  backButton: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   headerHero: { paddingBottom: 30, alignItems: "center" },
   avatarWrapper: { marginBottom: 5 },
-  avatarSurface: { width: 130, height: 130, borderRadius: 65, position: "relative", borderWidth: 5, borderColor: COLORS.accent },
+  avatarSurface: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    position: "relative",
+    borderWidth: 5,
+    borderColor: COLORS.accent,
+  },
   avatar: { width: "100%", height: "100%", borderRadius: 65 },
-  heroName: { color: COLORS.white, fontSize: 24, fontWeight: "900", letterSpacing: -0.5 },
+  heroName: {
+    color: COLORS.white,
+    fontSize: 24,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+  },
   userEmailText: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 4 },
-  titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 25 },
-  contentTitle: { fontSize: 14, fontWeight: "800", color: COLORS.grey600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 20 },
-  editActionBtn: { flexDirection: "row", alignItems: "center", paddingVertical: 8, paddingHorizontal: 14, borderRadius: 12, backgroundColor: COLORS.primary },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  contentTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 20,
+  },
+  editActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+  },
   cancelActionBtn: { backgroundColor: COLORS.error },
   editActionText: { color: COLORS.white, fontWeight: "800", fontSize: 13 },
-  contentBody: { flex: 1, backgroundColor: COLORS.background, borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingVertical: 25, paddingHorizontal: 25, borderTopWidth: 5, borderColor: COLORS.accent },
+  contentBody: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingVertical: 25,
+    paddingHorizontal: 25,
+    borderTopWidth: 5,
+    borderColor: COLORS.accent,
+  },
   infoGrid: { marginBottom: 20 },
-  tile: { backgroundColor: COLORS.white, padding: 10, borderRadius: 20, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: COLORS.grey200, marginBottom: 12 },
-  tileIconBg: { width: 44, height: 44, borderRadius: 14, backgroundColor: COLORS.background, justifyContent: "center", alignItems: "center", marginRight: 16 },
-  tileLabel: { fontSize: 11, fontWeight: "700", color: COLORS.grey600, textTransform: "uppercase" },
-  tileValue: { fontSize: 16, fontWeight: "700", color: COLORS.textDark, marginTop: 2 },
+  tile: {
+    backgroundColor: COLORS.white,
+    padding: 10,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.grey200,
+    marginBottom: 12,
+  },
+  tileIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  tileLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+  },
+  tileValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.textDark,
+    marginTop: 2,
+  },
   formContainer: { marginBottom: 20 },
   input: { backgroundColor: COLORS.white, borderRadius: 10 },
   inputContent: { paddingVertical: 10, paddingHorizontal: 15 },
   genderBox: { marginTop: 0 },
-  genderLabel: { fontSize: 13, fontWeight: "700", color: COLORS.grey600, marginBottom: 12 },
+  genderLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: COLORS.grey600,
+    marginBottom: 12,
+  },
   radioGroup: { flexDirection: "row" },
-  genderOption: { flex: 1, flexDirection: "row", alignItems: "center", padding: 5, borderRadius: 15, borderWidth: 1, borderColor: COLORS.grey200, backgroundColor: COLORS.white, marginRight: 8 },
-  genderOptionActive: { borderColor: COLORS.primary, backgroundColor: "#F0F4FF" },
+  genderOption: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: COLORS.grey200,
+    backgroundColor: COLORS.white,
+    marginRight: 8,
+  },
+  genderOptionActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: "#F0F4FF",
+  },
   genderText: { fontWeight: "600", color: COLORS.grey600 },
   genderTextActive: { color: COLORS.primary },
-  saveBtn: { borderRadius: 16, marginTop: 10, backgroundColor: COLORS.primary, padding: 7, fontWeight: "800" },
+  saveBtn: {
+    borderRadius: 16,
+    marginTop: 10,
+    backgroundColor: COLORS.primary,
+    padding: 7,
+    fontWeight: "800",
+  },
 });

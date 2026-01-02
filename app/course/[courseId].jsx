@@ -380,7 +380,7 @@ export default function CoursePlayerScreen() {
   );
 }
 
-/* ---------------- SMALL COMPONENTS ---------------- */
+// ==================== SMALL COMPONENTS ==================== //
 const InfoRow = ({ icon, label, value }) => (
   <View style={styles.row}>
     <MaterialCommunityIcons name={icon} size={20} color="#3F51B5" />
@@ -395,7 +395,7 @@ const IncludeItem = ({ text }) => (
   </View>
 );
 
-/* ---------------- STYLES ---------------- */
+// ==================== STYLES ==================== //
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F7FA" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

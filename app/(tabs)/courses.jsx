@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import CourseList from "../../components/courses/CourseList";
 import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
@@ -38,7 +38,6 @@ export default function Courses() {
             searchText={searchText}
             language={language}
           />
-        {/* </ScrollView> */}
       </View>
     </View>
   );
