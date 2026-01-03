@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import EnrolledCourses from "../../components/courses/EnrolledCourses";
-import FeatureCategory from "../../components/courses/FeatureCategory";
 import Search from "../../components/courses/Search";
 import Topbar from "../../components/headers/Topbar";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function MyCourseScreen() {
   const { language } = useLanguage();
-   const [searchText, setSearchText] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("All");
+  const [searchText, setSearchText] = useState("");
 
   return (
     <View style={styles.screenContainer}>
@@ -24,23 +22,11 @@ export default function MyCourseScreen() {
           }
         />
 
-        {/* <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-          <FeatureCategory
-            onSelectedCategory={setSelectedCategoryId}
-            language={language}
-          />
-        </View> */}
-          <EnrolledCourses
-            searchText={searchText}
-            language={language}
-          />
-        
+        <EnrolledCourses searchText={searchText} />
       </View>
     </View>
   );
 }
-
-//==================== Styles ====================
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: "#25375A" },

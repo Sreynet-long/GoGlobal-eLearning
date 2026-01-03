@@ -1,5 +1,4 @@
 import { useQuery } from "@apollo/client";
-import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDebounce } from "../../app/hook/useDebounce";
 import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -24,31 +24,46 @@ const { width } = Dimensions.get("window");
 const CourseCard = ({ item, language, onPress }) => {
   const progress = item.overall_completion_percentage ?? 0;
 
+  const getCourseActionLabel = () => {
+    if (item.has_course_completed || progress === 100) return "Completed";
+    if (progress > 0) return "Continue";
+    return "Start course";
+  };
+
+  const actionLabel = getCourseActionLabel();
+
   return (
     <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={onPress}>
       <Image
         source={{ uri: `${IMAGE_BASE_URL}/file/${item.thumbnail}` }}
         style={styles.cardImage}
       />
+
       <View style={styles.cardBody}>
         <Text style={styles.textTitle} numberOfLines={2}>
           {item.title}
         </Text>
 
         <View style={styles.progressSection}>
-          <View style={styles.progressInfo}>
-            <Text style={styles.progressText}>
-              {progress}% {t("completed", language)}
-            </Text>
-          </View>
+          <Text style={styles.progressText}>
+            {progress}% {t("completed", language)}
+          </Text>
+
           <View style={styles.progressBarContainer}>
             <View style={[styles.progressBar, { width: `${progress}%` }]} />
           </View>
         </View>
 
-        {/* <View style={styles.cardFooter}>
-          <Text style={styles.continueText}>Continue learning →</Text>
-        </View> */}
+        <View style={styles.cardFooter}>
+          <Text
+            style={[
+              styles.continueText,
+              actionLabel === "Completed" && styles.completedText,
+            ]}
+          >
+            {actionLabel}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -60,6 +75,7 @@ export default function EnrolledCourses({ searchText }) {
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
+  const debouncedSearch = useDebounce(searchText, 500);
 
   const { data, loading, error, fetchMore, refetch } = useQuery(
     GET_COURSE_ENROLLED_WITH_PAGINATION,
@@ -68,23 +84,24 @@ export default function EnrolledCourses({ searchText }) {
         page: 1,
         limit: 10,
         pagination: true,
-        keyword: searchText?.trim() || "",
+        keyword: debouncedSearch || "",
       },
       fetchPolicy: "cache-and-network",
       notifyOnNetworkStatusChange: true,
     }
   );
-  useFocusEffect(
-    useCallback(() => {
-      refetch({
-        page: 1,
-        limit: 10,
-        pagination: true,
-        keyword: searchText?.trim() || "",
-      });
-    }, [refetch, searchText])
-  );
-  // Update courses whenever new data is fetched
+
+  useEffect(() => {
+    setPage(1);
+    setCourses([]);
+    refetch({
+      page: 1,
+      limit: 50,
+      pagination: true,
+      keyword: debouncedSearch || "",
+    });
+  }, [debouncedSearch]);
+
   useEffect(() => {
     if (data?.getCourseEnrolledWithPagination?.data) {
       const newCourses = data.getCourseEnrolledWithPagination.data;
@@ -92,14 +109,20 @@ export default function EnrolledCourses({ searchText }) {
         page === 1 ? newCourses : [...prev, ...newCourses]
       );
     }
-  }, [data, page]);
+  }, [data]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
-    await refetch({ page: 1 });
+    setCourses([]);
+    await refetch({
+      page: 1,
+      limit: 50,
+      pagination: true,
+      keyword: debouncedSearch || "",
+    });
     setRefreshing(false);
-  }, [refetch]);
+  }, [refetch, debouncedSearch]);
 
   const loadMore = () => {
     const hasNextPage =
@@ -107,7 +130,9 @@ export default function EnrolledCourses({ searchText }) {
     if (loading || !hasNextPage) return;
 
     const nextPage = page + 1;
-    fetchMore({ variables: { page: nextPage } });
+    fetchMore({
+      variables: { page: nextPage, keyword: debouncedSearch || "" },
+    });
     setPage(nextPage);
   };
 
@@ -225,7 +250,7 @@ const styles = StyleSheet.create({
     color: "#3F51B5",
     marginLeft: 100,
   },
-  cardFooter: { marginTop: 8, alignItems: "flex-end" },
-  continueText: { fontSize: 12, fontWeight: "700", color: "#58589b" },
+  cardFooter: { marginTop: 8, alignItems: "flex-end"},
+  continueText: { fontSize: 12, fontWeight: "600", color: "#3F51B5" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

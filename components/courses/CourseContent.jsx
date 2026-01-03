@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
@@ -37,8 +37,7 @@ export default function CourseContent({
     );
 
   const sections = data?.getContentSectionWithPagination?.data || [];
-
-  if (sections.length === 0)
+  if (!sections.length)
     return (
       <Text style={styles.noContentText}>No course content available.</Text>
     );
@@ -67,7 +66,6 @@ export default function CourseContent({
                   expandedSection === section._id ? null : section._id
                 )
               }
-              activeOpacity={0.7}
             >
               <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap" }}>
                 <Text style={styles.sectionTitleText}>

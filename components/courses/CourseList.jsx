@@ -15,13 +15,13 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 import CourseIncludes from "./CourseInclude";
 import EmptyCourse from "./EmptyCourse";
 import EnrolledButton from "./EnrolledButton";
-import { useAuth } from "../../context/AuthContext";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -45,13 +45,28 @@ const CourseSkeleton = () => (
   </View>
 );
 
+const getCourseAction = (course) => {
+  const progress = course.overall_completion_percentage ?? 0;
+
+  if (course.has_course_completed || progress === 100) {
+    return { label: "Completed", type: "completed" };
+  }
+
+  if (course.has_enrolled) {
+    if (progress > 0) return { label: "Continue", type: "continue" };
+    return { label: "Start course", type: "start" };
+  }
+
+  return { label: "View Detail", type: "view" };
+};
+
 export default function CourseList({ selectedCategoryId, searchText }) {
   const router = useRouter();
   const isAuth = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   const { data, loading, refetch } = useQuery(GET_COURSE_WITH_PAGINATION, {
     variables: {
       page: 1,
@@ -61,7 +76,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
       categoryId: selectedCategoryId === "All" ? "All" : selectedCategoryId,
     },
     fetchPolicy: "cache-and-network",
-   
   });
 
   useEffect(() => {
@@ -71,18 +85,26 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const courses = data?.getCourseWithPagination?.data ?? [];
 
   const handleOpenDetails = (course) => {
-    console.log("select course:", course);
-    if (course.has_enrolled) {
-      router.push(`/course/${course._id}`);
-    } else {
+    const action = getCourseAction(course);
+
+    if (action.type === "view") {
       setSelectedCourse(course);
       setModalVisible(true);
+      return;
     }
+    router.push({
+      pathname: `/course/${course._id}`,
+      params: {
+        courseId: course._id,
+        resume: action.type === "continue",
+      },
+    });
   };
 
   const renderItem = useCallback(
     ({ item }) => {
       const hasDiscount = item.original_price > item.sell_price;
+      const action = getCourseAction(item);
 
       return (
         <TouchableOpacity
@@ -99,7 +121,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           <View style={styles.cardBody}>
             <Text style={styles.textTitle} numberOfLines={2}>
               {renderText(item.title)}
-            </Text>
+            </Text> 
             {item.has_enrolled ? (
               <>
                 {item.has_course_completed ? (
@@ -109,7 +131,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                 ) : (
                   <>
                     <Text style={styles.progressText}>
-                     {item.overall_completion_percentage}% Completed
+                      {item.overall_completion_percentage}% Completed
                     </Text>
                     <View style={styles.progressBarContainer}>
                       <View
@@ -120,8 +142,23 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                       />
                     </View>
                     <View style={styles.cardFooter}>
-                      <View style={styles.enrollBadge}>
-                        <Text style={styles.textContinue}>Continue</Text>
+                      <View
+                        style={[
+                          styles.enrollBadge,
+                          action.type === "completed" && styles.completedBadge,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            action.type === "completed"
+                              ? styles.completedText
+                              : action.type === "continue"
+                              ? styles.textContinue
+                              : styles.textEnroll,
+                          ]}
+                        >
+                          {action.label}
+                        </Text>
                       </View>
                     </View>
                   </>
@@ -185,8 +222,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ]}
         ListEmptyComponent={<EmptyCourse />}
       />
-
-      {/* Modal for unenrolled courses */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -204,10 +239,10 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             <View style={styles.modalHandle} />
 
             <ScrollView
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={true}
               contentContainerStyle={{ paddingBottom: 40 }}
-              keyboardShouldPersistTaps= "handled"
-              // bounces={false}
+              keyboardShouldPersistTaps="handled"
+              // bounces={false} 
             >
               {selectedCourse ? (
                 <>
@@ -218,7 +253,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                     style={styles.modalImage}
                   />
                   <Text style={styles.modalTitle}>
-                    {renderText(selectedCourse.title)}
+                    {renderText(selectedCourse.title)} 
                   </Text>
 
                   {selectedCourse.has_enrolled ? (
@@ -256,7 +291,8 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                           {selectedCourse.original_price >
                             selectedCourse.sell_price && (
                             <Text style={styles.modalOldPrice}>
-                              ${Number(selectedCourse.original_price).toFixed(2)}
+                              $
+                              {Number(selectedCourse.original_price).toFixed(2)}
                             </Text>
                           )}
                         </View>
@@ -384,7 +420,7 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
     marginTop: 4,
   },
-  
+
   textSellPrice: { fontSize: 17, fontWeight: "800", color: "#3F51B5" },
   textOldPrice: {
     fontSize: 12,
@@ -466,7 +502,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 10,
     color: "#3F51B5",
-    marginLeft: 100
+    marginLeft: 100,
   },
   progressBarContainer: {
     height: 10,

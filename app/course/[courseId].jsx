@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -17,7 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CourseContent from "../../components/courses/CourseContent";
 import { useVideoCompletion } from "../../components/courses/useVideoCompletion";
 import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
-import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
+import { GET_COURSE_BY_ID } from "../../schema/course";
 
 const TABS = ["Course content", "Overview"];
 
@@ -47,15 +47,25 @@ export default function CoursePlayerScreen() {
   //   ]);
   // }, [data]);
 
-  const backendCompleted = data?.getCourseById?.completedVideo || [];
-  const { completedVideoIds, toggleVideoComplete } =
-    useVideoCompletion(enrolledId, backendCompleted);
+  // const backendCompleted = data?.getCourseById?.completedVideo || [];
+
+  const completedFromBackend = useMemo(() => {
+    if (!data?.getVideoContentWithPagination?.data) return [];
+    return data.getVideoContentWithPagination.data
+      .filter((v) => v.has_completed === true)
+      .map((v) => v._id);
+  }, [data]);
+
+  const { completedVideoIds, toggleVideoComplete } = useVideoCompletion(
+    enrolledId,
+    courseId,
+    completedFromBackend,
+  );
 
   const handleVideoFinish = (video) => {
     if (!completedVideoIds.includes(video._id))
       toggleVideoComplete(video._id, true);
   };
-
 
   // const handleVideoComplete = async (video) => {
   //   markVideoComplete(video._id);
@@ -132,7 +142,7 @@ export default function CoursePlayerScreen() {
         <View>
           <IncludeItem
             text={`${includes?.number_of_downloadable_resources} downloadable resources`}
-             icon="download-outline"
+            icon="download-outline"
           />
           <IncludeItem
             text={`${includes?.number_of_projects_practices} projects & practices`}
@@ -142,7 +152,10 @@ export default function CoursePlayerScreen() {
             <IncludeItem text="Full lifetime access" icon="infinity" />
           )}
           {includes?.has_certificate_of_completion && (
-            <IncludeItem text="Certificate of completion" icon="certificate-outline" />
+            <IncludeItem
+              text="Certificate of completion"
+              icon="certificate-outline"
+            />
           )}
         </View>
       </View>
@@ -186,9 +199,9 @@ export default function CoursePlayerScreen() {
             useNativeControls
             resizeMode="contain"
             isLooping={false}
-            onPlaybackStatusUpdate={(status) => {
-              if (status.didJustFinish) handleVideoFinish(selectedVideo);
-            }}
+            onPlaybackStatusUpdate={(status) =>
+              status.didJustFinish && handleVideoFinish(selectedVideo)
+            }
           />
         </View>
       );

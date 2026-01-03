@@ -1,25 +1,34 @@
-import { useMutation, useQuery } from "@apollo/client/react";
-import { useState, useEffect, useCallback } from "react";
-import { VIDEO_PROCESS_STATUS, GET_COURSE_BY_ID } from "../../schema/course";
+import { useMutation } from "@apollo/client/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
 
-export function useVideoCompletion(enrolledId, backendCompleted = []) {
+export function useVideoCompletion(
+  enrolledId,
+  courseId,
+  backendCompleted = []
+) {
   const [completedVideoIds, setCompletedVideoIds] = useState([]);
   const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
 
-  // sync backend → local once
+  const syncedRef = useRef(false);
+
+  // useEffect(() => {
+  //   if (syncedRef.current) return;
+  //   if (!backendCompleted?.length) return;
+
+  //   setCompletedVideoIds([...new Set(backendCompleted)]);
+  //   syncedRef.current = true;
+  // }, [backendCompleted]);
+
   useEffect(() => {
-    if (!backendCompleted?.length) return;
-    setCompletedVideoIds((prev) =>
-      [...new Set([...prev, ...backendCompleted])]
-    );
-  }, [backendCompleted]);
+    if (!backendCompleted) return;
+    setCompletedVideoIds(backendCompleted);
+  },[backendCompleted]);
 
   const toggleVideoComplete = useCallback(
-    
     async (videoId, completed) => {
       if (!enrolledId) return;
 
-      // optimistic UI
       setCompletedVideoIds((prev) =>
         completed
           ? [...new Set([...prev, videoId])]
@@ -27,11 +36,10 @@ export function useVideoCompletion(enrolledId, backendCompleted = []) {
       );
 
       try {
-        await videoProcessStatus(
-           console.log("Saving:", {
-          enrolledId,videoId, completed
-        }),
-          {
+        console.log("saving:", {enrolled_id: enrolledId,
+              video_content_id: videoId,
+              has_completed: completed,});
+        await videoProcessStatus({
           variables: {
             input: {
               enrolled_id: enrolledId,
@@ -39,15 +47,50 @@ export function useVideoCompletion(enrolledId, backendCompleted = []) {
               has_completed: completed,
             },
           },
-          
+          update: (cache) => {
+            try {
+              const existing = cache.readQuery({
+                query: GET_COURSE_BY_ID,
+                variables: { courseId },
+              });
+
+              if (!existing?.getCourseById) return;
+
+              const prevCompleted = existing.getCourseById.completedVideo || [];
+
+              const newCompleted = completed
+                ? [...new Set([...prevCompleted, videoId])]
+                : prevCompleted.filter((id) => id !== videoId);
+
+              cache.writeQuery({
+                query: GET_COURSE_BY_ID,
+                variables: { courseId },
+                data: {
+                  getCourseById: {
+                    ...existing.getCourseById,
+                    completedVideo: newCompleted,
+                  },
+                },
+              });
+            } catch (err) {
+              console.warn("Cache update failed:", err);
+            }
+          },
         });
-       
       } catch (e) {
         console.error("Toggle failed", e);
+        // setCompletedVideoIds((prev) =>
+        //   completed ? prev.filter((id) => id !== videoId) : [...prev, videoId]
+        // );
+
+        setCompletedVideoIds((prev) =>
+          completed
+            ? prev.filter((id) => id !== videoId)
+            : [...new Set([...prev, videoId])]
+        );
       }
     },
-    [enrolledId],
-   
+    [enrolledId, courseId, videoProcessStatus]
   );
 
   return { completedVideoIds, toggleVideoComplete };

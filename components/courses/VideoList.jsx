@@ -1,7 +1,6 @@
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
-import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -9,11 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { FILE_BASE_URL } from "../../config/env";
-import {
-  GET_VIDEO_CONTENT_WITH_PAGINATION,
-  VIDEO_PROCESS_STATUS,
-} from "../../schema/course";
+import { GET_VIDEO_CONTENT_WITH_PAGINATION } from "../../schema/course";
 import DownloadButton from "./DownloadButton";
 
 export default function VideoList({
@@ -22,7 +19,6 @@ export default function VideoList({
   activeVideoId,
   completedVideo,
   onToggleComplete,
-  enrolledId,
 }) {
   const { data, loading, error } = useQuery(GET_VIDEO_CONTENT_WITH_PAGINATION, {
     variables: {
@@ -36,55 +32,13 @@ export default function VideoList({
     fetchPolicy: "cache-and-network",
   });
 
-  const [localCompleted, setLocalCompleted] = useState([]);
-  const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
-
-  // initialize localCompleted from prop or backend
-  useEffect(() => {
-    if (completedVideo) {
-      setLocalCompleted(completedVideo);
-    }
-  }, [completedVideo]);
-
-  const toggleCompleted = async (videoId) => {
-    const isCompleted = localCompleted.includes(videoId);
-
-    // Optimistic UI update
-    setLocalCompleted((prev) =>
-      isCompleted ? prev.filter((id) => id !== videoId) : [...prev, videoId]
-    );
-
-    // Call parent if needed
-    onToggleComplete && onToggleComplete(videoId, !isCompleted);
-
-    try {
-      await videoProcessStatus({
-        variables: {
-          enrolledId,
-          videoId,
-          completed: !isCompleted,
-        },
-      });
-    } catch (err) {
-      console.error("Failed to update completion", err);
-      // revert UI if mutation fails
-      setLocalCompleted((prev) =>
-        isCompleted ? [...prev, videoId] : prev.filter((id) => id !== videoId)
-      );
-    }
-  };
-
   if (loading)
-    return (
-      <ActivityIndicator
-        style={{ margin: 12, color: "rgba(79, 120, 255, 1)" }}
-      />
-    );
+    return <ActivityIndicator style={{ margin: 12, color: "#4F78FF" }} />;
   if (error)
     return (
       <Text style={{ color: "red", padding: 12 }}>Failed to load videos</Text>
     );
-
+  // console.log(data?.getVideoContentWithPagination?.data, "dataaaaaa");
   const videos = Array.from(
     new Map(
       (data?.getVideoContentWithPagination?.data || []).map((v) => [
@@ -97,7 +51,10 @@ export default function VideoList({
   return (
     <View>
       {videos.map((video) => {
-        const isCompleted = localCompleted.includes(video._id);
+        const backendCompleted = video.has_completed === true;
+        const localCompleted = completedVideo.includes(video._id);
+        const isCompleted = localCompleted || backendCompleted;
+        console.log("completed", isCompleted);
         return (
           <View key={video._id}>
             <TouchableOpacity
@@ -107,14 +64,11 @@ export default function VideoList({
               ]}
               onPress={() => onSelectVideo(video)}
             >
-              {/* Tap this icon to toggle completion */}
-              <TouchableOpacity onPress={() => toggleCompleted(video._id)}>
+              <TouchableOpacity
+                onPress={() => onToggleComplete(video._id, !isCompleted)}
+              >
                 <MaterialCommunityIcons
-                  name={
-                    isCompleted
-                      ? "check-circle"
-                      : "play-circle-outline"
-                  }
+                  name={isCompleted ? "check-circle" : "play-circle-outline"}
                   size={24}
                   color={isCompleted ? "#4CAF50" : "#393a3aff"}
                   style={{ marginRight: 12 }}
@@ -125,9 +79,7 @@ export default function VideoList({
                 <Text style={styles.lessonTitle}>
                   Lesson {video.video_content_order}. {video.video_content_name}
                 </Text>
-                <Text style={styles.lessonDuration}>
-                  Video
-                </Text>
+                <Text style={styles.lessonDuration}>Video</Text>
               </View>
             </TouchableOpacity>
 
