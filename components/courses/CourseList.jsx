@@ -21,6 +21,7 @@ import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
 import CourseIncludes from "./CourseInclude";
 import EmptyCourse from "./EmptyCourse";
 import EnrolledButton from "./EnrolledButton";
+import { useAuth } from "../../context/AuthContext";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -46,6 +47,7 @@ const CourseSkeleton = () => (
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const router = useRouter();
+  const isAuth = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -59,11 +61,12 @@ export default function CourseList({ selectedCategoryId, searchText }) {
       categoryId: selectedCategoryId === "All" ? "All" : selectedCategoryId,
     },
     fetchPolicy: "cache-and-network",
+   
   });
 
   useEffect(() => {
     refetch();
-  }, [searchText, selectedCategoryId]);
+  }, [searchText, selectedCategoryId, isAuth]);
 
   const courses = data?.getCourseWithPagination?.data ?? [];
 
@@ -203,6 +206,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 40 }}
+              keyboardShouldPersistTaps= "handled"
               // bounces={false}
             >
               {selectedCourse ? (
@@ -380,6 +384,7 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
     marginTop: 4,
   },
+  
   textSellPrice: { fontSize: 17, fontWeight: "800", color: "#3F51B5" },
   textOldPrice: {
     fontSize: 12,

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -15,6 +15,7 @@ import {
 import { Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CourseContent from "../../components/courses/CourseContent";
+import { useVideoCompletion } from "../../components/courses/useVideoCompletion";
 import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
 import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
 
@@ -22,9 +23,8 @@ const TABS = ["Course content", "Overview"];
 
 export default function CoursePlayerScreen() {
   const router = useRouter();
-  const { courseId } = useLocalSearchParams(); // ONLY courseId
+  const { courseId } = useLocalSearchParams();
   const videoRef = useRef(null);
-
   const [activeTab, setActiveTab] = useState("Course content");
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -37,121 +37,25 @@ export default function CoursePlayerScreen() {
 
   const enrolledId = data?.getCourseById?.enrolled_id;
 
-  const [completedVideoIds, setCompletedVideoIds] = useState([]);
-
-  const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
+  // const [completedVideoIds, setCompletedVideoIds] = useState([]);
 
   // Sync backend completed videos
-  useEffect(() => {
-    const backendCompleted = data?.getCourseById?.completedVideo || [];
-    setCompletedVideoIds((prev) => [
-      ...new Set([...(prev || []), ...backendCompleted]),
-    ]);
-  }, [data]);
+  // useEffect(() => {
+  //   const backendCompleted = data?.getCourseById?.completedVideo || [];
+  //   setCompletedVideoIds((prev) => [
+  //     ...new Set([...(prev || []), ...backendCompleted]),
+  //   ]);
+  // }, [data]);
 
-  const toggleVideoComplete = async (videoId, completed) => {
-    if (!enrolledId) return;
-
-    setCompletedVideoIds((prev) =>
-      completed
-        ? [...new Set([...prev, videoId])]
-        : prev.filter((id) => id !== videoId)
-    );
-
-    try {
-      await videoProcessStatus({
-        variables: {
-          input: {
-            has_completed: completed,
-            enrolled_id: enrolledId,
-            video_content_id: videoId,
-          },
-        },
-        optimisticResponse: {
-          videoProcessStatus: {
-            __typename: "ResponseMessage",
-            status: true,
-            message: {
-              __typename: "Message",
-              messageEn: completed ? "Completed" : "Uncompleted",
-              messageKh: completed ? "បានបញ្ចប់" : "មិនទាន់បញ្ចប់",
-            },
-          },
-        },
-        update: (cache) => {
-          cache.modify({
-            id: cache.identify({
-              __typename: "CourseEnrolled",
-              id: enrolledId,
-            }),
-            fields: {
-              completedVideo(existing = []) {
-                return completed
-                  ? [...new Set([...existing, videoId])]
-                  : existing.filter((id) => id !== videoId);
-              },
-            },
-          });
-        },
-      });
-    } catch (error) {
-      console.log("Toggle failed", error);
-    }
-  };
+  const backendCompleted = data?.getCourseById?.completedVideo || [];
+  const { completedVideoIds, toggleVideoComplete } =
+    useVideoCompletion(enrolledId, backendCompleted);
 
   const handleVideoFinish = (video) => {
-    if(!completedVideoIds.includes(video._id))
+    if (!completedVideoIds.includes(video._id))
       toggleVideoComplete(video._id, true);
-  }
+  };
 
-  // const markVideoComplete = async (videoId) => {
-  //   if (!enrolledId) return;
-
-  //   setCompletedVideoIds((prev) => [...new Set([...prev, videoId])]);
-
-  //   try {
-  //     await videoProcessStatus({
-  //       variables: {
-  //         input: {
-  //           has_completed: true,
-  //           enrolled_id: enrolledId,
-  //           video_content_id: videoId,
-  //         },
-  //       },
-  //       optimisticResponse: {
-  //         videoProcessStatus: {
-  //           __typename: "ResponseMessage",
-  //           status: true,
-  //           message: {
-  //             __typename: "Message",
-  //             messageEn: "Marked complete (optimistic)",
-  //             messageKh: "បានបញ្ចប់ (optimistic)",
-  //           },
-  //         },
-  //       },
-  //       update: (cache, { data }) => {
-  //         if (data?.videoProcessStatus?.status) {
-  //           cache.modify({
-  //             id: cache.identify({
-  //               __typename: "CourseEnrolled",
-  //               id: enrolledId,
-  //             }),
-  //             fields: {
-  //               overall_completion_percentage(existing = 0) {
-  //                 return existing + 1;
-  //               },
-  //               completedVideo(existing = []) {
-  //                 return [...new Set([...existing, videoId])];
-  //               },
-  //             },
-  //           });
-  //         }
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.error("Video status failed", err);
-  //   }
-  // };
 
   // const handleVideoComplete = async (video) => {
   //   markVideoComplete(video._id);
@@ -175,7 +79,7 @@ export default function CoursePlayerScreen() {
           <CourseContent
             courseId={courseId}
             onSelectVideo={setSelectedVideo}
-            completedVideo={completedVideoIds || []}
+            completedVideo={completedVideoIds}
             onToggleComplete={toggleVideoComplete}
           />
         );
@@ -225,7 +129,24 @@ export default function CoursePlayerScreen() {
           label="Quizzes"
           value={includes?.number_quizzes}
         />
+        <View>
+          <IncludeItem
+            text={`${includes?.number_of_downloadable_resources} downloadable resources`}
+             icon="download-outline"
+          />
+          <IncludeItem
+            text={`${includes?.number_of_projects_practices} projects & practices`}
+            icon="briefcase-outline"
+          />
+          {includes?.is_full_lifetime_access && (
+            <IncludeItem text="Full lifetime access" icon="infinity" />
+          )}
+          {includes?.has_certificate_of_completion && (
+            <IncludeItem text="Certificate of completion" icon="certificate-outline" />
+          )}
+        </View>
       </View>
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>What you will learn:</Text>
         <ParagraphList
@@ -250,25 +171,6 @@ export default function CoursePlayerScreen() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Description:</Text>
         <ParagraphList text={course?.description} />
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>This course includes:</Text>
-        <IncludeItem
-          text={`${includes?.number_of_hours} hours on-demand video`}
-        />
-        <IncludeItem
-          text={`${includes?.number_of_downloadable_resources} downloadable resources`}
-        />
-        <IncludeItem
-          text={`${includes?.number_of_projects_practices} projects & practices`}
-        />
-        {includes?.is_full_lifetime_access && (
-          <IncludeItem text="Full lifetime access" />
-        )}
-        {includes?.has_certificate_of_completion && (
-          <IncludeItem text="Certificate of completion" />
-        )}
       </View>
     </ScrollView>
   );
@@ -388,10 +290,12 @@ const InfoRow = ({ icon, label, value }) => (
     <Text style={styles.rowValue}>{value}</Text>
   </View>
 );
-const IncludeItem = ({ text }) => (
+const IncludeItem = ({ text, label, value, icon }) => (
   <View style={styles.includeRow}>
-    <MaterialCommunityIcons name="check-circle" size={18} color="#4CAF50" />
+    <MaterialCommunityIcons name={icon} size={20} color="#3F51B5" />
     <Text style={styles.includeText}>{text}</Text>
+    <Text style={styles.rowLabel}>{label}</Text>
+    <Text style={styles.rowValue}>{value}</Text>
   </View>
 );
 
@@ -442,7 +346,7 @@ const styles = StyleSheet.create({
   },
   emptyText: { fontSize: 16, fontStyle: "italic", color: "#999" },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  rowLabel: { flex: 1, marginLeft: 10, color: "#555" },
+  rowLabel: { flex: 1, marginLeft: 10 },
   rowValue: { fontWeight: "700" },
 
   includeRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },

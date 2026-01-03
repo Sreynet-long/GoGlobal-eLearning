@@ -1,7 +1,13 @@
 import { useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { RESUME_LESSON } from "../../schema/courseHomepage";
@@ -11,7 +17,7 @@ export default function VideoCard() {
   const router = useRouter();
 
   const { data, loading, error } = useQuery(RESUME_LESSON, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
   });
 
   if (loading) {
@@ -45,10 +51,12 @@ export default function VideoCard() {
           <View style={styles.iconCircle}>
             <Ionicons name="play" size={18} color="#ffffff" />
           </View>
-          
+
           <View style={styles.content}>
             <Text style={styles.label}>
-              {(t("RESUME_LEARNING", language) || "RESUME LEARNING").toUpperCase()}
+              {(
+                t("RESUME_LEARNING", language) || "RESUME LEARNING"
+              ).toUpperCase()}
             </Text>
             <Text style={styles.title} numberOfLines={1}>
               {course.title}
@@ -56,7 +64,7 @@ export default function VideoCard() {
           </View>
 
           <View style={styles.percentageContainer}>
-             <Text style={styles.percentageText}>{progress}%</Text>
+            <Text style={styles.percentageText}>{progress}%</Text>
           </View>
         </View>
 
@@ -75,8 +83,8 @@ const styles = StyleSheet.create({
   },
   loaderContainer: {
     height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   card: {
     backgroundColor: "#ffffffff",

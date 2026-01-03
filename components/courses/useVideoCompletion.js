@@ -1,60 +1,54 @@
-import { useMutation } from "@apollo/client/react";
-import { useCallback, useState } from "react";
-import { VIDEO_PROCESS_STATUS } from "../../schema/course";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { useState, useEffect, useCallback } from "react";
+import { VIDEO_PROCESS_STATUS, GET_COURSE_BY_ID } from "../../schema/course";
 
-export function useVideoCompletion(enrolledId) {
+export function useVideoCompletion(enrolledId, backendCompleted = []) {
   const [completedVideoIds, setCompletedVideoIds] = useState([]);
   const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
-  const markVideoComplete = useCallback(
-    async (videoId) => {
-      if (!enrolledId || !videoId) return;
-      setCompletedVideoIds((prev) => [...new Set([...prev, videoId])]);
+
+  // sync backend → local once
+  useEffect(() => {
+    if (!backendCompleted?.length) return;
+    setCompletedVideoIds((prev) =>
+      [...new Set([...prev, ...backendCompleted])]
+    );
+  }, [backendCompleted]);
+
+  const toggleVideoComplete = useCallback(
+    
+    async (videoId, completed) => {
+      if (!enrolledId) return;
+
+      // optimistic UI
+      setCompletedVideoIds((prev) =>
+        completed
+          ? [...new Set([...prev, videoId])]
+          : prev.filter((id) => id !== videoId)
+      );
 
       try {
-        await videoProcessStatus({
+        await videoProcessStatus(
+           console.log("Saving:", {
+          enrolledId,videoId, completed
+        }),
+          {
           variables: {
             input: {
-              has_completed: true,
               enrolled_id: enrolledId,
               video_content_id: videoId,
+              has_completed: completed,
             },
           },
-          optimisticResponse: {
-            videoProcessStatus: {
-              __typename: "ResponseMessage",
-              status: true,
-              message: {
-                __typename: "Message",
-                messageEn: "Marked complete (optimistic)",
-                messageKh: "បានបញ្ចប់ (optimistic)",
-              },
-            },
-          },
-          update: (cache, { data }) => {
-            if (data?.videoProcessStatus?.status) {
-              cache.modify({
-                id: cache.identify({
-                  __typename: "CourseEnrolled",
-                  id: enrolledId,
-                }),
-                fields: {
-                  overall_completion_percentage(existing = 0) {
-                    return existing + 1;
-                  },
-                  completedVideo(existing = []) {
-                    return [...new Set([...existing, videoId])];
-                  },
-                },
-              });
-            }
-          },
+          
         });
-      } catch (err) {
-        console.error("Video status failed", err);
+       
+      } catch (e) {
+        console.error("Toggle failed", e);
       }
     },
-    [videoProcessStatus, enrolledId]
+    [enrolledId],
+   
   );
 
-  return { completedVideoIds, markVideoComplete };
+  return { completedVideoIds, toggleVideoComplete };
 }

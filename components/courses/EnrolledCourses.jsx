@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -74,16 +74,23 @@ export default function EnrolledCourses({ searchText }) {
       notifyOnNetworkStatusChange: true,
     }
   );
-    useFocusEffect(
+  useFocusEffect(
     useCallback(() => {
-      refetch({ page: 1 });
-    }, [refetch])
+      refetch({
+        page: 1,
+        limit: 10,
+        pagination: true,
+        keyword: searchText?.trim() || "",
+      });
+    }, [refetch, searchText])
   );
   // Update courses whenever new data is fetched
   useEffect(() => {
     if (data?.getCourseEnrolledWithPagination?.data) {
       const newCourses = data.getCourseEnrolledWithPagination.data;
-      setCourses(prev => page === 1 ? newCourses : [...courses, ...newCourses]);
+      setCourses((prev) =>
+        page === 1 ? newCourses : [...prev, ...newCourses]
+      );
     }
   }, [data, page]);
 
@@ -206,8 +213,18 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     overflow: "hidden",
   },
-  progressBar: { backgroundColor: "#3F51B5", height: 10, borderRadius: 5, transitionProperty: "width" },
-  progressText: { fontSize: 14, fontWeight: "600", color: "#3F51B5" ,marginLeft: 100},
+  progressBar: {
+    backgroundColor: "#3F51B5",
+    height: 10,
+    borderRadius: 5,
+    transitionProperty: "width",
+  },
+  progressText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#3F51B5",
+    marginLeft: 100,
+  },
   cardFooter: { marginTop: 8, alignItems: "flex-end" },
   continueText: { fontSize: 12, fontWeight: "700", color: "#58589b" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
