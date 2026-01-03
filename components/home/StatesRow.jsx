@@ -27,7 +27,7 @@ export default function StatesRow() {
   const stats = [
     { label: "Easy to learn", icon: "book-outline", color: "#6366f1" },
     { label: "Modern Tech", icon: "rocket-outline", color: "#f97316" },
-    { label: "Active Projects", icon: "layers-outline", color: "#22c55e" },
+    { label: "Many courses", icon: "layers-outline", color: "#22c55e" },
     { label: "Skills Built", icon: "construct-outline", color: "#0ea5e9" },
   ];
 
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 32,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#f1f5f9",
     justifyContent: "center",
     alignItems: "center",

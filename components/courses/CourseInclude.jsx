@@ -12,7 +12,6 @@ function Row({ icon, children }) {
   );
 }
 
-// Main component
 export default function CourseIncludes({ course }) {
   const includes = course?.course_includes;
 

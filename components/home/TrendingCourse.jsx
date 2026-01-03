@@ -61,19 +61,19 @@ const CourseIconsPreview = ({ includes }) => {
 
   const tooltipItems = [
     {
-      icon: <Entypo name="folder" size={14} color="#4f46e5" />,
+      icon: <Entypo name="folder" size={12} color="#4f46e5" />,
       label: `Lessons: ${includes.number_of_lessons || 0}`,
       show: includes.number_of_lessons != null,
       bg: "#eef2ff",
     },
     {
-      icon: <Entypo name="folder-video" size={14} color="#0891b2" />,
+      icon: <Entypo name="folder-video" size={12} color="#0891b2" />,
       label: `Videos: ${includes.number_of_video || 0}`,
       show: includes.number_of_video != null,
       bg: "#ecfeff",
     },
     {
-      icon: <Entypo name="hour-glass" size={14} color="#d97706" />,
+      icon: <Entypo name="hour-glass" size={12} color="#d97706" />,
       label: `Hours: ${includes.number_of_hours || 0}`,
       show: includes.number_of_hours != null,
       bg: "#fffbeb",
@@ -82,7 +82,7 @@ const CourseIconsPreview = ({ includes }) => {
       icon: (
         <MaterialCommunityIcons
           name="clipboard-list-outline"
-          size={14}
+          size={12}
           color="#7c3aed"
         />
       ),
@@ -94,7 +94,7 @@ const CourseIconsPreview = ({ includes }) => {
       icon: (
         <MaterialCommunityIcons
           name="folder-multiple-outline"
-          size={14}
+          size={12}
           color="#db2777"
         />
       ),
@@ -103,7 +103,7 @@ const CourseIconsPreview = ({ includes }) => {
       bg: "#fdf2f8",
     },
     {
-      icon: <Entypo name="download" size={14} color="#2563eb" />,
+      icon: <Entypo name="download" size={12} color="#2563eb" />,
       label: `Resources: ${includes.number_of_downloadable_resources || 0}`,
       show: includes.number_of_downloadable_resources != null,
       bg: "#eff6ff",
@@ -112,7 +112,7 @@ const CourseIconsPreview = ({ includes }) => {
       icon: (
         <MaterialCommunityIcons
           name="timer-sand-full"
-          size={14}
+          size={12}
           color="#059669"
         />
       ),
@@ -124,7 +124,7 @@ const CourseIconsPreview = ({ includes }) => {
       icon: (
         <MaterialCommunityIcons
           name="calendar-month-outline"
-          size={14}
+          size={12}
           color="#ea580c"
         />
       ),
@@ -136,7 +136,7 @@ const CourseIconsPreview = ({ includes }) => {
       icon: (
         <MaterialCommunityIcons
           name="certificate-outline"
-          size={14}
+          size={12}
           color="#9333ea"
         />
       ),
@@ -168,11 +168,11 @@ const CourseIconsPreview = ({ includes }) => {
             bottom: 50,
             left: -18,
             width: CARD_WIDTH,
-            height: 170,
+            height: 155,
             backgroundColor: "#ffffff",
             borderRadius: 20,
             paddingHorizontal: 10,
-            paddingVertical: 4,
+            paddingVertical: 0,
             borderWidth: 1,
             borderColor: "rgba(255,255,255,0.8)",
             overflow: "hidden",
@@ -191,7 +191,7 @@ const CourseIconsPreview = ({ includes }) => {
               width: 100,
               height: 100,
               borderRadius: 50,
-              // backgroundColor: 'rgba(99, 102, 241, 0.12)',
+              backgroundColor: 'rgba(123, 241, 99, 0.12)',
             }}
           />
           <View
@@ -202,7 +202,7 @@ const CourseIconsPreview = ({ includes }) => {
               width: 120,
               height: 120,
               borderRadius: 60,
-              // backgroundColor: 'rgba(236, 72, 153, 0.08)',
+              backgroundColor: 'rgba(72, 97, 236, 0.08)',
             }}
           />
           <View
@@ -212,7 +212,7 @@ const CourseIconsPreview = ({ includes }) => {
               left: -40,
               width: 300,
               height: 30,
-              // backgroundColor: 'rgba(99, 102, 241, 0.03)',
+              backgroundColor: 'rgba(99, 102, 241, 0.03)',
               transform: [{ rotate: "-15deg" }],
             }}
           />
@@ -223,7 +223,7 @@ const CourseIconsPreview = ({ includes }) => {
               marginTop: 2,
               marginBottom: 2,
               borderBottomWidth: 1,
-              // borderBottomColor: 'rgba(0,0,0,0.03)',
+              borderBottomColor: 'rgba(0,0,0,0.03)',
               paddingBottom: 2,
             }}
           >
@@ -269,7 +269,7 @@ const CourseIconsPreview = ({ includes }) => {
                       <View
                         style={{
                           width: 24,
-                          height: 24,
+                          height: 18,
                           borderRadius: 6,
                           backgroundColor: item.bg || "#fff",
                           justifyContent: "center",
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
     marginBottom: 10,
   },
   headerTitle: { fontSize: 20, fontWeight: "900", color: "#0f172a" },
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: { fontSize: 14, fontWeight: "800", color: "#6366f1" },
 
-  scrollContainer: { paddingLeft: 10, paddingRight: 4 },
+  scrollContainer: { paddingLeft: 20,marginRight:20 },
 
   cardContainer: {
     width: CARD_WIDTH,
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
   },
   tooltipCard: {
     width: CARD_WIDTH,
-    maxHeight: 180,
+    maxHeight: 190,
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 10,

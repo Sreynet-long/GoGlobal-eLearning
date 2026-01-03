@@ -1,4 +1,3 @@
-import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import {
@@ -60,19 +59,19 @@ export default function Notification({ badgeCount = 3, notifications }) {
         activeOpacity={0.8}
         style={[styles.iconButton, open && styles.iconButtonActive]}
       >
-        <Entypo name="bell" size={24} color={COLORS.white} />
-        {badgeCount > 0 && (
+        <MaterialIcons name="notifications" size={20} color={COLORS.white} />
+        {/* {badgeCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
               {badgeCount > 9 ? "9+" : badgeCount}
             </Text>
           </View>
-        )}
+        )} */}
       </TouchableOpacity>
 
       {open && (
         <>
-          {/* Full-screen backdrop to close dropdown when clicked outside */}
+         
           <TouchableOpacity
             style={styles.backdrop}
             onPress={toggleOpen}
@@ -121,7 +120,7 @@ export default function Notification({ badgeCount = 3, notifications }) {
 const styles = StyleSheet.create({
   container: { position: "relative", zIndex: 1000 },
   iconButton: {
-    padding: 10,
+    padding: 0,
     borderRadius: 14,
    
   },
@@ -154,8 +153,8 @@ const styles = StyleSheet.create({
   dropdown: {
     position: "absolute",
     top: 55,
-    right: 10,
-    width: width * 0.85,
+    right: -20,
+    width: width * 0.95,
     backgroundColor: COLORS.white,
     borderRadius: 20,
     overflow: "visible",
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
   arrowUp: {
     position: "absolute",
     top: -10,
-    right: 22,
+    right: 18,
     width: 0,
     height: 0,
     borderLeftWidth: 10,
