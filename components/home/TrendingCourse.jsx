@@ -191,7 +191,7 @@ const CourseIconsPreview = ({ includes }) => {
               width: 100,
               height: 100,
               borderRadius: 50,
-              backgroundColor: 'rgba(123, 241, 99, 0.12)',
+              backgroundColor: "rgba(123, 241, 99, 0.12)",
             }}
           />
           <View
@@ -202,7 +202,7 @@ const CourseIconsPreview = ({ includes }) => {
               width: 120,
               height: 120,
               borderRadius: 60,
-              backgroundColor: 'rgba(72, 97, 236, 0.08)',
+              backgroundColor: "rgba(72, 97, 236, 0.08)",
             }}
           />
           <View
@@ -212,7 +212,7 @@ const CourseIconsPreview = ({ includes }) => {
               left: -40,
               width: 300,
               height: 30,
-              backgroundColor: 'rgba(99, 102, 241, 0.03)',
+              backgroundColor: "rgba(99, 102, 241, 0.03)",
               transform: [{ rotate: "-15deg" }],
             }}
           />
@@ -223,7 +223,7 @@ const CourseIconsPreview = ({ includes }) => {
               marginTop: 2,
               marginBottom: 2,
               borderBottomWidth: 1,
-              borderBottomColor: 'rgba(0,0,0,0.03)',
+              borderBottomColor: "rgba(0,0,0,0.03)",
               paddingBottom: 2,
             }}
           >
@@ -319,7 +319,7 @@ const CourseCard = ({ course, onPress }) => {
 
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9} delayPressIn={80}>
         <View
           style={styles.imageWrapper}
           onLayout={(e) => setImageLayout(e.nativeEvent.layout)}
@@ -381,6 +381,7 @@ export default function TrendingCourse() {
   const router = useRouter();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
+
   const [modalVisible, setModalVisible] = useState(false);
 
   const { data, loading, error } = useQuery(
@@ -397,7 +398,9 @@ export default function TrendingCourse() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>{t("Your_Learning_Journey", language)}</Text>
+          <Text style={styles.headerTitle}>
+            {t("Your_Learning_Journey", language)}
+          </Text>
           <Text style={styles.headerSubtitle}>
             {t("enroll_today", language)}
           </Text>
@@ -461,12 +464,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
-    justifyContent: "center",  
-    alignItems: "center", 
+    justifyContent: "center",
+    alignItems: "center",
   },
   seeAllText: { fontSize: 14, fontWeight: "800", color: "#6366f1" },
 
-  scrollContainer: { paddingLeft: 20,marginRight:20 },
+  scrollContainer: { paddingLeft: 20, marginRight: 20 },
 
   cardContainer: {
     width: CARD_WIDTH,
@@ -507,8 +510,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(73,77,85,0.6)",
     padding: 3,
     borderRadius: 4,
-    borderWidth:1,
-    borderColor:"white"
+    borderWidth: 1,
+    borderColor: "white",
   },
 
   discountPill: {
@@ -543,14 +546,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   freeText: {
-    alignSelf: "flex-start", 
+    alignSelf: "flex-start",
     marginTop: 10,
     fontSize: 15,
     fontWeight: "900",
     color: "#10b981",
     backgroundColor: "#10b98123",
     paddingHorizontal: 6,
-    paddingVertical: 2, 
+    paddingVertical: 2,
     borderRadius: 5,
   },
 

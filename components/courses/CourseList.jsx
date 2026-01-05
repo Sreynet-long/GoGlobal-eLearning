@@ -5,27 +5,21 @@ import {
   Dimensions,
   FlatList,
   Image,
-  Modal,
-  Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_WITH_PAGINATION } from "../../schema/course";
-import CourseIncludes from "./CourseInclude";
+import CourseDetailModal from "./CourseDetailModal";
 import EmptyCourse from "./EmptyCourse";
-import EnrolledButton from "./EnrolledButton";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-// Helper to safely render text strings
 const renderText = (value) => {
   if (!value) return "";
   if (Array.isArray(value)) return "• " + value.join("\n• ");
@@ -121,7 +115,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           <View style={styles.cardBody}>
             <Text style={styles.textTitle} numberOfLines={2}>
               {renderText(item.title)}
-            </Text> 
+            </Text>
             {item.has_enrolled ? (
               <>
                 {item.has_course_completed ? (
@@ -222,163 +216,13 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ]}
         ListEmptyComponent={<EmptyCourse />}
       />
-      <Modal
+
+      <CourseDetailModal
         visible={modalVisible}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setModalVisible(false)}
-        >
-          <Pressable
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHandle} />
+        course={selectedCourse}
+        onClose={() => setModalVisible(false)}
+      />
 
-            <ScrollView
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={{ paddingBottom: 40 }}
-              keyboardShouldPersistTaps="handled"
-              // bounces={false} 
-            >
-              {selectedCourse ? (
-                <>
-                  <Image
-                    source={{
-                      uri: `${IMAGE_BASE_URL}/file/${selectedCourse.thumbnail}`,
-                    }}
-                    style={styles.modalImage}
-                  />
-                  <Text style={styles.modalTitle}>
-                    {renderText(selectedCourse.title)} 
-                  </Text>
-
-                  {selectedCourse.has_enrolled ? (
-                    <>
-                      {selectedCourse.has_course_completed ? (
-                        <View style={styles.completedBadge}>
-                          <Text style={styles.completedText}>Completed</Text>
-                        </View>
-                      ) : (
-                        <>
-                          <Text style={styles.progressText}>
-                            Progress:{" "}
-                            {selectedCourse.overall_completion_percentage}%
-                          </Text>
-                          <View style={styles.progressBarContainer}>
-                            <View
-                              style={[
-                                styles.progressBar,
-                                {
-                                  width: `${selectedCourse.overall_completion_percentage}%`,
-                                },
-                              ]}
-                            />
-                          </View>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {selectedCourse.sell_price != null && (
-                        <View style={styles.modalPriceRow}>
-                          <Text style={styles.modalSellPrice}>
-                            ${Number(selectedCourse.sell_price).toFixed(2)}
-                          </Text>
-                          {selectedCourse.original_price >
-                            selectedCourse.sell_price && (
-                            <Text style={styles.modalOldPrice}>
-                              $
-                              {Number(selectedCourse.original_price).toFixed(2)}
-                            </Text>
-                          )}
-                        </View>
-                      )}
-                      <EnrolledButton
-                        course={selectedCourse}
-                        onSuccess={() => setModalVisible(false)}
-                      />
-                    </>
-                  )}
-
-                  <View style={styles.sectionDivider}>
-                    <Text style={styles.includesTitle}>Course Includes:</Text>
-                    <Divider style={{ marginVertical: 10 }} />
-                    <CourseIncludes course={selectedCourse} />
-                  </View>
-
-                  <View style={styles.sectionWhatULearn}>
-                    <Text style={styles.title}>What you'll learn:</Text>
-                    {selectedCourse?.what_you_learn?.trim() ? (
-                      <>
-                        {selectedCourse?.what_you_learn
-                          ?.split("\n")
-                          .map((line, index) => (
-                            <Text key={index} style={styles.paragraph}>
-                              • {line}
-                            </Text>
-                          ))}
-                      </>
-                    ) : (
-                      <Text style={styles.emptyText}>No content here.</Text>
-                    )}
-
-                    <Text style={styles.title}>Who this course is for:</Text>
-                    {selectedCourse?.who_this_course_is_for?.trim() ? (
-                      <>
-                        {selectedCourse?.who_this_course_is_for
-                          ?.split("\n")
-                          .map((line, index) => (
-                            <Text key={index} style={styles.paragraph}>
-                              • {line}
-                            </Text>
-                          ))}
-                      </>
-                    ) : (
-                      <Text style={styles.emptyText}>No content here.</Text>
-                    )}
-
-                    <Text style={styles.title}>Requirements:</Text>
-                    {selectedCourse?.requirements?.trim() ? (
-                      <>
-                        {selectedCourse?.requirements
-                          ?.split("\n")
-                          .map((line, index) => (
-                            <Text key={index} style={styles.paragraph}>
-                              • {line}
-                            </Text>
-                          ))}
-                      </>
-                    ) : (
-                      <Text style={styles.emptyText}>No content here.</Text>
-                    )}
-
-                    <Text style={styles.title}>Description:</Text>
-                    {selectedCourse?.description?.trim() ? (
-                      <>
-                        {selectedCourse?.description
-                          ?.split("\n")
-                          .map((line, index) => (
-                            <Text key={index} style={styles.paragraph}>
-                              • {line}
-                            </Text>
-                          ))}
-                      </>
-                    ) : (
-                      <Text style={styles.emptyText}>No content here.</Text>
-                    )}
-                  </View>
-
-                  <View style={{ height: 30 }} />
-                </>
-              ) : null}
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </View>
   );
 }
@@ -440,54 +284,6 @@ const styles = StyleSheet.create({
   textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
   textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
 
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    height: SCREEN_HEIGHT * 0.86,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingTop: 10,
-  },
-  modalHandle: {
-    width: 40,
-    height: 5,
-    backgroundColor: "#E0E0E0",
-    borderRadius: 3,
-    alignSelf: "center",
-    marginBottom: 15,
-  },
-  modalImage: { width: "100%", height: 200, borderRadius: 15 },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#1A1A1A",
-    marginTop: 15,
-  },
-  modalPriceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  modalSellPrice: { fontSize: 28, fontWeight: "800", color: "#3F51B5" },
-  modalOldPrice: {
-    fontSize: 18,
-    color: "#999",
-    textDecorationLine: "line-through",
-    marginLeft: 10,
-  },
-
-  sectionDivider: {
-    marginTop: 20,
-    backgroundColor: "#F9F9F9",
-    padding: 15,
-    borderRadius: 12,
-  },
-  includesTitle: { fontWeight: "700", fontSize: 16, color: "#444" },
   sectionBox: { marginTop: 5, padding: 15, borderRadius: 12 },
   sectionText: {
     fontSize: 14,
@@ -559,28 +355,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  bulletRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 6,
-  },
-
-  bullet: {
-    marginRight: 8,
-    fontSize: 16,
-    lineHeight: 20,
-    color: "#3F51B5",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginVertical: 10,
-  },
-  emptyText: {
-    fontSize: 13,
-    marginBottom: 10,
-    color: "rgba(0, 0, 0, 1)",
-    fontStyle: "italic",
-  },
-  paragraph: { fontSize: 16, lineHeight: 24, marginBottom: 6, color: "#333" },
 });

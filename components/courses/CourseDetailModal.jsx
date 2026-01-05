@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
 import {
-  Animated,
   Dimensions,
   Image,
   Modal,
@@ -12,96 +12,76 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { GET_COURSE_BY_ID } from "../../schema/course";
 import CourseIncludes from "./CourseInclude";
 import EnrolledButton from "./EnrolledButton";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
+// helper
 const renderText = (value) => {
-  if (!value) return null;
-
-  if (Array.isArray(value)) {
-     return (
-    <View>
-      {includes.map((item, index) => (
-        <Text key={index} style={{ fontSize: 14, marginBottom: 5 }}>
-          • {item}
-        </Text>
-      ))}
-    </View>
-  );
-}
-
-  if (typeof value === "object") return null;
-
-  return <Text style={styles.sectionText}>{String(value)}</Text>;
+  if (!value) return "";
+  if (Array.isArray(value)) return "• " + value.join("\n• ");
+  if (typeof value === "object") return "";
+  return String(value);
 };
 
-export default function CourseDetailModal({ visible, onClose, course }) {
-  const progressAnim = useRef(new Animated.Value(0)).current;
+export default function CourseDetailModal({ visible, course, onClose }) {
+  const [fullCourse, setFullCourse] = useState(course);
+
+  const { data } = useQuery(GET_COURSE_BY_ID, {
+    variables: { courseId: course?._id },
+    skip: !course || course.what_you_learn, 
+  });
 
   useEffect(() => {
-    if (course?.overall_completion_percentage != null) {
-      Animated.timing(progressAnim, {
-        toValue: Number(course.overall_completion_percentage),
-        duration: 800,
-        useNativeDriver: false,
-      }).start();
+    if (data?.getCourseById) {
+      setFullCourse(data.getCourseById);
+    } else {
+      setFullCourse(course);
     }
-  }, [course]);
+  }, [data, course]);
 
-  if (!course) return null;
-
-  const includes = course?.course_includes;
+  if (!fullCourse) return null;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent>
       <Pressable style={styles.modalOverlay} onPress={onClose}>
         <Pressable
           style={styles.modalContent}
           onPress={(e) => e.stopPropagation()}
         >
           <View style={styles.modalHandle} />
-
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 40 }}
           >
-            {course.thumbnail && (
-              <Image
-                source={{ uri: `${IMAGE_BASE_URL}/file/${course.thumbnail}` }}
-                style={styles.modalImage}
-                resizeMode="cover"
-              />
-            )}
+            <Image
+              source={{ uri: `${IMAGE_BASE_URL}/file/${fullCourse.thumbnail}` }}
+              style={styles.modalImage}
+            />
+            <Text style={styles.modalTitle}>
+              {renderText(fullCourse.title)}
+            </Text>
 
-            <Text style={styles.modalTitle}>{String(course.title)}</Text>
-
-            {course.has_enrolled ? (
-              course.has_course_complated ? (
+            {/* ===== ENROLLED / PRICE ===== */}
+            {fullCourse.has_enrolled ? (
+              fullCourse.has_course_completed ? (
                 <View style={styles.completedBadge}>
                   <Text style={styles.completedText}>Completed</Text>
                 </View>
               ) : (
                 <>
                   <Text style={styles.progressText}>
-                    Progress:{" "}
-                    {Number(course.overall_completion_percentage || 0)}%
+                    Progress: {fullCourse.overall_completion_percentage}%
                   </Text>
                   <View style={styles.progressBarContainer}>
-                    <Animated.View
+                    <View
                       style={[
                         styles.progressBar,
                         {
-                          width: progressAnim.interpolate({
-                            inputRange: [0, 100],
-                            outputRange: ["0%", "100%"],
-                          }),
+                          width: `${fullCourse.overall_completion_percentage}%`,
                         },
                       ]}
                     />
@@ -110,58 +90,38 @@ export default function CourseDetailModal({ visible, onClose, course }) {
               )
             ) : (
               <>
-                {course.sell_price != null && (
-                  <View style={styles.modalPriceRow}>
-                    <Text style={styles.modalSellPrice}>
-                      ${Number(course.sell_price).toFixed(2)}
+                <View style={styles.modalPriceRow}>
+                  <Text style={styles.modalSellPrice}>
+                    ${Number(fullCourse.sell_price).toFixed(2)}
+                  </Text>
+                  {fullCourse.original_price > fullCourse.sell_price && (
+                    <Text style={styles.modalOldPrice}>
+                      ${Number(fullCourse.original_price).toFixed(2)}
                     </Text>
-                    {course.original_price &&
-                      course.original_price > course.sell_price && (
-                        <Text style={styles.modalOldPrice}>
-                          ${Number(course.original_price).toFixed(2)}
-                        </Text>
-                      )}
-                  </View>
-                )}
-                <EnrolledButton course={course} onSuccess={onClose} />
+                  )}
+                </View>
+                <EnrolledButton course={fullCourse} onSuccess={onClose} />
               </>
             )}
 
+            {/* ===== COURSE INCLUDES ===== */}
             <View style={styles.sectionDivider}>
               <Text style={styles.includesTitle}>Course Includes:</Text>
               <Divider style={{ marginVertical: 10 }} />
-              {includes ? (
-                <CourseIncludes course={course} />
-              ) : (
-                <Text style={styles.emptyText}>• No course details available</Text>
-              )}
+              <CourseIncludes course={fullCourse} />
             </View>
 
-            <View style={styles.sectionBox}>
-              <Text style={styles.includesTitle}>What you'll learn:</Text>
-              <Divider style={{ marginVertical: 8 }} />
-              {renderText(course.what_you_learn)}
-            </View>
-
-            <View style={styles.sectionBox}>
-              <Text style={styles.includesTitle}>Who this course is for:</Text>
-              <Divider style={{ marginVertical: 8 }} />
-              {renderText(course.who_this_course_is_for)}
-            </View>
-
-            <View style={styles.sectionBox}>
-              <Text style={styles.includesTitle}>Requirements:</Text>
-              <Divider style={{ marginVertical: 8 }} />
-              {renderText(course.requirements)}
-            </View>
-
-            <View style={styles.sectionBox}>
-              <Text style={styles.includesTitle}>Description:</Text>
-              <Divider style={{ marginVertical: 8 }} />
-              {renderText(course.description)}
-            </View>
-
-            <View style={{ height: 30 }} />
+            {/* ===== TEXT SECTIONS ===== */}
+            <Section
+              title="What you'll learn"
+              value={fullCourse.what_you_learn}
+            />
+            <Section
+              title="Who this course is for"
+              value={fullCourse.who_this_course_is_for}
+            />
+            <Section title="Requirements" value={fullCourse.requirements} />
+            <Section title="Description" value={fullCourse.description} />
           </ScrollView>
         </Pressable>
       </Pressable>
@@ -169,6 +129,23 @@ export default function CourseDetailModal({ visible, onClose, course }) {
   );
 }
 
+/* ===== SMALL SUB COMPONENT ===== */
+const Section = ({ title, value }) => (
+  <View style={{ padding: 15 }}>
+    <Text style={styles.title}>{title}:</Text>
+    {value?.trim() ? (
+      value.split("\n").map((line, i) => (
+        <Text key={i} style={styles.paragraph}>
+          • {line}
+        </Text>
+      ))
+    ) : (
+      <Text style={styles.emptyText}>No content here.</Text>
+    )}
+  </View>
+);
+
+/* ===== STYLES ===== */
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -177,11 +154,10 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    height: SCREEN_HEIGHT * 0.86,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    maxHeight: SCREEN_HEIGHT * 0.84,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     padding: 20,
-    paddingTop: 10,
   },
   modalHandle: {
     width: 40,
@@ -191,7 +167,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 15,
   },
-  scrollContent: { paddingBottom: 20 },
   modalImage: { width: "100%", height: 200, borderRadius: 15 },
   modalTitle: { fontSize: 22, fontWeight: "800", marginTop: 15 },
   modalPriceRow: {
@@ -202,44 +177,33 @@ const styles = StyleSheet.create({
   modalSellPrice: { fontSize: 28, fontWeight: "800", color: "#3F51B5" },
   modalOldPrice: {
     fontSize: 18,
-    color: "#999",
+    color: "#e61111ff",
     textDecorationLine: "line-through",
     marginLeft: 10,
   },
-  includesTitle: { fontWeight: "700", fontSize: 16 },
   sectionDivider: {
     marginTop: 20,
     backgroundColor: "#F9F9F9",
     padding: 15,
     borderRadius: 12,
   },
-  sectionBox: {
-    marginTop: 15,
-    padding: 15,
-    borderRadius: 12,
-    backgroundColor: "#F9F9F9",
-  },
-  sectionText: { fontSize: 14, lineHeight: 20 },
-  progressText: { fontSize: 16, fontWeight: "600", marginTop: 10 },
+  includesTitle: { fontWeight: "700", fontSize: 16 },
+  progressText: { fontSize: 14, fontWeight: "600", color: "#3F51B5" },
   progressBarContainer: {
     height: 10,
     backgroundColor: "#E0E0E0",
     borderRadius: 5,
     marginVertical: 8,
-    overflow: "hidden",
   },
-  progressBar: { height: 10, backgroundColor: "#3F51B5", borderRadius: 5 },
+  progressBar: { height: 10, backgroundColor: "#3F51B5" },
   completedBadge: {
     backgroundColor: "#E6F7E6",
-    padding: 8,
+    padding: 10,
     borderRadius: 6,
-    marginTop: 8,
+    marginTop: 10,
   },
   completedText: { color: "#2E7D32", fontWeight: "700" },
-  emptyText: {
-    fontSize: 15,
-    color: "#999",
-    fontStyle: "italic",
-    marginTop: 5,
-  },
+  title: { fontSize: 16, fontWeight: "600", marginBottom: 6 },
+  paragraph: { fontSize: 16, lineHeight: 24, marginBottom: 6, color: "#333" },
+  emptyText: { fontStyle: "italic", color: "#888" },
 });

@@ -114,7 +114,6 @@ export default function EnrolledCourses({ searchText }) {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
-    setCourses([]);
     await refetch({
       page: 1,
       limit: 50,

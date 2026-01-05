@@ -139,12 +139,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#FFD700",
-    marginBottom: 4,
+    marginBottom: 5,
   },
   slideSubtitle: {
     fontSize: 14,
+    fontWeight: "700",
     color: "#fff",
-    marginBottom: 12,
+    marginBottom: 15,
   },
   slideButton: {
     backgroundColor: "#fff",
@@ -157,6 +158,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 10
   },
   slideButtonText: {
     color: "#25375A",

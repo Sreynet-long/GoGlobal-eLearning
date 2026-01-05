@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   header: {
   flexDirection: "row",
   justifyContent: "space-between",
-  paddingHorizontal: 10,
+  paddingHorizontal: 30,
   marginBottom: 10,
 },
 
@@ -263,7 +263,7 @@ seeAllBtn: {
   paddingVertical: 6,
   borderRadius: 15,
   justifyContent: "center",  
-  alignItems: "center",  
+  alignItems: "center",
 },
 
 seeAllText: {
@@ -271,10 +271,11 @@ seeAllText: {
   fontWeight: "800",
   color: "#6366f1",
   textAlign:"center"
+  
 },
 
 
-  scrollContainer: { paddingLeft: 10, paddingRight: 4 },
+  scrollContainer: { paddingLeft: 20, paddingRight: 4 },
 
   cardContainer: {
     width: CARD_WIDTH,

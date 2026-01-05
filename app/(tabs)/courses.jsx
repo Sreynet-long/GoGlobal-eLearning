@@ -29,10 +29,6 @@ export default function Courses() {
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
 
-        {/* <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        > */}
           <CourseList
             selectedCategoryId={selectedCategoryId}
             searchText={searchText}
@@ -55,5 +51,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingBottom: 30,
   },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 80, paddingTop: 12 },
+  scrollContent: { paddingHorizontal: 12, paddingBottom: 80, paddingTop: 12 },
 });
