@@ -28,12 +28,13 @@ export default function Courses() {
         <View style={{ paddingHorizontal: 16 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
-
+        {/* <View style={styles.scrollContent}> */}
           <CourseList
             selectedCategoryId={selectedCategoryId}
             searchText={searchText}
             language={language}
           />
+          {/* </View> */}
       </View>
     </View>
   );
@@ -51,5 +52,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingBottom: 30,
   },
-  scrollContent: { paddingHorizontal: 12, paddingBottom: 80, paddingTop: 12 },
+  scrollContent: { paddingHorizontal: 5, paddingBottom: 80, paddingTop: 12 },
 });

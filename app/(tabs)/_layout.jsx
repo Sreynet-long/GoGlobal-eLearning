@@ -3,10 +3,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, StatusBar} from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
+const NAVIGATION_HEIGHT = Platform.OS === "ios" ? 40 : (StatusBar.currentHeight || 0) + -5;
 
 export default function TabsLayout() {
   const { isAuth } = useAuth();
@@ -22,7 +23,7 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: "#25375A",
           position: "absolute",
-          bottom: 40,
+          bottom: NAVIGATION_HEIGHT,
           marginHorizontal:15,
           left: 40,
           right: 40,

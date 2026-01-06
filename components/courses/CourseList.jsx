@@ -124,17 +124,21 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                   </View>
                 ) : (
                   <>
-                    <Text style={styles.progressText}>
-                      {item.overall_completion_percentage}% Completed
-                    </Text>
                     <View style={styles.progressBarContainer}>
+                      <View style={styles.progressBarBackground}>
                       <View
                         style={[
-                          styles.progressBar,
+                          styles.progressBarFill,
                           { width: `${item.overall_completion_percentage}%` },
                         ]}
                       />
+                      </View>
+                        <Text style={styles.progressText}>
+                          {item.overall_completion_percentage}%
+                        </Text>
+                      
                     </View>
+
                     <View style={styles.cardFooter}>
                       <View
                         style={[
@@ -222,7 +226,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         course={selectedCourse}
         onClose={() => setModalVisible(false)}
       />
-
     </View>
   );
 }
@@ -240,7 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#FFF",
     borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: "#F0F0F0",
     shadowColor: "#000",
@@ -292,21 +295,34 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flex: 1,
   },
+  progressBarContainer: {
+    flexDirection: "row",         
+    alignItems: "center",
+    width: "100%",
+  },
+
+  progressBarBackground: {
+    flex: 1,                      
+    height: 8,
+    backgroundColor: "#E0E0E0",   
+    borderRadius: 4,
+    overflow: "hidden",            
+    marginRight: 8,
+  },
+
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#22c55e",
+    borderRadius: 4,
+  },
 
   progressText: {
     fontSize: 14,
-    fontWeight: "600",
-    marginTop: 10,
-    color: "#3F51B5",
-    marginLeft: 100,
+    color: "#22c55e",
+    fontWeight: "700",
+    minWidth: 40,
+    textAlign: "right",
   },
-  progressBarContainer: {
-    height: 10,
-    backgroundColor: "#E0E0E0",
-    borderRadius: 5,
-    marginVertical: 8,
-  },
-  progressBar: { height: 10, backgroundColor: "#3F51B5", borderRadius: 5 },
   completedBadge: {
     backgroundColor: "#E6F7E6",
     paddingHorizontal: 10,
@@ -354,5 +370,4 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flex: 1,
   },
-
 });

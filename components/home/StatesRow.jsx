@@ -13,7 +13,7 @@ const StatItem = ({ label, icon, color }) => (
     </View>
     
     <View style={styles.textWrapper}>
-      <Text style={styles.statLabel} numberOfLines={2}>
+      <Text style={styles.statLabel} numberOfLines={3}>
         {label}
       </Text>
       <View style={[styles.dot, { backgroundColor: color }]} />
@@ -98,8 +98,9 @@ const styles = StyleSheet.create({
     color: "#334155",
     textAlign: "center",
     letterSpacing: 0.8,
-    lineHeight: 10,
+    lineHeight: 15,
     maxWidth: 60,
+    
   },
   dot: {
     width: 3,

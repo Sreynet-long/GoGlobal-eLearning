@@ -20,17 +20,20 @@ export default function VideoList({
   completedVideo,
   onToggleComplete,
 }) {
-  const { data, loading, error } = useQuery(GET_VIDEO_CONTENT_WITH_PAGINATION, {
-    variables: {
-      contentSectionId: sectionId,
-      page: 1,
-      limit: 50,
-      pagination: false,
-      keyword: "",
-    },
-    skip: !sectionId,
-    fetchPolicy: "cache-and-network",
-  });
+  const { data, loading, error, refetch } = useQuery(
+    GET_VIDEO_CONTENT_WITH_PAGINATION,
+    {
+      variables: {
+        contentSectionId: sectionId,
+        page: 1,
+        limit: 50,
+        pagination: false,
+        keyword: "",
+      },
+      skip: !sectionId,
+      fetchPolicy: "cache-and-network",
+    }
+  );
 
   if (loading)
     return <ActivityIndicator style={{ margin: 12, color: "#4F78FF" }} />;
@@ -65,7 +68,10 @@ export default function VideoList({
               onPress={() => onSelectVideo(video)}
             >
               <TouchableOpacity
-                onPress={() => onToggleComplete(video._id, !isCompleted)}
+                onPress={() => {
+                  onToggleComplete(video._id, !isCompleted);
+                  refetch();
+                }}
               >
                 <MaterialCommunityIcons
                   name={isCompleted ? "check-circle" : "play-circle-outline"}

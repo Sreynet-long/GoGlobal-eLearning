@@ -198,6 +198,7 @@ export default function CoursePlayerScreen() {
             style={styles.videoWrapper}
             useNativeControls
             resizeMode="contain"
+            shouldPlay={true}
             isLooping={false}
             onPlaybackStatusUpdate={(status) =>
               status.didJustFinish && handleVideoFinish(selectedVideo)

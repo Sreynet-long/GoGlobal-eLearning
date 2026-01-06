@@ -5,10 +5,12 @@ import { GET_COURSE_BY_ID, VIDEO_PROCESS_STATUS } from "../../schema/course";
 export function useVideoCompletion(
   enrolledId,
   courseId,
-  backendCompleted = []
+  backendCompleted = [],
+  refetch
 ) {
   const [completedVideoIds, setCompletedVideoIds] = useState([]);
-  const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS);
+  const [videoProcessStatus] = useMutation(VIDEO_PROCESS_STATUS,{
+  });
 
   const syncedRef = useRef(false);
 

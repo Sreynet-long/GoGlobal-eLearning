@@ -24,13 +24,21 @@ const { width } = Dimensions.get("window");
 const CourseCard = ({ item, language, onPress }) => {
   const progress = item.overall_completion_percentage ?? 0;
 
-  const getCourseActionLabel = () => {
-    if (item.has_course_completed || progress === 100) return "Completed";
-    if (progress > 0) return "Continue";
-    return "Start course";
+  // const getCourseActionLabel = () => {
+  //   if (item.has_course_completed || progress === 100) return "Completed";
+  //   if (progress > 0) return "Continue";
+  //   return "Start course";
+  // };
+  const getCourseAction = () => {
+    if (item.has_course_completed || progress === 100) 
+      return { label: "Completed", type: "completed" };
+
+    if (progress > 0) return { label: "Continue", type: "continue" };
+      return { label: "Start course", type: "start" };
+    
   };
 
-  const actionLabel = getCourseActionLabel();
+  const actionLabel = getCourseAction();
 
   return (
     <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={onPress}>
@@ -44,25 +52,34 @@ const CourseCard = ({ item, language, onPress }) => {
           {item.title}
         </Text>
 
-        <View style={styles.progressSection}>
-          <Text style={styles.progressText}>
-            {progress}% {t("completed", language)}
-          </Text>
-
-          <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBar, { width: `${progress}%` }]} />
+        <View style={styles.progressBarContainer}>
+          <View style={styles.progressBarBackground}>
+            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
           </View>
+          <Text style={styles.progressText}>{progress}%</Text>
         </View>
 
         <View style={styles.cardFooter}>
-          <Text
-            style={[
-              styles.continueText,
-              actionLabel === "Completed" && styles.completedText,
-            ]}
-          >
-            {actionLabel}
-          </Text>
+          <View style={styles.enrollBadge}>
+            <Text
+              style={[
+                styles.continueText,
+                actionLabel.type === "Completed" && styles.completedText,
+              ]}
+            >
+              <Text
+                style={[
+                  actionLabel.type === "completed"
+                    ? styles.completedText
+                    : actionLabel.type === "continue"
+                    ? styles.textContinue
+                    : styles.textEnroll,
+                ]}
+              >
+                {actionLabel.label}
+              </Text>
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -224,32 +241,46 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   progressSection: { marginTop: 10 },
-  progressInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
+
   progressBarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     width: "100%",
-    height: 10,
+  },
+
+  progressBarBackground: {
+    flex: 1,
+    height: 8,
     backgroundColor: "#E0E0E0",
-    borderRadius: 5,
-    marginVertical: 8,
+    borderRadius: 4,
     overflow: "hidden",
+    marginRight: 8,
   },
-  progressBar: {
-    backgroundColor: "#3F51B5",
-    height: 10,
-    borderRadius: 5,
-    transitionProperty: "width",
+
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#22c55e",
+    borderRadius: 4,
   },
+
   progressText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#3F51B5",
-    marginLeft: 100,
+    color: "#22c55e",
+    fontWeight: "700",
+    minWidth: 40,
+    textAlign: "right",
   },
-  cardFooter: { marginTop: 8, alignItems: "flex-end"},
+  completedText: { color: "#2E7D32", fontWeight: "700", fontSize: 14 },
+textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
+  textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
+
+  cardFooter: { marginTop: 8, alignItems: "flex-end" },
+  enrollBadge: {
+    backgroundColor: "#F0F2FF",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
   continueText: { fontSize: 12, fontWeight: "600", color: "#3F51B5" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

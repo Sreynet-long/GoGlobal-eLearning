@@ -13,7 +13,7 @@ import Flag_kh from "../../assets/flags/kh.png";
 import { useLanguage } from "../../context/LanguageContext";
 import Notification from "./Notification";
 
-const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 60 : (StatusBar.currentHeight || 0) + 15;
+const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 60 : (StatusBar.currentHeight || 0) + 1;
 
 const COLORS = {
   primary: "#25375A",
