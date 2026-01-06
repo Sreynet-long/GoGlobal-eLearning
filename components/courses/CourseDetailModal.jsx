@@ -114,6 +114,7 @@ export default function CourseDetailModal({ visible, course, onClose }) {
             {/* ===== TEXT SECTIONS ===== */}
             <Section
               title="What you'll learn"
+              
               value={fullCourse.what_you_learn}
             />
             <Section

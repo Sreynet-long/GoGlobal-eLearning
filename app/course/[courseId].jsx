@@ -194,7 +194,7 @@ export default function CoursePlayerScreen() {
         <View style={styles.videoWrapper}>
           <Video
             ref={videoRef}
-            source={{ uri: FILE_BASE_URL + selectedVideo.video_src }}
+            source={{ uri: FILE_BASE_URL + selectedVideo.video_src }} 
             style={styles.videoWrapper}
             useNativeControls
             resizeMode="contain"
