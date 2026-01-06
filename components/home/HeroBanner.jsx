@@ -16,7 +16,7 @@ import { t } from "../../lang";
 import { GET_COURSE_BANNER_WITH_PAGINATION } from "../../schema/courseHomepage";
 
 const { width: screenWidth } = Dimensions.get("window");
-const SLIDE_MARGIN = 16;
+const SLIDE_MARGIN = 20;
 const SLIDE_WIDTH = screenWidth - SLIDE_MARGIN * 1;
 const AUTOSCROLL_INTERVAL = 4000;
 
@@ -115,7 +115,7 @@ const HeroBanner = () => {
 const styles = StyleSheet.create({
   carouselContainer: {
     marginVertical: 5,
-    marginHorizontal:20,
+    marginHorizontal:10,
     height: 200,
   },
   slide: {
