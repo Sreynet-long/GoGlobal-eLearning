@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 25,
     paddingTop: 20,
-    paddingBottom: 80,
+    paddingBottom: 90,
   },
   menuTitle: {
     fontSize: 18,

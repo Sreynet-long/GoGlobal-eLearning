@@ -114,7 +114,7 @@ export default function ContactUsScreen() {
               {t("contact_us", language) || "Contact Us"}
             </Text>
             <Text style={styles.heroSubtitle}>
-              {t("we'll_provide_u_with_the_best_service_possible", language) ||
+              {t("well_provide_u_with_the_best_service_possible", language) ||
                 "We'll provide you with the best service possible"}
             </Text>
           </View>
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonContent: { height: 54 },
-  buttonLabel: { fontSize: 16, fontWeight: "700" },
+  buttonLabel: { fontSize: 16, fontWeight: "700", paddingTop: 3, alignSelf: "center" },
   socialContainer: { alignItems: "center", marginTop: 35 },
   socialText: {
     fontSize: 12,

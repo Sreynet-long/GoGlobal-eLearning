@@ -7,10 +7,7 @@ import Topbar from "../../components/headers/Topbar";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
-
-
 export default function Courses() {
-  
   const { language } = useLanguage();
   const [searchText, setSearchText] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("All");
@@ -28,13 +25,13 @@ export default function Courses() {
         <View style={{ paddingHorizontal: 16 }}>
           <FeatureCategory onSelectedCategory={setSelectedCategoryId} />
         </View>
-        {/* <View style={styles.scrollContent}> */}
-          <CourseList
-            selectedCategoryId={selectedCategoryId}
-            searchText={searchText}
-            language={language}
-          />
-          {/* </View> */}
+
+        <CourseList
+          style={styles.scrollContent}
+          selectedCategoryId={selectedCategoryId}
+          searchText={searchText}
+          language={language}
+        />
       </View>
     </View>
   );
@@ -52,5 +49,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     // paddingBottom: 30,
   },
-  // scrollContent: {paddingBottom: 20 },
+  scrollContent: { paddingBottom: 20 },
 });

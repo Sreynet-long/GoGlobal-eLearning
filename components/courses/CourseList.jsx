@@ -225,6 +225,8 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           courses.length === 0 && { flex: 1 },
         ]}
         ListEmptyComponent={<EmptyCourse />}
+        ListFooterComponent={<View style={{ height: 120 }} />}
+
       />
 
       <CourseDetailModal
@@ -240,7 +242,7 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     paddingHorizontal: 18,
     paddingTop: 20,
-    paddingBottom: 130,
+    // paddingBottom: 130,
   },
   textHeader: {
     fontSize: 20,

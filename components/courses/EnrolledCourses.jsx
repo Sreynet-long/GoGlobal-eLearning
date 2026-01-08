@@ -196,7 +196,7 @@ export default function EnrolledCourses({ searchText }) {
               style={{ margin: 20 }}
             />
           ) : (
-            <View style={{ height: 40 }} />
+            <View style={{ height: 120 }} />
           )
         }
       />

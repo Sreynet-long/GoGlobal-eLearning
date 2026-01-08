@@ -202,22 +202,20 @@ export default function FreeCourse() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-  <View>
-    <Text style={styles.headerTitle}>
-      {t("start_learning_for_free", language)}
-    </Text>
-    <Text style={styles.headerSubtitle}>
-      Unlock your potential today
-    </Text>
-  </View>
+        <View>
+          <Text style={styles.headerTitle}>
+            {t("start_learning_for_free", language)}
+          </Text>
+          <Text style={styles.headerSubtitle}>
+            {/* {t("unlock_your_potential_today", language)} */}
+            Unlock your potential today!
+          </Text>
+        </View>
 
-  <TouchableOpacity style={styles.seeAllBtn}>
-    <Text style={styles.seeAllText}>
-      {t("view_all", language)}
-    </Text>
-  </TouchableOpacity>
-</View>
-
+        <TouchableOpacity style={styles.seeAllBtn}>
+          <Text style={styles.seeAllText}>{t("view_all", language)}</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView
         horizontal
@@ -239,44 +237,41 @@ const styles = StyleSheet.create({
   container: { marginVertical: 15 },
 
   header: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  paddingHorizontal: 23,
-  marginBottom: 10,
-},
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 23,
+    marginBottom: 10,
+  },
 
-headerTitle: {
-  fontSize: 20,
-  fontWeight: "900",
-  color: "#0f172a",
-},
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#0f172a",
+  },
 
-headerSubtitle: {
-  fontSize: 12,
-  color: "#94a3b8",
-  fontWeight: "600",
-},
+  headerSubtitle: {
+    fontSize: 12,
+    color: "#94a3b8",
+    fontWeight: "600",
+  },
 
-seeAllBtn: {
-  backgroundColor: "#cbc0ff3f",
-  paddingHorizontal: 9,
-  // paddingVertical: 6,
-  borderRadius: 15,
-  justifyContent: "center",  
-  alignItems: "center",
-  height: 25,
-  marginTop: 3,
+  seeAllBtn: {
+    backgroundColor: "#cbc0ff3f",
+    paddingHorizontal: 9,
+    // paddingVertical: 6,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 25,
+    marginTop: 3,
+  },
 
-},
-
-seeAllText: {
-  fontSize: 12,
-  fontWeight: "700",
-  color: "#6366f1",
-  textAlign:"center"
-  
-},
-
+  seeAllText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#6366f1",
+    textAlign: "center",
+  },
 
   scrollContainer: { paddingLeft: 20, paddingRight: 4 },
 
@@ -318,8 +313,8 @@ seeAllText: {
     backgroundColor: "rgba(73,77,85,0.6)",
     padding: 3,
     borderRadius: 4,
-    borderWidth:1,
-    borderColor:"white"
+    borderWidth: 1,
+    borderColor: "white",
   },
 
   infoWrapper: { padding: 12 },
