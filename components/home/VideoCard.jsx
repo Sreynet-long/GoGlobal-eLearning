@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -8,17 +9,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { RESUME_LESSON } from "../../schema/courseHomepage";
-
 export default function VideoCard() {
   const { language } = useLanguage();
   const router = useRouter();
+  const isAuth = useAuth();
 
-  const { data, loading, error } = useQuery(RESUME_LESSON, {
+  const { data, refetch, loading, error } = useQuery(RESUME_LESSON, {
     fetchPolicy: "cache-and-network",
   });
+
+  useEffect(() => {
+    refetch();
+  }, [isAuth]);
 
   if (loading) {
     return (

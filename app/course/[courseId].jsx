@@ -62,6 +62,7 @@ export default function CoursePlayerScreen() {
     completedFromBackend,
   );
 
+
   const handleVideoFinish = (video) => {
     if (!completedVideoIds.includes(video._id))
       toggleVideoComplete(video._id, true);

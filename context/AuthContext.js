@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = await getToken();
         if (token) {
-          console.log(token, "tokenAuth")
+          console.log(token, "tokenAuth");
           const fetchedUser = await fetchUserFromApi(token);
           setUser(fetchedUser);
           setIsAuth(true);
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       await setToken(token);
       setIsAuth(true);
       if (fetchedUser) setUser(fetchedUser);
-      router.replace("/"); 
+      router.replace("/");
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await removeToken();
-      await client.clearStore(); 
+      await client.clearStore();
       setIsAuth(false);
       setUser(null);
       router.replace("/");

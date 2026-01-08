@@ -1,7 +1,7 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-
+import { useEffect, useState } from "react";
 import { Tabs } from "expo-router";
 import { Platform, StyleSheet, StatusBar} from "react-native";
 import { useAuth } from "../../context/AuthContext";
@@ -12,6 +12,18 @@ const NAVIGATION_HEIGHT = Platform.OS === "ios" ? 40 : (StatusBar.currentHeight 
 export default function TabsLayout() {
   const { isAuth } = useAuth();
   const { language } = useLanguage();
+// console.log("isAuth",isAuth)
+//     const [data, setData] = useState(isAuth);
+
+//     useEffect(() => {
+// setData(isAuth)
+//     },[isAuth])
+  
+//     const handleRefresh = () => {
+//       // Fetch new data or generate a new value
+//       const newData = "Updated Data: " + Math.random();
+//       setData(newData); // This triggers a re-render
+//     };
 
   return (
     <Tabs

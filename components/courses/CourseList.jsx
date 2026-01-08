@@ -39,6 +39,11 @@ const CourseSkeleton = () => (
   </View>
 );
 
+const getProgress = (course) => {
+  const value = Number(course?.overall_completion_percentage);
+  if (Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+};
 const getCourseAction = (course) => {
   const progress = course.overall_completion_percentage ?? 0;
 
@@ -99,6 +104,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     ({ item }) => {
       const hasDiscount = item.original_price > item.sell_price;
       const action = getCourseAction(item);
+      const progress = getProgress(item);
 
       return (
         <TouchableOpacity
@@ -126,17 +132,14 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                   <>
                     <View style={styles.progressBarContainer}>
                       <View style={styles.progressBarBackground}>
-                      <View
-                        style={[
-                          styles.progressBarFill,
-                          { width: `${item.overall_completion_percentage}%` },
-                        ]}
-                      />
+                        <View
+                          style={[
+                            styles.progressBarFill,
+                            { width: `${progress}%` },
+                          ]}
+                        />
                       </View>
-                        <Text style={styles.progressText}>
-                          {item.overall_completion_percentage}%
-                        </Text>
-                      
+                      <Text style={styles.progressText}>{progress}%</Text>
                     </View>
 
                     <View style={styles.cardFooter}>
@@ -204,6 +207,9 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         data={courses}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
+        extraData={courses.map(
+          (c) => `${c._id}-${c.overall_completion_percentage}`
+        )}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
         removeClippedSubviews
@@ -231,7 +237,11 @@ export default function CourseList({ selectedCategoryId, searchText }) {
 }
 
 const styles = StyleSheet.create({
-  contentContainerStyle: { padding: 16 },
+  contentContainerStyle: {
+    paddingHorizontal: 18,
+    paddingTop: 20,
+    paddingBottom: 130,
+  },
   textHeader: {
     fontSize: 20,
     fontWeight: "800",
@@ -296,17 +306,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   progressBarContainer: {
-    flexDirection: "row",         
+    flexDirection: "row",
     alignItems: "center",
     width: "100%",
   },
 
   progressBarBackground: {
-    flex: 1,                      
+    flex: 1,
     height: 8,
-    backgroundColor: "#E0E0E0",   
+    backgroundColor: "#E0E0E0",
     borderRadius: 4,
-    overflow: "hidden",            
+    overflow: "hidden",
     marginRight: 8,
   },
 

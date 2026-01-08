@@ -24,11 +24,6 @@ const { width } = Dimensions.get("window");
 const CourseCard = ({ item, language, onPress }) => {
   const progress = item.overall_completion_percentage ?? 0;
 
-  // const getCourseActionLabel = () => {
-  //   if (item.has_course_completed || progress === 100) return "Completed";
-  //   if (progress > 0) return "Continue";
-  //   return "Start course";
-  // };
   const getCourseAction = () => {
     if (item.has_course_completed || progress === 100) 
       return { label: "Completed", type: "completed" };
@@ -211,7 +206,7 @@ export default function EnrolledCourses({ searchText }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  listContent: { paddingHorizontal: 16, paddingTop: 16 },
+  listContent: { paddingHorizontal: 16, paddingTop: 16 , paddingBottom: 80},
   textHeader: {
     fontSize: 22,
     fontWeight: "800",

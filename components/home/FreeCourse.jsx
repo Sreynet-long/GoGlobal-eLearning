@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   header: {
   flexDirection: "row",
   justifyContent: "space-between",
-  paddingHorizontal: 30,
+  paddingHorizontal: 23,
   marginBottom: 10,
 },
 
@@ -259,16 +259,19 @@ headerSubtitle: {
 
 seeAllBtn: {
   backgroundColor: "#cbc0ff3f",
-  paddingHorizontal: 12,
-  paddingVertical: 6,
+  paddingHorizontal: 9,
+  // paddingVertical: 6,
   borderRadius: 15,
   justifyContent: "center",  
   alignItems: "center",
+  height: 25,
+  marginTop: 3,
+
 },
 
 seeAllText: {
-  fontSize: 14,
-  fontWeight: "800",
+  fontSize: 12,
+  fontWeight: "700",
   color: "#6366f1",
   textAlign:"center"
   
