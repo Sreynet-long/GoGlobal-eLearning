@@ -12,6 +12,8 @@ import {
 import { Divider } from "react-native-paper";
 import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
 import VideoList from "./VideoList";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang"; 
 
 export default function CourseContent({
   courseId,
@@ -22,6 +24,7 @@ export default function CourseContent({
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const scrollRef = useRef(null);
+  const { language } = useLanguage();
 
   const { data, loading } = useQuery(GET_CONTENT_SECTION_WITH_PAGINATION, {
     variables: { page: 1, limit: 50, pagination: false, keyword: "", courseId },
@@ -55,7 +58,7 @@ export default function CourseContent({
       contentContainerStyle={{ paddingBottom: 20 }}
     >
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Course Curriculum:</Text>
+        <Text style={styles.cardTitle}>{t("course_curriculum",language)}</Text>
 
         {sections.map((section) => (
           <View key={section._id} style={styles.sectionCard}>

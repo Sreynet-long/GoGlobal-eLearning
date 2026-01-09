@@ -44,19 +44,19 @@ const getProgress = (course) => {
   if (Number.isNaN(value)) return 0;
   return Math.max(0, Math.min(100, value));
 };
-const getCourseAction = (course) => {
+const getCourseAction = (course, language) => {
   const progress = course.overall_completion_percentage ?? 0;
 
   if (course.has_course_completed || progress === 100) {
-    return { label: "Completed", type: "completed" };
+    return { label: t("completed", language), type: "completed" };
   }
 
   if (course.has_enrolled) {
-    if (progress > 0) return { label: "Continue", type: "continue" };
-    return { label: "Start course", type: "start" };
+    if (progress > 0) return { label: t("continue", language), type: "continue" };
+    return { label: t("start_course", language), type: "start" };
   }
 
-  return { label: "View Detail", type: "view" };
+  return { label: t("View Detail", language), type: "view" };
 };
 
 export default function CourseList({ selectedCategoryId, searchText }) {
@@ -84,7 +84,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const courses = data?.getCourseWithPagination?.data ?? [];
 
   const handleOpenDetails = (course) => {
-    const action = getCourseAction(course);
+    const action = getCourseAction(course,language);
 
     if (action.type === "view") {
       setSelectedCourse(course);
@@ -103,7 +103,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const renderItem = useCallback(
     ({ item }) => {
       const hasDiscount = item.original_price > item.sell_price;
-      const action = getCourseAction(item);
+      const action = getCourseAction(item, language);
       const progress = getProgress(item);
 
       return (
@@ -179,7 +179,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                 </View>
                 <View style={styles.cardFooter}>
                   <View style={styles.enrollBadge}>
-                    <Text style={styles.textEnroll}>View Detail</Text>
+                    <Text style={styles.textEnroll}>{t("view_detail", language)}</Text>
                   </View>
                 </View>
               </>
@@ -226,7 +226,6 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ]}
         ListEmptyComponent={<EmptyCourse />}
         ListFooterComponent={<View style={{ height: 120 }} />}
-
       />
 
       <CourseDetailModal
@@ -242,7 +241,6 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     paddingHorizontal: 18,
     paddingTop: 20,
-    // paddingBottom: 130,
   },
   textHeader: {
     fontSize: 20,

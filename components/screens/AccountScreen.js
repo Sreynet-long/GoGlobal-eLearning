@@ -271,6 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.5,
+    lineHeight: 26
   },
   versionText: {
     textAlign: "center",

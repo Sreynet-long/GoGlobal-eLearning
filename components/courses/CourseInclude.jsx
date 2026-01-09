@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 
 // Row component
 function Row({ icon, children }) {
@@ -13,6 +15,7 @@ function Row({ icon, children }) {
 }
 
 export default function CourseIncludes({ course }) {
+  const {language} = useLanguage();
   const includes = course?.course_includes;
 
   if (!includes) {
@@ -25,17 +28,17 @@ export default function CourseIncludes({ course }) {
         key="download"
         icon={<Entypo name="download" size={15} color="#000" />}
       >
-      <Text> {`${includes.number_of_downloadable_resources} downloadable resources`}</Text> 
+      <Text> {`${includes.number_of_downloadable_resources} ${t("downloadable_resources", language)}`}</Text> 
       </Row>
     ),
     includes.number_of_hours != null && (
       <Row key="hours" icon={<Entypo name="hour-glass" size={15} color="#000" />}>
-        <Text>{`${includes.number_of_hours} hours`}</Text>
+        <Text>{`${includes.number_of_hours} ${t("hours", language)}`}</Text>
       </Row>
     ),
     includes.number_of_lessons != null && (
       <Row key="lessons" icon={<Entypo name="folder" size={15} color="#000" />}>
-        <Text>{`${includes.number_of_lessons} lessons`}</Text>
+        <Text>{`${includes.number_of_lessons} ${t("lessons", language)}`}</Text>
       </Row>
     ),
     includes.number_of_projects_practices != null && (
@@ -49,12 +52,12 @@ export default function CourseIncludes({ course }) {
           />
         }
       >
-        <Text>{`${includes.number_of_projects_practices} projects & practices`}</Text>
+        <Text>{`${includes.number_of_projects_practices} ${t("projects_practices", language)}`}</Text>
       </Row>
     ),
     includes.number_of_video != null && (
       <Row key="videos" icon={<Entypo name="folder-video" size={15} color="#000" />}>
-        {`${includes.number_of_video} videos`}
+        {`${includes.number_of_video} ${t("videos",language)}`}
       </Row>
     ),
     includes.number_quizzes != null && (
@@ -68,7 +71,7 @@ export default function CourseIncludes({ course }) {
           />
         }
       >
-        <Text>{`${includes.number_quizzes} quizzes`}</Text>
+        <Text>{`${includes.number_quizzes} ${t("quizzes",language)}`}</Text>
       </Row>
     ),
     includes.has_certificate_of_completion && (
@@ -76,7 +79,7 @@ export default function CourseIncludes({ course }) {
         key="certificate"
         icon={<MaterialCommunityIcons name="certificate-outline" size={17} color="#000" />}
       >
-        <Text>Certificate of completion</Text>
+        <Text>{t("certificate_of_completion", language)}</Text>
       </Row>
     ),
     includes.is_full_lifetime_access && (
@@ -84,7 +87,7 @@ export default function CourseIncludes({ course }) {
         key="lifetime"
         icon={<MaterialCommunityIcons name="timer-sand-full" size={17} color="#000" />}
       >
-        <Text>Full lifetime access</Text>
+        <Text>{t("full_lifetime_access", language)}</Text>
       </Row>
     ),
   ];

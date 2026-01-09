@@ -25,10 +25,10 @@ export default function StatesRow() {
   const { language } = useLanguage();
 
   const stats = [
-    { label: "Easy to learn", icon: "book-outline", color: "#6366f1" },
-    { label: "Modern Tech", icon: "rocket-outline", color: "#f97316" },
-    { label: "Many courses", icon: "layers-outline", color: "#22c55e" },
-    { label: "Skills Built", icon: "construct-outline", color: "#0ea5e9" },
+    { label: t("easy_to_learn", language), icon: "book-outline", color: "#6366f1" },
+    { label: t("modern_tech", language), icon: "rocket-outline", color: "#f97316" },
+    { label: t("many_courses", language), icon: "layers-outline", color: "#22c55e" },
+    { label: t("skills_built", language), icon: "construct-outline", color: "#0ea5e9" },
   ];
 
   return (
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: "900",
     color: "#334155",
     textAlign: "center",

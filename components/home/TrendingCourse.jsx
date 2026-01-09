@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     // gap: 6
   },
   headerTitle: { fontSize: 20, fontWeight: "900", color: "#0f172a" },
-  headerSubtitle: { fontSize: 12, color: "#94a3b8", fontWeight: "600" },
+  headerSubtitle: { fontSize: 12, color: "#8494acff", fontWeight: "600" },
 
   seeAllBtn: {
     backgroundColor: "#cbc0ff3f",
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 25,
-    marginTop: 3,
+    marginTop: 6,
   },
   seeAllText: { fontSize: 12, fontWeight: "700", color: "#6366f1" },
 

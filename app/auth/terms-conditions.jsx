@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     color: COLORS.slate,
-    paddingLeft: 0,
+    paddingLeft: 40,
   },
   bottomSpacer: { height: 20 },
   floatingFooter: {

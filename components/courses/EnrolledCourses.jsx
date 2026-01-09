@@ -25,15 +25,15 @@ const CourseCard = ({ item, language, onPress }) => {
   const progress = item.overall_completion_percentage ?? 0;
 
   const getCourseAction = () => {
-    if (item.has_course_completed || progress === 100) 
-      return { label: "Completed", type: "completed" };
+    if (item.has_course_completed || progress === 100)
+      return { label: t("completed", language), type: "completed" };
 
-    if (progress > 0) return { label: "Continue", type: "continue" };
-      return { label: "Start course", type: "start" };
-    
+    if (progress > 0)
+      return { label: t("continue", language), type: "continue" };
+    return { label: t("start_course", language), type: "start" };
   };
 
-  const actionLabel = getCourseAction();
+  const action = getCourseAction();
 
   return (
     <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={onPress}>
@@ -58,22 +58,16 @@ const CourseCard = ({ item, language, onPress }) => {
           <View style={styles.enrollBadge}>
             <Text
               style={[
-                styles.continueText,
-                actionLabel.type === "Completed" && styles.completedText,
+                action.type === "completed"
+                  ? styles.completedText
+                  : action.type === "continue"
+                  ? styles.textContinue
+                  : styles.textEnroll,
               ]}
             >
-              <Text
-                style={[
-                  actionLabel.type === "completed"
-                    ? styles.completedText
-                    : actionLabel.type === "continue"
-                    ? styles.textContinue
-                    : styles.textEnroll,
-                ]}
-              >
-                {actionLabel.label}
-              </Text>
+              {action.label}
             </Text>
+            {/* </Text> */}
           </View>
         </View>
       </View>
@@ -94,7 +88,7 @@ export default function EnrolledCourses({ searchText }) {
     {
       variables: {
         page: 1,
-        limit: 10,
+        limit: 50,
         pagination: true,
         keyword: debouncedSearch || "",
       },
@@ -144,7 +138,7 @@ export default function EnrolledCourses({ searchText }) {
     fetchMore({
       variables: { page: nextPage, keyword: debouncedSearch || "" },
     });
-    setPage(nextPage);
+    setPage(nextPage); 
   };
 
   if (error)
@@ -206,7 +200,7 @@ export default function EnrolledCourses({ searchText }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  listContent: { paddingHorizontal: 16, paddingTop: 16 , paddingBottom: 80},
+  listContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 80 },
   textHeader: {
     fontSize: 22,
     fontWeight: "800",
@@ -266,7 +260,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   completedText: { color: "#2E7D32", fontWeight: "700", fontSize: 14 },
-textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
+  textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
   textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
 
   cardFooter: { marginTop: 8, alignItems: "flex-end" },

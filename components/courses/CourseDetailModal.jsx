@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { GET_COURSE_BY_ID } from "../../schema/course";
 import CourseIncludes from "./CourseInclude";
 import EnrolledButton from "./EnrolledButton";
@@ -38,6 +40,7 @@ const getProgress = (course) => {
 
 /* ---------------- Component ---------------- */
 export default function CourseDetailModal({ visible, course, onClose }) {
+  const { language } = useLanguage();
   const [fullCourse, setFullCourse] = useState(course);
 
   const { data } = useQuery(GET_COURSE_BY_ID, {
@@ -120,7 +123,9 @@ export default function CourseDetailModal({ visible, course, onClose }) {
 
             {/* COURSE INCLUDES */}
             <View style={styles.sectionBox}>
-              <Text style={styles.sectionTitle}>Course Includes:</Text>
+              <Text style={styles.sectionTitle}>
+                {t("course_includes", language)}
+              </Text>
               <Divider style={{ marginVertical: 10 }} />
               <CourseIncludes course={fullCourse} />
             </View>
@@ -128,21 +133,24 @@ export default function CourseDetailModal({ visible, course, onClose }) {
             {/* TEXT SECTIONS */}
             <View style={styles.textSectionContainer}>
               <Section
-                title="What you'll learn"
+                title={t("what_you_will_learn", language)}
                 value={fullCourse.what_you_learn}
                 icon="check-circle-outline"
               />
               <Section
-                title="Who this course is for"
+                title={t("who_this_course_is_for", language)}
                 value={fullCourse.who_this_course_is_for}
                 icon="account-outline"
               />
               <Section
-                title="Requirements"
+                title={t("requirements", language)}
                 value={fullCourse.requirements}
                 icon="tools"
               />
-              <Section title="Description" value={fullCourse.description} />
+              <Section
+                title={t("description", language)}
+                value={fullCourse.description}
+              />
             </View>
 
             <View style={{ height: 40 }} />
@@ -156,7 +164,7 @@ export default function CourseDetailModal({ visible, course, onClose }) {
 /* ---------------- Sub Component ---------------- */
 const Section = ({ title, value, icon }) => (
   <View style={styles.textSection}>
-    <Text style={styles.sectionTitle}>{title}:</Text>
+    <Text style={styles.sectionTitle}>{title}</Text>
     {value?.trim() ? (
       value.split("\n").map((line, i) => (
         <View key={i} style={styles.listItem}>

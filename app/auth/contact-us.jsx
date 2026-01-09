@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
     paddingHorizontal: 50,
-    lineHeight: 18,
+    lineHeight: 22,
   },
   accentBackgroundLayer: {
     flex: 1,

@@ -32,7 +32,7 @@ export default function VideoCard() {
         <ActivityIndicator size="small" color="#22c55e" />
       </View>
     );
-  }
+  } 
 
   const course = data?.getResumeLearning;
   if (error || !course) return null;

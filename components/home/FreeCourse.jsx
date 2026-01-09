@@ -208,7 +208,8 @@ export default function FreeCourse() {
           </Text>
           <Text style={styles.headerSubtitle}>
             {/* {t("unlock_your_potential_today", language)} */}
-            Unlock your potential today!
+            {t("access_free_courses_and_start_learning_today", language)}
+            {/* Unlock your potential today! */}
           </Text>
         </View>
 
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
 
   headerSubtitle: {
     fontSize: 12,
-    color: "#94a3b8",
+    color: "#8494acff",
     fontWeight: "600",
   },
 
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 25,
-    marginTop: 3,
+    marginTop: 6,
   },
 
   seeAllText: {
