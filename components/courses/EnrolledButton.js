@@ -31,8 +31,16 @@ export default function EnrolledButton({ course, onSuccess }) {
         return;
       }
 
-      Alert.alert("Success", "Course enrolled successfully!");
-      onSuccess?.();
+      Alert.alert("Success", "Course enrolled successfully!", [
+        {
+          text: "OK",
+          // onPress: () => {
+          //   onSuccess?.();
+          //   router.replace("/(tabs)/myCourses&Login");
+          // },
+        },
+      ]);
+      
     } catch (err) {
       console.log("Enroll error:", err);
       Alert.alert("Error", "Enroll failed. Please try again.");
@@ -43,7 +51,7 @@ export default function EnrolledButton({ course, onSuccess }) {
     Alert.alert("Login required", "Please login first", [
       {
         text: "OK",
-        onPress: () => router.push("/auth/loginScreen"),
+        // onPress: () => router.replace("/myCourses&Login"),
       },
       { text: "Cancel", style: "cancel" },
     ]);

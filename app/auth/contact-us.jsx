@@ -220,7 +220,7 @@ export default function ContactUsScreen() {
                 </Text>
                 <View style={styles.socialIcons}>
                   <TouchableOpacity
-                    onPress={() => Linking.openURL("https://facebook.com")}
+                    onPress={() => Linking.openURL("https://www.facebook.com/p/Go-Global-IT-100090694682396/")}
                   >
                     <Surface style={styles.socialBtn} elevation={1}>
                       <MaterialIcons
@@ -231,7 +231,7 @@ export default function ContactUsScreen() {
                     </Surface>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => Linking.openURL("https://linkedin.com")}
+                    onPress={() => Linking.openURL("https://www.go-globalit.com/")}
                   >
                     <Surface style={styles.socialBtn} elevation={1}>
                       <MaterialIcons

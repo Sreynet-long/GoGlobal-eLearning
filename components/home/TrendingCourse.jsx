@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -14,6 +14,7 @@ import {
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_TRENDING_WITH_PAGINATION } from "../../schema/courseHomepage";
@@ -379,15 +380,20 @@ const CourseCard = ({ course, onPress }) => {
 /* ================= TRENDING COURSES ================= */
 export default function TrendingCourse() {
   const router = useRouter();
+  const isAuth = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { data, loading, error } = useQuery(
+  const { data, loading, error, refetch } = useQuery(
     GET_COURSE_TRENDING_WITH_PAGINATION,
     { variables: { limit: 10 } }
   );
+
+  useEffect(() => {
+    refetch();
+  }, [isAuth]);
 
   if (loading)
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;

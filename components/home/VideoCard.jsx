@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -13,6 +13,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { RESUME_LESSON } from "../../schema/courseHomepage";
+
 export default function VideoCard() {
   const { language } = useLanguage();
   const router = useRouter();
@@ -21,6 +22,12 @@ export default function VideoCard() {
   const { data, refetch, loading, error } = useQuery(RESUME_LESSON, {
     fetchPolicy: "cache-and-network",
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   useEffect(() => {
     refetch();
@@ -32,7 +39,7 @@ export default function VideoCard() {
         <ActivityIndicator size="small" color="#22c55e" />
       </View>
     );
-  } 
+  }
 
   const course = data?.getResumeLearning;
   if (error || !course) return null;

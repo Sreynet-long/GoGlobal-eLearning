@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
-export default function EmptyCourse() {
+export default function EmptyCourseEnroll() {
   const { language } = useLanguage();
 
   return (

@@ -47,7 +47,7 @@ export default function CoursePlayerScreen() {
     },
   ];
 
-  const { data, loading } = useQuery(GET_COURSE_BY_ID, {
+  const { data, loading, refetch } = useQuery(GET_COURSE_BY_ID, {
     variables: { courseId },
     skip: !courseId,
     fetchPolicy: "cache-and-network",
@@ -103,7 +103,7 @@ export default function CoursePlayerScreen() {
   };
 
   const renderOverview = () => (
-    <ScrollView 
+    <ScrollView
     // contentContainerStyle={{ paddingBottom: 50 }}
     >
       <View style={styles.card}>

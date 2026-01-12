@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -10,10 +11,10 @@ import {
   View,
 } from "react-native";
 import { Divider } from "react-native-paper";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
 import { GET_CONTENT_SECTION_WITH_PAGINATION } from "../../schema/course";
 import VideoList from "./VideoList";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../lang"; 
 
 export default function CourseContent({
   courseId,
@@ -26,9 +27,24 @@ export default function CourseContent({
   const scrollRef = useRef(null);
   const { language } = useLanguage();
 
-  const { data, loading } = useQuery(GET_CONTENT_SECTION_WITH_PAGINATION, {
-    variables: { page: 1, limit: 50, pagination: false, keyword: "", courseId },
-  });
+  const { data, loading, refetch } = useQuery(
+    GET_CONTENT_SECTION_WITH_PAGINATION,
+    {
+      variables: {
+        page: 1,
+        limit: 50,
+        pagination: false,
+        keyword: "",
+        courseId,
+      },
+    }
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   if (loading)
     return (
@@ -58,7 +74,7 @@ export default function CourseContent({
       contentContainerStyle={{ paddingBottom: 20 }}
     >
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t("course_curriculum",language)}</Text>
+        <Text style={styles.cardTitle}>{t("course_curriculum", language)}</Text>
 
         {sections.map((section) => (
           <View key={section._id} style={styles.sectionCard}>

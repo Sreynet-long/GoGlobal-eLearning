@@ -39,7 +39,8 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else Alert.alert(t("error", language), t("cannot_open_url", language));
+          else
+            Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -56,7 +57,8 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else Alert.alert(t("error", language), t("cannot_open_url", language));
+          else
+            Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -73,7 +75,8 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else Alert.alert(t("error", language), t("cannot_open_url", language));
+          else
+            Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -90,7 +93,8 @@ export default function AboutScreen() {
         try {
           const supported = await Linking.canOpenURL(url);
           if (supported) await Linking.openURL(url);
-          else Alert.alert(t("error", language), t("cannot_open_url", language));
+          else
+            Alert.alert(t("error", language), t("cannot_open_url", language));
         } catch (err) {
           Alert.alert(t("error", language), err.message);
         }
@@ -132,7 +136,7 @@ export default function AboutScreen() {
               color={COLORS.accent}
             />
           </View>
-          <Title style={styles.mainTitle}>
+          <Title style={[styles.mainTitle, { color: COLORS.primary }]}>
             <Text>{t("our_story", language)}</Text>
           </Title>
           <Text style={styles.brandDescription}>
@@ -172,7 +176,7 @@ export default function AboutScreen() {
                     color={COLORS.accent}
                   />
                 </View>
-                <Text style={[styles.cardTitle, { color: COLORS.white }]}>
+                <Text style={styles.cardTitle}>
                   {t("our_mission", language)}
                 </Text>
                 <Text
@@ -259,7 +263,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accent,
   },
   mainTitle: {
-    color: COLORS.white,
+    // color: COLORS.white,
     fontSize: 28,
     fontWeight: "900",
     marginBottom: 8,

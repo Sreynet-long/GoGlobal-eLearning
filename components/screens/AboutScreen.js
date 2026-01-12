@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 25,
     paddingTop: 0,
-    paddingBottom: 60,
+    paddingBottom: 115,
     alignItems: 'center', 
     marginBottom:60
   },
@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '800',
     color: COLORS.primary,
+    // color: "#FFFFFF",
     textAlign: 'center',
   },
   titleUnderline: {

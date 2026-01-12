@@ -12,13 +12,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useDebounce } from "../../app/hook/useDebounce";
+import  useDebounce from "../../app/hook/useDebounce";
 import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_ENROLLED_WITH_PAGINATION } from "../../schema/course";
-import EmptyCourseEnroll from "./EmptyCourse";
-
+import EmptyCourseEnroll from "./EmptyCourseEnroll";
+import { useFocusEffect } from "expo-router";
 const { width } = Dimensions.get("window");
 
 const CourseCard = ({ item, language, onPress }) => {
@@ -97,6 +97,12 @@ export default function EnrolledCourses({ searchText }) {
     }
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
   useEffect(() => {
     setPage(1);
     setCourses([]);
@@ -138,7 +144,7 @@ export default function EnrolledCourses({ searchText }) {
     fetchMore({
       variables: { page: nextPage, keyword: debouncedSearch || "" },
     });
-    setPage(nextPage); 
+    setPage(nextPage);
   };
 
   if (error)
@@ -259,7 +265,7 @@ const styles = StyleSheet.create({
     minWidth: 40,
     textAlign: "right",
   },
-  completedText: { color: "#2E7D32", fontWeight: "700", fontSize: 14 },
+  completedText: { color: "#2E7D32", fontWeight: "600", fontSize: 12},
   textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
   textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
 

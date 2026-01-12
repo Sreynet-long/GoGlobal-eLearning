@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useRouter } from "expo-router";
+import { use, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -16,6 +17,8 @@ import { IMAGE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_FREE_WITH_PAGINATION } from "../../schema/courseHomepage";
+import CourseDetailModal from "../courses/CourseDetailModal";
+import { useAuth } from "../../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.7;
@@ -188,11 +191,21 @@ const CourseCard = ({ course }) => {
 
 /* ================= FREE COURSES ================= */
 export default function FreeCourse() {
+  const router = useRouter();
+  const isAuth = useAuth();
   const { language } = useLanguage();
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const { data, loading, error } = useQuery(GET_COURSE_FREE_WITH_PAGINATION, {
-    variables: { limit: 10 },
-  });
+  const { data, loading, error, refetch } = useQuery(
+    GET_COURSE_FREE_WITH_PAGINATION,
+    {
+      variables: { limit: 10 },
+    }
+  );
+  useEffect(() => {
+    refetch();
+  }, [isAuth]);
 
   if (loading)
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
@@ -213,7 +226,10 @@ export default function FreeCourse() {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.seeAllBtn}>
+        <TouchableOpacity
+          style={styles.seeAllBtn}
+          onPress={() => router.push("/(tabs)/courses")}
+        >
           <Text style={styles.seeAllText}>{t("view_all", language)}</Text>
         </TouchableOpacity>
       </View>
@@ -226,9 +242,25 @@ export default function FreeCourse() {
         contentContainerStyle={styles.scrollContainer}
       >
         {data.getFreeCourse.map((course) => (
-          <CourseCard key={course._id} course={course} />
+          <CourseCard
+            key={course._id}
+            course={course}
+            onPress={() => {
+              if (course.has_enrolled) {
+                router.push(`/course/${course._id}`);
+              } else {
+                setSelectedCourse(course);
+                setModalVisible(true);
+              }
+            }}
+          />
         ))}
       </ScrollView>
+      <CourseDetailModal
+        visible={modalVisible}
+        course={selectedCourse}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }

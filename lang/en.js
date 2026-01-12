@@ -34,7 +34,7 @@ export default {
   enroll: "Enroll",
   error_loading: "Error loading courses",
   course_detail_title: "Course Detail",
-  no_courses_enrolled: "No courses enrolled in this category.",
+  no_courses_enrolled: "No courses enrolled found.",
   courses_enrolled_list: "Courses Enrolled List",
   hours: "hours",
   completed: "Completed",

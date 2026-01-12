@@ -338,10 +338,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
-    alignSelf: "flex-start",
     marginTop: 8,
   },
-  completedText: { color: "#2E7D32", fontWeight: "700", fontSize: 14 },
+  completedText: { color: "#2E7D32", fontWeight: "600", fontSize: 12 },
 
   cardSkeleton: {
     flexDirection: "row",

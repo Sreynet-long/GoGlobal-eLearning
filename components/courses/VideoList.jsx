@@ -31,7 +31,7 @@ export default function VideoList({
         keyword: "",
       },
       skip: !sectionId,
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "network-only",
     }
   );
 
@@ -51,15 +51,21 @@ export default function VideoList({
     ).values()
   );
 
+  // console.log("videos", videos);
+  console.log(
+    "data?.getVideoContentWithPagination?.data",
+    data?.getVideoContentWithPagination?.data
+  );
+
   return (
     <View>
-      {videos.map((video) => {
+      {data?.getVideoContentWithPagination?.data.map((video, index) => {
         const backendCompleted = video.has_completed === true;
         const localCompleted = completedVideo.includes(video._id);
         const isCompleted = localCompleted || backendCompleted;
-        console.log("completed", isCompleted);
+        // console.log("completed", isCompleted);
         return (
-          <View key={video._id}>
+          <View key={index}>
             <TouchableOpacity
               style={[
                 styles.lessonRow,
@@ -83,7 +89,7 @@ export default function VideoList({
 
               <View style={styles.lessonInfo}>
                 <Text style={styles.lessonTitle}>
-                  Lesson {video.video_content_order}. {video.video_content_name}
+                  Lesson {video.video_content_order}.{video.video_content_name}
                 </Text>
                 <Text style={styles.lessonDuration}>Video</Text>
               </View>

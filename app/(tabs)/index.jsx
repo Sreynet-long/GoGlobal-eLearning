@@ -6,7 +6,7 @@ import StatesRow from "../../components/home/StatesRow";
 import TrendingCourse from "../../components/home/TrendingCourse";
 import VideoCard from "../../components/home/VideoCard";
 
-export default function Index() {
+export default function index() {
   return (
     <View style={styles.screenContainer}>
       <Topbar />
