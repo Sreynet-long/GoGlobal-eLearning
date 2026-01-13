@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 6,
     paddingHorizontal: 50,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   accentBackgroundLayer: {
     flex: 1,
@@ -317,5 +317,5 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   buttonContent: { height: 56 },
-  buttonLabel: { fontSize: 16, fontWeight: "700" },
+  buttonLabel: { fontSize: 16, fontWeight: "700", lineHeight: 24},
 });

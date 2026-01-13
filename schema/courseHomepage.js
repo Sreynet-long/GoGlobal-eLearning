@@ -49,8 +49,13 @@ export const GET_COURSE_TRENDING_WITH_PAGINATION = gql`
       category_id {
         category_name
       }
+      is_free_course
       sell_price
       original_price
+      what_you_learn
+      who_this_course_is_for
+      requirements
+      description
       course_includes {
         number_of_lessons
         number_of_video
@@ -77,6 +82,10 @@ export const GET_COURSE_FREE_WITH_PAGINATION = gql`
       }
       overall_completion_percentage
       is_free_course
+      what_you_learn
+      who_this_course_is_for
+      requirements
+      description
       course_includes {
         number_of_lessons
         number_of_video

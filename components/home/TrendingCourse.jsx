@@ -399,7 +399,10 @@ export default function TrendingCourse() {
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
 
   if (error || !data?.getHilightCourse?.length) return null;
-
+  const handlePressCourse = (course) => {
+    setSelectedCourse(course);
+    setModalVisible(true);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -431,14 +434,15 @@ export default function TrendingCourse() {
           <CourseCard
             key={course._id}
             course={course}
-            onPress={() => {
-              if (course.has_enrolled) {
-                router.push(`/course/${course._id}`);
-              } else {
-                setSelectedCourse(course);
-                setModalVisible(true);
-              }
-            }}
+            // onPress={() => {
+            //   if (course.has_enrolled) {
+            //     router.push(`/course/${course._id}`);
+            //   } else {
+            //     setSelectedCourse(course);
+            //     setModalVisible(true);
+            //   }
+            // }}
+            onPress={() => handlePressCourse(course)}
           />
         ))}
       </ScrollView>

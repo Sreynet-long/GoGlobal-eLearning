@@ -276,7 +276,10 @@ export default function CoursePlayerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => {
+          router.back();
+          refetch();
+        }}>
           <MaterialCommunityIcons name="chevron-left" size={30} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
@@ -288,7 +291,7 @@ export default function CoursePlayerScreen() {
 
       <View style={styles.tabBar}>
         {TABS.map((tab) => (
-          <TouchableOpacity
+          <TouchableOpacity 
             key={tab.key}
             onPress={() => setActiveTab(tab.key)}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}

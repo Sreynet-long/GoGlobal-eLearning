@@ -53,7 +53,7 @@ export default function AboutScreen() {
             <View style={styles.iconCircleLarge}>
               <MaterialIcons name="auto-stories" size={32} color={COLORS.accent} />
             </View>
-            <Title style={styles.centeredTitle}>{t("our_story", language)}</Title>
+            <Text style={styles.centeredTitle}>{t("our_story", language)}</Text>
             <View style={styles.titleUnderline} />
             <Text style={styles.centeredParagraph}>{t("our_story_text1", language)}</Text>
             <Text style={styles.centeredParagraph}>{t("our_story_text2", language)}</Text>
@@ -73,7 +73,7 @@ export default function AboutScreen() {
             </View>
           </View>
 
-          <Title style={[styles.centeredTitle, { marginTop: 20 }]}>{t("contact_us", language)}</Title>
+          <Text style={[styles.centeredTitle, { marginTop: 20 }]}>{t("contact_us", language)}</Text>
           <View style={styles.contactGrid}>
             {contactItems.map((item) => (
               <TouchableOpacity key={item.key} style={styles.contactCard} onPress={item.onPress}>
@@ -163,10 +163,10 @@ const styles = StyleSheet.create({
   },
   centeredTitle: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '900',
     color: COLORS.primary,
-    // color: "#FFFFFF",
     textAlign: 'center',
+    marginBottom: 8,
   },
   titleUnderline: {
     width: 40,

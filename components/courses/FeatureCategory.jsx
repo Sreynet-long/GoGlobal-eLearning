@@ -33,7 +33,7 @@ export default function FeatureCategory({ onSelectedCategory }) {
   const { language } = useLanguage();
   const [selectedCategoryId, setSelectedCategoryId] = useState("All");
 
-  const { data, loading, error } = useQuery(GET_COURSE_CATEGORY, {
+  const { data, loading, error} = useQuery(GET_COURSE_CATEGORY, {
     variables: { page: 1, limit: 50, keyword: "", pagination: false },
   });
 

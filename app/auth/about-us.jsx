@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Surface, Text, Title } from "react-native-paper";
+import { Surface, Text } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
@@ -136,9 +136,7 @@ export default function AboutScreen() {
               color={COLORS.accent}
             />
           </View>
-          <Title style={[styles.mainTitle, { color: COLORS.primary }]}>
-            <Text>{t("our_story", language)}</Text>
-          </Title>
+          <Text style={[styles.mainTitle]}>{t("our_story", language)}</Text>
           <Text style={styles.brandDescription}>
             {t("our_story_text1", language)}
           </Text>
@@ -176,11 +174,11 @@ export default function AboutScreen() {
                     color={COLORS.accent}
                   />
                 </View>
-                <Text style={styles.cardTitle}>
+                <Text style={styles.cardTitle1}>
                   {t("our_mission", language)}
                 </Text>
                 <Text
-                  style={[styles.cardText, { color: "#94A3B8" }]}
+                  style={[styles.cardText, { color: "#f3f3f3" }]}
                   numberOfLines={4}
                 >
                   {t("our_mission_text", language)}
@@ -263,16 +261,17 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accent,
   },
   mainTitle: {
-    // color: COLORS.white,
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "900",
+    color: COLORS.white,
+    textAlign: "center",
     marginBottom: 8,
   },
   brandDescription: {
-    color: "rgba(255,255,255,0.6)",
+    color: "rgb(255, 255, 255)",
     textAlign: "center",
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 25,
   },
   accentRimLayer: {
     backgroundColor: COLORS.accent,
@@ -343,7 +342,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     color: COLORS.primary,
-    textAlign: "center",
+    textAlign: "center",  
+  },
+    cardTitle1: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: COLORS.white,
+    textAlign: "center",  
   },
   cardText: {
     fontSize: 12,

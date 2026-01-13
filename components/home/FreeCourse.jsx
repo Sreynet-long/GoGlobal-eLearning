@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "expo-router";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -14,11 +14,11 @@ import {
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { IMAGE_BASE_URL } from "../../config/env";
+import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_FREE_WITH_PAGINATION } from "../../schema/courseHomepage";
 import CourseDetailModal from "../courses/CourseDetailModal";
-import { useAuth } from "../../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.7;
@@ -157,14 +157,19 @@ const CourseIconsPreview = ({ includes }) => {
 };
 
 /* ================= COURSE CARD ================= */
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, onPress }) => {
   const imageUri = course.thumbnail
     ? `${IMAGE_BASE_URL}/file/${course.thumbnail}`
     : `${IMAGE_BASE_URL}/default/course.png`;
 
+  const isFree = !course.sell_price || course.sell_price === 0;
+  const hasDiscount =
+    course.sell_price &&
+    course.original_price &&
+    Number(course.sell_price) < Number(course.original_price);
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity activeOpacity={0.9}>
+      <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
         <View style={styles.imageWrapper}>
           <Image source={{ uri: imageUri }} style={styles.courseImage} />
 
@@ -181,7 +186,20 @@ const CourseCard = ({ course }) => {
           {course.title}
         </Text>
 
-        <Text style={styles.freeText}>FREE</Text>
+        {isFree ? (
+          <Text style={styles.freeText}>FREE</Text>
+        ) : (
+          <View style={styles.priceStack}>
+            <Text style={styles.sellPrice}>
+              ${Number(course.sell_price).toFixed(2)}
+            </Text>
+            {hasDiscount && (
+              <Text style={styles.originalPrice}>
+                ${Number(course.original_price).toFixed(2)}
+              </Text>
+            )}
+          </View>
+        )}
 
         <CourseIconsPreview includes={course.course_includes} />
       </View>

@@ -11,7 +11,9 @@ export default function EnrolledButton({ course, onSuccess }) {
   const { isAuth } = useAuth();
   const router = useRouter();
 
-  const [createCourseEnrolled, { loading }] = useMutation(CREATE_COURSE_ENROLLED);
+  const [createCourseEnrolled, { loading }] = useMutation(CREATE_COURSE_ENROLLED, {
+    refetchQueries: [""]
+  });
 
   const handleEnroll = async () => {
     try {
@@ -31,15 +33,19 @@ export default function EnrolledButton({ course, onSuccess }) {
         return;
       }
 
+      // onSuccess?.();
+      setTimeout(() => {
       Alert.alert("Success", "Course enrolled successfully!", [
         {
           text: "OK",
-          // onPress: () => {
-          //   onSuccess?.();
-          //   router.replace("/(tabs)/myCourses&Login");
-          // },
+          onPress: () => {
+            router.replace("/(tabs)/myCourses&Login");
+
+          },
         },
+        { text: "Cancel", style: "cancel" },
       ]);
+    }, 50);
       
     } catch (err) {
       console.log("Enroll error:", err);
@@ -51,7 +57,7 @@ export default function EnrolledButton({ course, onSuccess }) {
     Alert.alert("Login required", "Please login first", [
       {
         text: "OK",
-        // onPress: () => router.replace("/myCourses&Login"),
+        onPress: () => router.replace("/(tabs)/myCourses&Login"),
       },
       { text: "Cancel", style: "cancel" },
     ]);

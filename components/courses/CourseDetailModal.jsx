@@ -43,9 +43,10 @@ export default function CourseDetailModal({ visible, course, onClose }) {
   const { language } = useLanguage();
   const [fullCourse, setFullCourse] = useState(course);
 
-  const { data } = useQuery(GET_COURSE_BY_ID, {
+  const { data, refetch } = useQuery(GET_COURSE_BY_ID, {
     variables: { courseId: course?._id },
-    skip: !course || course?.what_you_learn,
+    skip: !course?._id,
+    // skip: !course || course?.what_you_learn,
   });
 
   useEffect(() => {
@@ -56,7 +57,14 @@ export default function CourseDetailModal({ visible, course, onClose }) {
     }
   }, [data, course]);
 
+  // console.log("course detail modal", course);
+  console.log("full course detail modal", fullCourse);
+
   if (!fullCourse) return null;
+  const isFree = fullCourse.is_free_course === true;
+
+  const sellPrice = Number(fullCourse?.sell_price ?? 0);
+  const originalPrice = Number(fullCourse?.original_price ?? 0);
 
   const progress = getProgress(fullCourse);
 
@@ -105,19 +113,38 @@ export default function CourseDetailModal({ visible, course, onClose }) {
                   </View>
                 </>
               )
+            ) : isFree ? (
+              <>
+                <View style={styles.completedBadge}>
+                  <Text style={styles.completedText}>FREE</Text>
+                </View>
+                <EnrolledButton
+                  course={fullCourse}
+                  onSuccess={() => {
+                    refetch();
+                    onClose();
+                  }}
+                />
+              </>
             ) : (
               <>
                 <View style={styles.priceRow}>
-                  <Text style={styles.sellPrice}>
-                    ${Number(fullCourse.sell_price).toFixed(2)}
-                  </Text>
-                  {fullCourse.original_price > fullCourse.sell_price && (
+                  <Text style={styles.sellPrice}>${sellPrice.toFixed(2)}</Text>
+
+                  {originalPrice > sellPrice && (
                     <Text style={styles.oldPrice}>
-                      ${Number(fullCourse.original_price).toFixed(2)}
+                      ${originalPrice.toFixed(2)}
                     </Text>
                   )}
                 </View>
-                <EnrolledButton course={fullCourse} onSuccess={onClose} />
+
+                <EnrolledButton
+                  course={fullCourse}
+                  onSuccess={() => {
+                    refetch();
+                    onClose();
+                  }}
+                />
               </>
             )}
 
@@ -162,21 +189,34 @@ export default function CourseDetailModal({ visible, course, onClose }) {
 }
 
 /* ---------------- Sub Component ---------------- */
-const Section = ({ title, value, icon }) => (
-  <View style={styles.textSection}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {value?.trim() ? (
-      value.split("\n").map((line, i) => (
+const Section = ({ title, value, icon }) => {
+  if (!value || (Array.isArray(value) && value.length === 0)) {
+    return (
+      <View style={styles.textSection}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={styles.emptyText}>No content here.</Text>
+      </View>
+    );
+  }
+
+  const items = Array.isArray(value)
+    ? value
+    : value.split("\n").filter(Boolean);
+
+  return (
+    <View style={styles.textSection}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {items.map((line, i) => (
         <View key={i} style={styles.listItem}>
-          <MaterialCommunityIcons name={icon} size={18} color="#3F51B5" />
+          {icon && (
+            <MaterialCommunityIcons name={icon} size={18} color="#3F51B5" />
+          )}
           <Text style={styles.paragraph}>{line}</Text>
         </View>
-      ))
-    ) : (
-      <Text style={styles.emptyText}>No content here.</Text>
-    )}
-  </View>
-);
+      ))}
+    </View>
+  );
+};
 
 /* ---------------- Styles ---------------- */
 const styles = StyleSheet.create({
