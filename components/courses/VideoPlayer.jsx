@@ -1,7 +1,7 @@
 import { Video } from "expo-av";
 import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import * as ScreenOrientation from "expo-screen-orientation";
 
 export default function VideoPlayer({ video, onComplete }) {
@@ -46,7 +46,7 @@ export default function VideoPlayer({ video, onComplete }) {
         <View style={styles.videoWrapper}>
           <Video
             ref={videoRef}
-            source={{ uri: FILE_BASE_URL + selectedVideo.video_src }}
+            source={{ uri: `${FILE_BASE_URL}/file/${selectedVideo.video_src}` }}
             style={styles.videoWrapper}
             useNativeControls
             resizeMode="contain"
@@ -88,7 +88,7 @@ export default function VideoPlayer({ video, onComplete }) {
     return (
       <View style={styles.videoWrapper}>
         <Image
-          source={{ uri: `${IMAGE_BASE_URL}/file/${course?.thumbnail}` }}
+          source={{ uri: `${FILE_BASE_URL}/file/${course?.thumbnail}` }}
           style={styles.videoWrapper}
           resizeMode="cover"
         />

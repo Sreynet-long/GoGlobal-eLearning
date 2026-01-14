@@ -15,7 +15,7 @@ import {
   View,
 } from "react-native";
 import { Divider } from "react-native-paper";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_BY_ID } from "../../schema/course";
@@ -50,20 +50,26 @@ export default function CourseDetailModal({ visible, course, onClose }) {
   });
 
   useEffect(() => {
-    if (data?.getCourseById) {
-      setFullCourse(data.getCourseById);
-    } else {
+    if (visible) {
       setFullCourse(course);
     }
-  }, [data, course]);
+  }, [visible, course]);
+
+  useEffect(() => {
+    if (data?.getCourseById) {
+      setFullCourse(data.getCourseById);
+    }
+  }, [data]);
 
   // console.log("course detail modal", course);
   console.log("full course detail modal", fullCourse);
 
   if (!fullCourse) return null;
-  const isFree = fullCourse.is_free_course === true;
 
   const sellPrice = Number(fullCourse?.sell_price ?? 0);
+
+  const isFree = fullCourse?.is_free_course === true || sellPrice === 0;
+
   const originalPrice = Number(fullCourse?.original_price ?? 0);
 
   const progress = getProgress(fullCourse);
@@ -88,7 +94,7 @@ export default function CourseDetailModal({ visible, course, onClose }) {
             contentContainerStyle={styles.scrollContent}
           >
             <Image
-              source={{ uri: `${IMAGE_BASE_URL}/file/${fullCourse.thumbnail}` }}
+              source={{ uri: `${FILE_BASE_URL}/file/${fullCourse.thumbnail}` }}
               style={styles.image}
             />
 
@@ -120,9 +126,8 @@ export default function CourseDetailModal({ visible, course, onClose }) {
                 </View>
                 <EnrolledButton
                   course={fullCourse}
-                  onSuccess={() => {
-                    refetch();
-                    onClose();
+                  onSuccess={async () => {
+                    await refetch();
                   }}
                 />
               </>

@@ -1,10 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
-import {
-  StyleSheet,
-  TouchableOpacity
-} from "react-native";
-import { IMAGE_BASE_URL } from "../../../config/env";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
   primary: "#25375A",
@@ -17,8 +14,7 @@ const COLORS = {
   grey200: "#E2E8F0",
 };
 
-export default function UploadImage({setFileUpload}){
-
+export default function UploadImage({ setFileUpload }) {
   const createFormData = (files) => {
     const formData = new FormData();
 
@@ -56,7 +52,7 @@ export default function UploadImage({setFileUpload}){
 
       const formData = createFormData(files);
 
-      const response = await fetch(`${IMAGE_BASE_URL}/upload`, {
+      const response = await fetch(`${FILE_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
         headers: {
@@ -75,15 +71,14 @@ export default function UploadImage({setFileUpload}){
   };
 
   return (
-      <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
-        <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
-      </TouchableOpacity>
-      // <TouchableOpacity onPress={uploadFiles}>
-      //   <MaterialIcons name="photo-camera" size={20} color={"#FFFFFF"}/>
-      // </TouchableOpacity>
+    <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
+      <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
+    </TouchableOpacity>
+    // <TouchableOpacity onPress={uploadFiles}>
+    //   <MaterialIcons name="photo-camera" size={20} color={"#FFFFFF"}/>
+    // </TouchableOpacity>
   );
-};
-
+}
 
 const styles = StyleSheet.create({
   camera: {

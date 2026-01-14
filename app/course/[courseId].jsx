@@ -16,7 +16,7 @@ import { Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CourseContent from "../../components/courses/CourseContent";
 import { useVideoCompletion } from "../../components/courses/useVideoCompletion";
-import { FILE_BASE_URL, IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_BY_ID } from "../../schema/course";
@@ -211,7 +211,7 @@ export default function CoursePlayerScreen() {
         <View style={styles.videoWrapper}>
           <Video
             ref={videoRef}
-            source={{ uri: FILE_BASE_URL + selectedVideo.video_src }}
+            source={{ uri: `${FILE_BASE_URL}/file/${selectedVideo.video_src}` }}
             style={styles.videoWrapper}
             useNativeControls
             resizeMode="contain"
@@ -254,7 +254,7 @@ export default function CoursePlayerScreen() {
     return (
       <View style={styles.videoWrapper}>
         <Image
-          source={{ uri: `${IMAGE_BASE_URL}/file/${course?.thumbnail}` }}
+          source={{ uri: `${FILE_BASE_URL}/file/${course?.thumbnail}` }}
           style={styles.videoWrapper}
           resizeMode="cover"
         />
@@ -276,10 +276,12 @@ export default function CoursePlayerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          router.back();
-          refetch();
-        }}>
+        <TouchableOpacity
+          onPress={() => {
+            router.back();
+            refetch();
+          }}
+        >
           <MaterialCommunityIcons name="chevron-left" size={30} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
@@ -291,7 +293,7 @@ export default function CoursePlayerScreen() {
 
       <View style={styles.tabBar}>
         {TABS.map((tab) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key)}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}

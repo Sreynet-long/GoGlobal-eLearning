@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -52,7 +52,8 @@ const getCourseAction = (course, language) => {
   }
 
   if (course.has_enrolled) {
-    if (progress > 0) return { label: t("continue", language), type: "continue" };
+    if (progress > 0)
+      return { label: t("continue", language), type: "continue" };
     return { label: t("start_course", language), type: "start" };
   }
 
@@ -84,7 +85,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
   const courses = data?.getCourseWithPagination?.data ?? [];
 
   const handleOpenDetails = (course) => {
-    const action = getCourseAction(course,language);
+    const action = getCourseAction(course, language);
 
     if (action.type === "view") {
       setSelectedCourse(course);
@@ -102,9 +103,15 @@ export default function CourseList({ selectedCategoryId, searchText }) {
 
   const renderItem = useCallback(
     ({ item }) => {
-      const hasDiscount = item.original_price > item.sell_price;
+      // const hasDiscount = item.original_price > item.sell_price;
       const action = getCourseAction(item, language);
       const progress = getProgress(item);
+      const sellPrice = Number(item.sell_price);
+      const originalPrice = Number(item.original_price);
+
+      const isFree = item.is_free_course === true || sellPrice === 0;
+
+      const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
 
       return (
         <TouchableOpacity
@@ -113,10 +120,21 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           onPress={() => handleOpenDetails(item)}
         >
           <Image
-            source={{ uri: `${IMAGE_BASE_URL}/file/${item.thumbnail}` }}
+            source={{ uri: `${FILE_BASE_URL}/file/${item.thumbnail}` }}
             style={styles.cardImage}
             resizeMode="cover"
           />
+
+          {hasDiscount && (
+            <View style={styles.discountPill}>
+              <Text style={styles.discountPillText}>
+                {Math.round(
+                  ((originalPrice - sellPrice) / originalPrice) * 100
+                )}
+                % OFF
+              </Text>
+            </View>
+          )}
 
           <View style={styles.cardBody}>
             <Text style={styles.textTitle} numberOfLines={2}>
@@ -168,18 +186,28 @@ export default function CourseList({ selectedCategoryId, searchText }) {
             ) : (
               <>
                 <View style={styles.priceContainer}>
-                  <Text style={styles.textSellPrice}>
-                    ${Number(item.sell_price)?.toFixed(2)}
-                  </Text>
-                  {hasDiscount && (
-                    <Text style={styles.textOldPrice}>
-                      ${Number(item.original_price)?.toFixed(2)}
-                    </Text>
+                  {isFree ? (
+                    <Text style={styles.freeText}>FREE</Text>
+                  ) : (
+                    <View style={styles.priceRow}>
+                      <Text style={styles.textSellPrice}>
+                        ${Number(item.sell_price).toFixed(2)}
+                      </Text>
+                      {hasDiscount && (
+                        <>
+                          <Text style={styles.textOldPrice}>
+                            ${Number(item.original_price).toFixed(2)}
+                          </Text>
+                        </>
+                      )}
+                    </View>
                   )}
                 </View>
                 <View style={styles.cardFooter}>
                   <View style={styles.enrollBadge}>
-                    <Text style={styles.textEnroll}>{t("view_detail", language)}</Text>
+                    <Text style={styles.textEnroll}>
+                      {t("view_detail", language)}
+                    </Text>
                   </View>
                 </View>
               </>
@@ -271,11 +299,36 @@ const styles = StyleSheet.create({
     color: "#2D2D2D",
     lineHeight: 20,
   },
-
+  discountPill: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    backgroundColor: "#ef4444",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderBottomRightRadius: 15,
+  },
+  discountPillText: { color: "#fff", fontSize: 11, fontWeight: "900" },
   priceContainer: {
     flexDirection: "row",
     alignItems: "baseline",
     marginTop: 4,
+  },
+  freeText: {
+    alignSelf: "flex-start",
+    marginTop: 10,
+    fontSize: 15,
+    fontWeight: "900",
+    color: "#10b981",
+    backgroundColor: "#10b98123",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 16,
   },
 
   textSellPrice: { fontSize: 17, fontWeight: "800", color: "#3F51B5" },

@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -309,14 +309,14 @@ const CourseCard = ({ course, onPress }) => {
   const [imageLayout, setImageLayout] = useState(null);
 
   const imageUri = course.thumbnail
-    ? `${IMAGE_BASE_URL}/file/${course.thumbnail}`
-    : `${IMAGE_BASE_URL}/default/course.png`;
+    ? `${FILE_BASE_URL}/file/${course.thumbnail}`
+    : ``;
 
-  const isFree = !course.sell_price || course.sell_price === 0;
-  const hasDiscount =
-    course.sell_price &&
-    course.original_price &&
-    Number(course.sell_price) < Number(course.original_price);
+  const sellPrice = Number(course.sell_price);
+  const originalPrice = Number(course.original_price);
+  const isFree = course.is_free_course === true || sellPrice === 0;
+
+  const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
 
   return (
     <View style={styles.cardContainer}>
@@ -333,13 +333,11 @@ const CourseCard = ({ course, onPress }) => {
             </Text>
           </View>
 
-          {hasDiscount !== 0 && (
+          {hasDiscount && (
             <View style={styles.discountPill}>
               <Text style={styles.discountPillText}>
                 {Math.round(
-                  ((course.original_price - course.sell_price) /
-                    course.original_price) *
-                    100
+                  ((originalPrice - sellPrice) / originalPrice) * 100
                 )}
                 % OFF
               </Text>
@@ -388,11 +386,16 @@ export default function TrendingCourse() {
 
   const { data, loading, error, refetch } = useQuery(
     GET_COURSE_TRENDING_WITH_PAGINATION,
-    { variables: { limit: 10 } }
+    { variables: { limit: 10 }, fetchPolicy: "cache-and-network" }
+  );
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
   );
 
   useEffect(() => {
-    refetch();
+    if (isAuth !== undefined) refetch();
   }, [isAuth]);
 
   if (loading)
@@ -434,15 +437,15 @@ export default function TrendingCourse() {
           <CourseCard
             key={course._id}
             course={course}
-            // onPress={() => {
-            //   if (course.has_enrolled) {
-            //     router.push(`/course/${course._id}`);
-            //   } else {
-            //     setSelectedCourse(course);
-            //     setModalVisible(true);
-            //   }
-            // }}
-            onPress={() => handlePressCourse(course)}
+            onPress={() => {
+              if (course.has_enrolled) {
+                router.push(`/course/${course._id}`);
+              } else {
+                setSelectedCourse(course);
+                setModalVisible(true);
+              }
+            }}
+            // onPress={() => handlePressCourse(course)}
           />
         ))}
       </ScrollView>

@@ -4,7 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity
 } from "react-native";
-import { IMAGE_BASE_URL } from "../config/env";
+import { FILE_BASE_URL } from "../config/env";
 
 const COLORS = {
   primary: "#25375A",
@@ -56,7 +56,7 @@ export default function UploadImage({setFileUpload}){
 
       const formData = createFormData(files);
 
-      const response = await fetch(`${IMAGE_BASE_URL}/upload`, {
+      const response = await fetch(`${FILE_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
         headers: {

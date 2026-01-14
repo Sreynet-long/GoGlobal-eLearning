@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -159,14 +159,13 @@ const CourseIconsPreview = ({ includes }) => {
 /* ================= COURSE CARD ================= */
 const CourseCard = ({ course, onPress }) => {
   const imageUri = course.thumbnail
-    ? `${IMAGE_BASE_URL}/file/${course.thumbnail}`
-    : `${IMAGE_BASE_URL}/default/course.png`;
+    ? `${FILE_BASE_URL}/file/${course.thumbnail}`
+    : ``;
+  // const sellPrice = Number(course.sell_price);
+  // const originalPrice = Number(course.original_price);
+  const isFree = course.is_free_course === true || sellPrice === 0;
 
-  const isFree = !course.sell_price || course.sell_price === 0;
-  const hasDiscount =
-    course.sell_price &&
-    course.original_price &&
-    Number(course.sell_price) < Number(course.original_price);
+  // const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
   return (
     <View style={styles.cardContainer}>
       <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
@@ -178,6 +177,16 @@ const CourseCard = ({ course, onPress }) => {
               {course.category_id?.category_name?.toUpperCase() || "COURSE"}
             </Text>
           </View>
+          {/* {hasDiscount && (
+            <View style={styles.discountPill}>
+              <Text style={styles.discountPillText}>
+                {Math.round(
+                  ((originalPrice - sellPrice) / originalPrice) * 100
+                )}
+                % OFF
+              </Text>
+            </View>
+          )} */}
         </View>
       </TouchableOpacity>
 
@@ -186,20 +195,19 @@ const CourseCard = ({ course, onPress }) => {
           {course.title}
         </Text>
 
-        {isFree ? (
-          <Text style={styles.freeText}>FREE</Text>
-        ) : (
-          <View style={styles.priceStack}>
-            <Text style={styles.sellPrice}>
-              ${Number(course.sell_price).toFixed(2)}
-            </Text>
-            {hasDiscount && (
+        {isFree && <Text style={styles.freeText}>FREE</Text>}
+        {/* {isFree && (
+          // <View style={styles.priceStack}>
+          //   <Text style={styles.sellPrice}>
+          //     ${Number(course.sell_price).toFixed(2)}
+          //   </Text>
+             {hasDiscount && (
               <Text style={styles.originalPrice}>
                 ${Number(course.original_price).toFixed(2)}
               </Text>
             )}
           </View>
-        )}
+        )} */}
 
         <CourseIconsPreview includes={course.course_includes} />
       </View>
@@ -221,6 +229,12 @@ export default function FreeCourse() {
       variables: { limit: 10 },
     }
   );
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
   useEffect(() => {
     refetch();
   }, [isAuth]);

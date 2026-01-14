@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_BANNER_WITH_PAGINATION } from "../../schema/courseHomepage";
@@ -65,39 +65,44 @@ const HeroBanner = () => {
         }}
         scrollEventThrottle={16}
       >
-        {banners.map((item) => (
-          <ImageBackground
-            key={String(item._id)}
-            source={{
-              uri: item.image?.startsWith("http")
-                ? item.image
-                : `${IMAGE_BASE_URL}/file/${item.image}`,
-            }}
-            style={[styles.slide, { width: SLIDE_WIDTH }]}
-            imageStyle={{ borderRadius: 20 }}
-          >
-            <View style={styles.gradientOverlay}>
-              <Text style={styles.slideTitle}>
-                {String(item.title ?? "Course Title")}
-              </Text>
-
-              <Text style={styles.slideSubtitle}>
-                {String(item.description ?? t("explore_courses", language))}
-              </Text>
-
-              <TouchableOpacity
-                style={styles.slideButton}
-                onPress={() =>
-                  router.push(String(item.link ?? "/(tabs)/courses"))
-                }
+        {banners.map(
+          (item) => (
+            console.log("banner item", `${FILE_BASE_URL}/file/${item.image}`),
+            (
+              <ImageBackground
+                key={String(item._id)}
+                source={{
+                  uri: item.image?.startsWith("http")
+                    ? item.image
+                    : `${FILE_BASE_URL}/file/${item.image}`,
+                }}
+                style={[styles.slide, { width: SLIDE_WIDTH }]}
+                imageStyle={{ borderRadius: 20 }}
               >
-                <Text style={styles.slideButtonText}>
-                  {String(t("explore_now", language))}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-        ))}
+                <View style={styles.gradientOverlay}>
+                  <Text style={styles.slideTitle}>
+                    {String(item.title ?? "Course Title")}
+                  </Text>
+
+                  <Text style={styles.slideSubtitle}>
+                    {String(item.description ?? t("explore_courses", language))}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.slideButton}
+                    onPress={() =>
+                      router.push(String(item.link ?? "/(tabs)/courses"))
+                    }
+                  >
+                    <Text style={styles.slideButtonText}>
+                      {String(t("explore_now", language))}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ImageBackground>
+            )
+          )
+        )}
       </ScrollView>
 
       <View style={styles.pagination}>
@@ -115,7 +120,7 @@ const HeroBanner = () => {
 const styles = StyleSheet.create({
   carouselContainer: {
     marginVertical: 5,
-    marginHorizontal:10,
+    marginHorizontal: 10,
     height: 200,
   },
   slide: {
@@ -158,7 +163,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 10
+    marginBottom: 10,
   },
   slideButtonText: {
     color: "#25375A",

@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import  useDebounce from "../../app/hook/useDebounce";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_COURSE_ENROLLED_WITH_PAGINATION } from "../../schema/course";
@@ -38,7 +38,7 @@ const CourseCard = ({ item, language, onPress }) => {
   return (
     <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={onPress}>
       <Image
-        source={{ uri: `${IMAGE_BASE_URL}/file/${item.thumbnail}` }}
+        source={{ uri: `${FILE_BASE_URL}/file/${item.thumbnail}` }}
         style={styles.cardImage}
       />
 

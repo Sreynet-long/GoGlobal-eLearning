@@ -98,7 +98,7 @@ export default function VideoList({
             {video.resources?.length > 0 &&
               video.resources.map((res, i) => {
                 const filename = res.split("/").pop().split("__")[0] + ".pdf";
-                const fileUrl = FILE_BASE_URL + res;
+                const fileUrl = `${FILE_BASE_URL}/file/${res}`;
                 return (
                   <View key={i} style={styles.lessonPdfRow}>
                     <DownloadButton fileUrl={fileUrl} filename={filename} />

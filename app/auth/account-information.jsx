@@ -18,7 +18,7 @@ import {
   Text,
   TextInput,
 } from "react-native-paper";
-import { IMAGE_BASE_URL } from "../../config/env";
+import { FILE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -119,9 +119,9 @@ export default function AccountScreen() {
             <Image
               source={{
                 uri: fileUpload[0]?.filename
-                  ? `${IMAGE_BASE_URL}/file/${fileUpload[0]?.filename}`
+                  ? `${FILE_BASE_URL}/file/${fileUpload[0]?.filename}`
                   : user?.profile_image
-                  ? `${IMAGE_BASE_URL}/file/${user?.profile_image}`
+                  ? `${FILE_BASE_URL}/file/${user?.profile_image}`
                   : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
               }}
               style={styles.avatar}
