@@ -47,6 +47,7 @@ export default function LoginScreen() {
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -153,7 +154,7 @@ export default function LoginScreen() {
           <View style={styles.headerInfo}>
             <Text style={styles.headerTitle}>
               {isSignUp
-                ? t("create_account", language)
+                ? t("register_account", language)
                 : t("welcome_back", language)}
             </Text>
             <Text style={styles.headerSubtitle}>
@@ -240,13 +241,21 @@ export default function LoginScreen() {
             <TextInput
               label={t("password", language)}
               mode="outlined"
-              secureTextEntry
+              secureTextEntry={!showPass}
               value={password}
               onChangeText={setPassword}
               style={styles.inputSpacing}
               outlineStyle={styles.inputOutline}
+              activeOutlineColor={COLORS.primary}
               left={
                 <TextInput.Icon icon="lock-outline" color={COLORS.grey600} />
+              }
+              right={
+                <TextInput.Icon
+                  icon={showPass ? "eye-off" : "eye"}
+                  onPress={() => setShowPass(!showPass)}
+                  color={COLORS.grey600}
+                />
               }
             />
 

@@ -122,7 +122,7 @@ export default function AccountScreen() {
                   ? `${FILE_BASE_URL}/file/${fileUpload[0]?.filename}`
                   : user?.profile_image
                   ? `${FILE_BASE_URL}/file/${user?.profile_image}`
-                  : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+                  : ``,
               }}
               style={styles.avatar}
             />
@@ -257,6 +257,7 @@ function EditUser({ initialData, onSave, updating, language }) {
             >
               <RadioButton.Android
                 value={g}
+                onPress={() => setFormData({ ...formData, gender: g })}
                 status={
                   formData.gender.toLowerCase() === g ? "checked" : "unchecked"
                 }

@@ -88,7 +88,7 @@ export default {
   call_us: "លេខទូរស័ព្ទ",
   website: "វេបសាយ",
   facebook: "ហ្វេសប៊ុក",
-  create_account: "បង្កើតគណនី",
+  register_account: "ចុះឈ្មោះគណនី",
   sign_up: "ចុះឈ្មោះ",
   dont_have_account: "មិនទាន់មានគណនី? ចុះឈ្មោះ",
   already_have_account: "មានគណនីរួចហើយ? ចូលគណនី",

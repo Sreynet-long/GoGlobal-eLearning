@@ -279,7 +279,7 @@ export default function CoursePlayerScreen() {
         <TouchableOpacity
           onPress={() => {
             router.back();
-            refetch();
+            // refetch();
           }}
         >
           <MaterialCommunityIcons name="chevron-left" size={30} color="#000" />

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -62,7 +62,7 @@ const getCourseAction = (course, language) => {
 
 export default function CourseList({ selectedCategoryId, searchText }) {
   const router = useRouter();
-  const isAuth = useAuth();
+  const { isAuth } = useAuth();
   const { language } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -78,40 +78,58 @@ export default function CourseList({ selectedCategoryId, searchText }) {
     fetchPolicy: "cache-and-network",
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch({ fetchPolicy: "network-only" });
+    }, [refetch])
+  );
+
   useEffect(() => {
-    refetch();
-  }, [searchText, selectedCategoryId, isAuth]);
+    if (isAuth !== undefined) {
+      refetch();
+    }
+  }, [isAuth, searchText, selectedCategoryId]);
 
   const courses = data?.getCourseWithPagination?.data ?? [];
 
-  const handleOpenDetails = (course) => {
-    const action = getCourseAction(course, language);
+  const handleOpenDetails = useCallback(
+    (course) => {
+      const action = getCourseAction(course, language);
 
-    if (action.type === "view") {
-      setSelectedCourse(course);
-      setModalVisible(true);
-      return;
-    }
-    router.push({
-      pathname: `/course/${course._id}`,
-      params: {
-        courseId: course._id,
-        resume: action.type === "continue",
-      },
-    });
-  };
+      if (action.type === "view") {
+        setSelectedCourse(course);
+        setModalVisible(true);
+        return;
+      }
+      router.push({
+        pathname: `/course/[courseId]`,
+        params: {
+          courseId: course._id,
+          resume: action.type === "continue",
+        },
+      });
+    },
+    [router, language]
+  );
 
   const renderItem = useCallback(
     ({ item }) => {
-      // const hasDiscount = item.original_price > item.sell_price;
       const action = getCourseAction(item, language);
       const progress = getProgress(item);
-      const sellPrice = Number(item.sell_price);
-      const originalPrice = Number(item.original_price);
+      const sellPrice = Number(item.sell_price) || 0;
+      const originalPrice = Number(item.original_price) || 0;
 
       const isFree = item.is_free_course === true || sellPrice === 0;
 
-      const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
+      const hasDiscount =
+        !item.has_enrolled &&
+        !isFree &&
+        sellPrice > 0 &&
+        originalPrice > sellPrice;
+      const discountPercent =
+        hasDiscount && originalPrice > 0
+          ? Math.round(((originalPrice - sellPrice) / originalPrice) * 100)
+          : 0;
 
       return (
         <TouchableOpacity
@@ -128,10 +146,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
           {hasDiscount && (
             <View style={styles.discountPill}>
               <Text style={styles.discountPillText}>
-                {Math.round(
-                  ((originalPrice - sellPrice) / originalPrice) * 100
-                )}
-                % OFF
+                {discountPercent}% OFF
               </Text>
             </View>
           )}
@@ -194,11 +209,9 @@ export default function CourseList({ selectedCategoryId, searchText }) {
                         ${Number(item.sell_price).toFixed(2)}
                       </Text>
                       {hasDiscount && (
-                        <>
-                          <Text style={styles.textOldPrice}>
-                            ${Number(item.original_price).toFixed(2)}
-                          </Text>
-                        </>
+                        <Text style={styles.textOldPrice}>
+                          ${Number(item.original_price).toFixed(2)}
+                        </Text>
                       )}
                     </View>
                   )}
@@ -216,7 +229,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         </TouchableOpacity>
       );
     },
-    [language]
+    [language, handleOpenDetails]
   );
 
   if (loading && !data) {
@@ -235,9 +248,7 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         data={courses}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
-        extraData={courses.map(
-          (c) => `${c._id}-${c.overall_completion_percentage}`
-        )}
+        extraData={courses}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
         removeClippedSubviews
@@ -255,12 +266,13 @@ export default function CourseList({ selectedCategoryId, searchText }) {
         ListEmptyComponent={<EmptyCourse />}
         ListFooterComponent={<View style={{ height: 120 }} />}
       />
-
-      <CourseDetailModal
-        visible={modalVisible}
-        course={selectedCourse}
-        onClose={() => setModalVisible(false)}
-      />
+      {selectedCourse && (
+        <CourseDetailModal
+          visible={modalVisible}
+          course={selectedCourse}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </View>
   );
 }
@@ -328,7 +340,7 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 16,
+    // marginVertical: 6,
   },
 
   textSellPrice: { fontSize: 17, fontWeight: "800", color: "#3F51B5" },
@@ -343,7 +355,7 @@ const styles = StyleSheet.create({
   cardFooter: { alignItems: "flex-end" },
   enrollBadge: {
     backgroundColor: "#F0F2FF",
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },

@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -30,35 +30,50 @@ const CourseIconsPreview = ({ includes }) => {
   if (!includes) return null;
 
   const icons = [
-    includes.number_of_downloadable_resources !== null && (
-      <Entypo key="download" name="download" size={12} color="#0000005d" />
-    ),
-    includes.number_of_hours !== null && (
-      <Entypo key="hours" name="hour-glass" size={12} color="#0000005d" />
-    ),
-    includes.number_of_lessons !== null && (
-      <Entypo key="lessons" name="folder" size={12} color="#0000005d" />
-    ),
-    includes.number_of_video !== null && (
-      <Entypo key="video" name="folder-video" size={12} color="#0000005d" />
-    ),
-    includes.has_certificate_of_completion && (
+  {
+    id: "download",
+    show: includes.number_of_downloadable_resources != null,
+    icon: <Entypo name="download" size={12} color="#0000005d" />,
+  },
+  {
+    id: "hours",
+    show: includes.number_of_hours != null,
+    icon: <Entypo name="hour-glass" size={12} color="#0000005d" />,
+  },
+  {
+    id: "lessons",
+    show: includes.number_of_lessons != null,
+    icon: <Entypo name="folder" size={12} color="#0000005d" />,
+  },
+  {
+    id: "video",
+    show: includes.number_of_video != null,
+    icon: <Entypo name="folder-video" size={12} color="#0000005d" />,
+  },
+  {
+    id: "certificate",
+    show: includes.has_certificate_of_completion,
+    icon: (
       <MaterialCommunityIcons
-        key="certificate"
         name="certificate-outline"
         size={12}
         color="#0000005d"
       />
     ),
-    includes.is_full_lifetime_access && (
+  },
+  {
+    id: "lifetime",
+    show: includes.is_full_lifetime_access,
+    icon: (
       <MaterialCommunityIcons
-        key="lifetime"
         name="timer-sand-full"
         size={12}
         color="#0000005d"
       />
     ),
-  ].filter(Boolean);
+  },
+].filter(i => i.show);
+
 
   const tooltipItems = [
     {
@@ -155,9 +170,9 @@ const CourseIconsPreview = ({ includes }) => {
         activeOpacity={1}
         style={styles.iconGrid}
       >
-        {icons.map((icon, index) => (
-          <View key={index} style={styles.iconWrapper}>
-            {icon}
+        {icons.map((item) => (
+          <View key={item.id} style={styles.iconWrapper}>
+            {item.icon}
           </View>
         ))}
       </TouchableOpacity>
@@ -250,52 +265,51 @@ const CourseIconsPreview = ({ includes }) => {
                 paddingBottom: 2,
               }}
             >
-              {tooltipItems.map(
-                (item, index) =>
-                  item.show && (
+              {tooltipItems
+                .filter((item) => item.show)
+                .map((item) => (
+                  <View
+                    key={item.label}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      width: "48%",
+                      paddingVertical: 0,
+                      paddingHorizontal: 2,
+                      marginBottom: 0,
+                      backgroundColor: "rgba(248, 249, 250, 0.85)",
+                      borderRadius: 10,
+                      minHeight: 32,
+                    }}
+                  >
                     <View
-                      key={index}
                       style={{
-                        flexDirection: "row",
+                        width: 24,
+                        height: 18,
+                        borderRadius: 6,
+                        backgroundColor: item.bg || "#fff",
+                        justifyContent: "center",
                         alignItems: "center",
-                        width: "48%",
-                        paddingVertical: 0,
-                        paddingHorizontal: 2,
-                        marginBottom: 0,
-                        backgroundColor: "rgba(248, 249, 250, 0.85)",
-                        borderRadius: 10,
-                        minHeight: 32,
                       }}
                     >
-                      <View
-                        style={{
-                          width: 24,
-                          height: 18,
-                          borderRadius: 6,
-                          backgroundColor: item.bg || "#fff",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        {item.icon}
-                      </View>
-
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          marginLeft: 3,
-                          color: "#1e293b",
-                          fontSize: 12,
-                          fontWeight: "700",
-                          letterSpacing: -0.2,
-                          flex: 1,
-                        }}
-                      >
-                        {item.label}
-                      </Text>
+                      {item.icon}
                     </View>
-                  )
-              )}
+
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        marginLeft: 3,
+                        color: "#1e293b",
+                        fontSize: 12,
+                        fontWeight: "700",
+                        letterSpacing: -0.2,
+                        flex: 1,
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                  </View>
+                ))}
             </View>
           </ScrollView>
         </View>
@@ -311,7 +325,7 @@ const CourseCard = ({ course, onPress }) => {
   const imageUri = course.thumbnail
     ? `${FILE_BASE_URL}/file/${course.thumbnail}`
     : ``;
-
+  // const progress = getProgress(course);
   const sellPrice = Number(course.sell_price);
   const originalPrice = Number(course.original_price);
   const isFree = course.is_free_course === true || sellPrice === 0;
@@ -391,12 +405,8 @@ export default function TrendingCourse() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [])
+    }, [isAuth])
   );
-
-  useEffect(() => {
-    if (isAuth !== undefined) refetch();
-  }, [isAuth]);
 
   if (loading)
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
@@ -433,7 +443,7 @@ export default function TrendingCourse() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       >
-        {data.getHilightCourse.map((course) => (
+        {data.getHilightCourse.slice(0, 10).map((course) => (
           <CourseCard
             key={course._id}
             course={course}

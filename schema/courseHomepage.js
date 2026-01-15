@@ -67,6 +67,8 @@ export const GET_COURSE_TRENDING_WITH_PAGINATION = gql`
         period_of_access_as_month
         has_certificate_of_completion
       }
+      has_enrolled
+      has_course_completed
       overall_completion_percentage
     }
   }

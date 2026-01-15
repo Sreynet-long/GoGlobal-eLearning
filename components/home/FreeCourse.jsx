@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useRouter, useFocusEffect } from "expo-router";
-import { useEffect, useState, useCallback } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -161,11 +161,9 @@ const CourseCard = ({ course, onPress }) => {
   const imageUri = course.thumbnail
     ? `${FILE_BASE_URL}/file/${course.thumbnail}`
     : ``;
-  // const sellPrice = Number(course.sell_price);
-  // const originalPrice = Number(course.original_price);
-  const isFree = course.is_free_course === true || sellPrice === 0;
 
-  // const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
+  const isFree = course.is_free_course === true;
+
   return (
     <View style={styles.cardContainer}>
       <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
@@ -177,16 +175,6 @@ const CourseCard = ({ course, onPress }) => {
               {course.category_id?.category_name?.toUpperCase() || "COURSE"}
             </Text>
           </View>
-          {/* {hasDiscount && (
-            <View style={styles.discountPill}>
-              <Text style={styles.discountPillText}>
-                {Math.round(
-                  ((originalPrice - sellPrice) / originalPrice) * 100
-                )}
-                % OFF
-              </Text>
-            </View>
-          )} */}
         </View>
       </TouchableOpacity>
 
@@ -232,17 +220,16 @@ export default function FreeCourse() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [])
+    }, [isAuth])
   );
-
-  useEffect(() => {
-    refetch();
-  }, [isAuth]);
 
   if (loading)
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
 
   if (error || !data?.getFreeCourse?.length) return null;
+
+  console.log("FREE COURSES:", data?.getFreeCourse);
+  console.log("Free Course COUNT:", data?.getFreeCourse?.length);
 
   return (
     <View style={styles.container}>
@@ -279,7 +266,7 @@ export default function FreeCourse() {
             course={course}
             onPress={() => {
               if (course.has_enrolled) {
-                router.push(`/course/${course._id}`);
+              router.push(`/course/${course._id}`);
               } else {
                 setSelectedCourse(course);
                 setModalVisible(true);

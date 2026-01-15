@@ -89,7 +89,7 @@ export default {
   call_us: "Call Us",
   website: "Website",
   facebook: "Facebook",
-  create_account: "Create Account!",
+  register_account: "Register Account!",
   sign_up: "Sign Up",
   dont_have_account: "Don't have an account yet? ",
   already_have_account: "Already have an account? ",

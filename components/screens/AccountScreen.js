@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { Button, Surface, Text } from "react-native-paper";
-
+import { FILE_BASE_URL } from "../../config/env";
 import Topbar from "../../components/headers/Topbar";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -53,8 +53,8 @@ export default function AccountScreen() {
             <Image
               source={{
                 uri: user?.profile_image
-                  ? `http://192.168.5.36:6800/api/file/${user.profile_image}`
-                  : "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+                  ? `${FILE_BASE_URL}/file/${user.profile_image}`
+                  : ``,
               }}
               style={styles.avatar}
             />
