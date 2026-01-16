@@ -13,7 +13,7 @@ import { Text, Title } from "react-native-paper";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 
-const COMPANY_LOGO = require("../../assets/images/Go_Global_IT_logo.png");
+const COMPANY_LOGO = require("../../assets/images/Go_Global_elearning_logo.png");
 
 const COLORS = {
   primary: "#25375A",

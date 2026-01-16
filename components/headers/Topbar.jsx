@@ -52,7 +52,7 @@ export default function Topbar({ showBack = false }) {
           <View style={styles.brandGroup}>
             <View style={styles.logoBox}>
               <Image
-                source={require("../../assets/images/Go_Global_IT_logo.png")}
+                source={require("../../assets/images/Go_Global_elearning_logo.png")}
                 style={styles.logo}
               />
             </View>
