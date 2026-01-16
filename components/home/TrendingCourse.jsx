@@ -30,50 +30,49 @@ const CourseIconsPreview = ({ includes }) => {
   if (!includes) return null;
 
   const icons = [
-  {
-    id: "download",
-    show: includes.number_of_downloadable_resources != null,
-    icon: <Entypo name="download" size={12} color="#0000005d" />,
-  },
-  {
-    id: "hours",
-    show: includes.number_of_hours != null,
-    icon: <Entypo name="hour-glass" size={12} color="#0000005d" />,
-  },
-  {
-    id: "lessons",
-    show: includes.number_of_lessons != null,
-    icon: <Entypo name="folder" size={12} color="#0000005d" />,
-  },
-  {
-    id: "video",
-    show: includes.number_of_video != null,
-    icon: <Entypo name="folder-video" size={12} color="#0000005d" />,
-  },
-  {
-    id: "certificate",
-    show: includes.has_certificate_of_completion,
-    icon: (
-      <MaterialCommunityIcons
-        name="certificate-outline"
-        size={12}
-        color="#0000005d"
-      />
-    ),
-  },
-  {
-    id: "lifetime",
-    show: includes.is_full_lifetime_access,
-    icon: (
-      <MaterialCommunityIcons
-        name="timer-sand-full"
-        size={12}
-        color="#0000005d"
-      />
-    ),
-  },
-].filter(i => i.show);
-
+    {
+      id: "download",
+      show: includes.number_of_downloadable_resources != null,
+      icon: <Entypo name="download" size={12} color="#0000005d" />,
+    },
+    {
+      id: "hours",
+      show: includes.number_of_hours != null,
+      icon: <Entypo name="hour-glass" size={12} color="#0000005d" />,
+    },
+    {
+      id: "lessons",
+      show: includes.number_of_lessons != null,
+      icon: <Entypo name="folder" size={12} color="#0000005d" />,
+    },
+    {
+      id: "video",
+      show: includes.number_of_video != null,
+      icon: <Entypo name="folder-video" size={12} color="#0000005d" />,
+    },
+    {
+      id: "certificate",
+      show: includes.has_certificate_of_completion,
+      icon: (
+        <MaterialCommunityIcons
+          name="certificate-outline"
+          size={12}
+          color="#0000005d"
+        />
+      ),
+    },
+    {
+      id: "lifetime",
+      show: includes.is_full_lifetime_access,
+      icon: (
+        <MaterialCommunityIcons
+          name="timer-sand-full"
+          size={12}
+          color="#0000005d"
+        />
+      ),
+    },
+  ].filter((i) => i.show);
 
   const tooltipItems = [
     {
@@ -319,18 +318,46 @@ const CourseIconsPreview = ({ includes }) => {
 };
 
 /* ================= COURSE CARD ================= */
+
+const getProgress = (course) => {
+  const value = Number(course?.overall_completion_percentage);
+  if (Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+};
+
+const getCourseAction = (course, language) => {
+  const progress = course.overall_completion_percentage ?? 0;
+
+  if (course.has_course_completed || progress === 100) {
+    return { label: t("completed", language), type: "completed" };
+  }
+
+  if (course.has_enrolled) {
+    if (progress > 0)
+      return { label: t("continue", language), type: "continue" };
+    return { label: t("start_course", language), type: "start" };
+  }
+
+  return { label: t("View Detail", language), type: "view" };
+};
+
 const CourseCard = ({ course, onPress }) => {
   const [imageLayout, setImageLayout] = useState(null);
 
   const imageUri = course.thumbnail
     ? `${FILE_BASE_URL}/file/${course.thumbnail}`
     : ``;
-  // const progress = getProgress(course);
-  const sellPrice = Number(course.sell_price);
-  const originalPrice = Number(course.original_price);
+  const action = getCourseAction(course);
+  const progress = getProgress(course);
+  const sellPrice = Number(course.sell_price) || 0;
+  const originalPrice = Number(course.original_price) || 0;
   const isFree = course.is_free_course === true || sellPrice === 0;
 
-  const hasDiscount = !isFree && sellPrice > 0 && originalPrice > sellPrice;
+  const hasDiscount =
+    !course.has_enrolled &&
+    !isFree &&
+    sellPrice > 0 &&
+    originalPrice > sellPrice;
 
   return (
     <View style={styles.cardContainer}>
@@ -364,26 +391,72 @@ const CourseCard = ({ course, onPress }) => {
         <Text style={styles.courseTitle} numberOfLines={1}>
           {course.title}
         </Text>
+        {course.has_enrolled ? (
+          <>
+            {course.has_course_completed ? (
+              <View style={styles.completedBadge}>
+                <Text style={styles.completedText}>Completed</Text>
+              </View>
+            ) : (
+              <>
+                <View style={styles.progressBarContainer}>
+                  <View style={styles.progressBarBackground}>
+                    <View
+                      style={[
+                        styles.progressBarFill,
+                        { width: `${progress}%` },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.progressText}>{progress}%</Text>
+                </View>
 
-        {isFree ? (
-          <Text style={styles.freeText}>FREE</Text>
-        ) : (
-          <View style={styles.priceStack}>
-            <Text style={styles.sellPrice}>
-              ${Number(course.sell_price).toFixed(2)}
-            </Text>
-            {hasDiscount && (
-              <Text style={styles.originalPrice}>
-                ${Number(course.original_price).toFixed(2)}
-              </Text>
+                <View style={styles.cardFooterContainer}>
+                  <View
+                    style={[
+                      styles.enrollBadge,
+                      action.type === "completed" && styles.completedBadge,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        action.type === "completed"
+                          ? styles.completedText
+                          : action.type === "continue"
+                          ? styles.textContinue
+                          : styles.textEnroll,
+                      ]}
+                    >
+                      {action.label}
+                    </Text>
+                  </View>
+                </View>
+              </>
             )}
-          </View>
-        )}
+          </>
+        ) : (
+          <>
+            {isFree ? (
+              <Text style={styles.freeText}>FREE</Text>
+            ) : (
+              <View style={styles.priceStack}>
+                <Text style={styles.sellPrice}>
+                  ${Number(course.sell_price).toFixed(2)}
+                </Text>
+                {hasDiscount && (
+                  <Text style={styles.originalPrice}>
+                    ${Number(course.original_price).toFixed(2)}
+                  </Text>
+                )}
+              </View>
+            )}
 
-        <CourseIconsPreview
-          includes={course.course_includes}
-          imageLayout={imageLayout}
-        />
+            <CourseIconsPreview
+              includes={course.course_includes}
+              imageLayout={imageLayout}
+            />
+          </>
+        )}
       </View>
     </View>
   );
@@ -412,6 +485,7 @@ export default function TrendingCourse() {
     return <ActivityIndicator style={{ marginVertical: 30 }} color="#6366f1" />;
 
   if (error || !data?.getHilightCourse?.length) return null;
+  // console.log(data.getHilightCourse.map((c) => c._id));
   const handlePressCourse = (course) => {
     setSelectedCourse(course);
     setModalVisible(true);
@@ -444,6 +518,7 @@ export default function TrendingCourse() {
         contentContainerStyle={styles.scrollContainer}
       >
         {data.getHilightCourse.slice(0, 10).map((course) => (
+          // console.log(data.getHilightCourse.map((c) => c._id)),
           <CourseCard
             key={course._id}
             course={course}
@@ -554,7 +629,61 @@ const styles = StyleSheet.create({
   infoWrapper: { padding: 12 },
 
   courseTitle: { fontSize: 18, fontWeight: "800", color: "#1e293b" },
+  completedBadge: {
+    backgroundColor: "#E6F7E6",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  completedText: { color: "#2E7D32", fontWeight: "600", fontSize: 12 },
 
+  progressBarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 8,
+  },
+
+  progressBarBackground: {
+    flex: 1,
+    height: 5,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 4,
+    overflow: "hidden",
+    marginRight: 8,
+  },
+
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#22c55e",
+    borderRadius: 4,
+  },
+
+  progressText: {
+    fontSize: 12,
+    color: "#22c55e",
+    fontWeight: "700",
+    minWidth: 40,
+    textAlign: "right",
+  },
+  cardFooterContainer: { alignItems: "flex-start" },
+  enrollBadge: {
+    backgroundColor: "#F0F2FF",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  completedBadge: {
+    backgroundColor: "#E6F7E6",
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 6,
+    // marginTop: 10,
+  },
+  completedText: { color: "#2E7D32", fontWeight: "600", fontSize: 12 },
+  textContinue: { color: "#8d8513ff", fontWeight: "600", fontSize: 12 },
+  textEnroll: { color: "#3F51B5", fontWeight: "600", fontSize: 12 },
   priceStack: { flexDirection: "row", alignItems: "baseline", marginTop: 8 },
   sellPrice: {
     fontSize: 17,

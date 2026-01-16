@@ -83,6 +83,8 @@ export const GET_COURSE_FREE_WITH_PAGINATION = gql`
         category_name
       }
       overall_completion_percentage
+      has_enrolled
+      has_course_completed
       is_free_course
       what_you_learn
       who_this_course_is_for

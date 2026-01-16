@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
 import {
   Button,
@@ -205,6 +206,12 @@ function EditUser({ initialData, onSave, updating, language }) {
 
   return (
     <View style={styles.formContainer}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
+
+      >
       <View style={{ flexDirection: "row", marginBottom: 10 }}>
         <TextInput
           label={t("first_name", language)}
@@ -286,6 +293,7 @@ function EditUser({ initialData, onSave, updating, language }) {
       >
         {t("save_changes", language)}
       </Button>
+      </ScrollView>
     </View>
   );
 }
