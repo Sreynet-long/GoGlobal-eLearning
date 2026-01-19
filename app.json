@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "GO Global eLEARNING",
-    "slug": "goGlobal_eLearning",
+    "slug": "go-global-elearning-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -12,6 +12,10 @@
       "supportsTablet": true,
       "icon": {
         "image": "./assets/images/icon.png"
+      },
+      "bundleIdentifier": "com.goglobal.goglobalelearningapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -22,11 +26,13 @@
         "monochromeImage": "./assets/images/adaptive-icon.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.sreynet.goglobalelearningapp"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/splash.png"
     },
     "plugins": [
       "expo-router",
@@ -53,6 +59,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b4cbf465-a205-4efd-8022-96209aa1a8e9"
+      }
+    },
+    "owner": "globalit"
   }
 }
