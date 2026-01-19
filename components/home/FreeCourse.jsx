@@ -183,7 +183,7 @@ const getCourseAction = (course, language) => {
 const CourseCard = ({ course, onPress }) => {
   const imageUri = course.thumbnail
     ? `${FILE_BASE_URL}/file/${course.thumbnail}`
-    : ``;
+    : null;
   const action = getCourseAction(course);
   const progress = getProgress(course);
   const isFree = course.is_free_course === true;

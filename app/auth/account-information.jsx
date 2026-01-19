@@ -6,11 +6,11 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
 import {
   Button,
@@ -57,7 +57,7 @@ export default function AccountScreen() {
       setFileUpload([]);
       refetch?.();
       setEditing(false);
-      if (data?.mobileUpdateUser?.data) setUser(data.mobileUpdateUser.data);
+      if (data?.mobileUpdateUser?.data) setUser(data?.mobileUpdateUser?.data);
     },
   });
 
@@ -67,7 +67,7 @@ export default function AccountScreen() {
   const handleSave = (formData) => {
     updateUser({
       variables: {
-        id: user._id,
+        id: user?._id,
         input: {
           ...formData,
           profile_image: fileUpload[0]?.filename
@@ -80,12 +80,12 @@ export default function AccountScreen() {
 
   const handleCancel = async () => {
     setEditing(!editing);
-    await deleteImage(fileUpload[0]?.filename);
+    await deleteImage(fileUpload[0].filename);
     setFileUpload([]);
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) router.back();
+    if (router?.canGoBack()) router.back();
     else router.replace("/(tabs)/account&Aboutus");
   };
 
@@ -122,8 +122,8 @@ export default function AccountScreen() {
                 uri: fileUpload[0]?.filename
                   ? `${FILE_BASE_URL}/file/${fileUpload[0]?.filename}`
                   : user?.profile_image
-                  ? `${FILE_BASE_URL}/file/${user?.profile_image}`
-                  : ``,
+                    ? `${FILE_BASE_URL}/file/${user?.profile_image}`
+                    : null,
               }}
               style={styles.avatar}
             />
@@ -168,28 +168,30 @@ export default function AccountScreen() {
             language={language}
           />
         ) : (
-          <View style={styles.infoGrid}>
-            <InfoTile
-              label={t("first_name", language)}
-              value={user?.first_name}
-              icon="account-box"
-            />
-            <InfoTile
-              label={t("last_name", language)}
-              value={user?.last_name}
-              icon="badge"
-            />
-            <InfoTile
-              label={t("phone", language)}
-              value={user?.phone_number}
-              icon="contact-phone"
-            />
-            <InfoTile
-              label={t("gender", language)}
-              value={user?.gender}
-              icon={getGenderIcon(user?.gender)}
-            />
-          </View>
+          <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+            <View style={styles.infoGrid}>
+              <InfoTile
+                label={t("first_name", language)}
+                value={user?.first_name}
+                icon="account-box"
+              />
+              <InfoTile
+                label={t("last_name", language)}
+                value={user?.last_name}
+                icon="badge"
+              />
+              <InfoTile
+                label={t("phone", language)}
+                value={user?.phone_number}
+                icon="contact-phone"
+              />
+              <InfoTile
+                label={t("gender", language)}
+                value={user?.gender}
+                icon={getGenderIcon(user?.gender)}
+              />
+            </View>
+          </ScrollView>
         )}
       </View>
     </KeyboardAvoidingView>
@@ -210,89 +212,90 @@ function EditUser({ initialData, onSave, updating, language }) {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
-
       >
-      <View style={{ flexDirection: "row", marginBottom: 10 }}>
+        <View style={{ flexDirection: "row", marginBottom: 10 }}>
+          <TextInput
+            label={t("first_name", language)}
+            value={formData.first_name}
+            onChangeText={(v) => setFormData({ ...formData, first_name: v })}
+            mode="outlined"
+            style={[styles.input, { flex: 1, marginRight: 8 }]}
+            contentStyle={styles.inputContent}
+            outlineColor={COLORS.grey200}
+            activeOutlineColor={COLORS.primary}
+          />
+
+          <TextInput
+            label={t("last_name", language)}
+            value={formData.last_name}
+            onChangeText={(v) => setFormData({ ...formData, last_name: v })}
+            mode="outlined"
+            style={[styles.input, { flex: 1 }]}
+            contentStyle={styles.inputContent}
+            outlineColor={COLORS.grey200}
+            activeOutlineColor={COLORS.primary}
+          />
+        </View>
+
         <TextInput
-          label={t("first_name", language)}
-          value={formData.first_name}
-          onChangeText={(v) => setFormData({ ...formData, first_name: v })}
+          label={t("phone", language)}
+          value={formData.phone_number}
+          onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
           mode="outlined"
-          style={[styles.input, { flex: 1, marginRight: 8 }]}
+          keyboardType="phone-pad"
+          style={styles.input}
           contentStyle={styles.inputContent}
           outlineColor={COLORS.grey200}
           activeOutlineColor={COLORS.primary}
         />
 
-        <TextInput
-          label={t("last_name", language)}
-          value={formData.last_name}
-          onChangeText={(v) => setFormData({ ...formData, last_name: v })}
-          mode="outlined"
-          style={[styles.input, { flex: 1 }]}
-          contentStyle={styles.inputContent}
-          outlineColor={COLORS.grey200}
-          activeOutlineColor={COLORS.primary}
-        />
-      </View>
+        <View style={styles.genderBox}>
+          <Text style={styles.genderLabel}>{t("gender", language)}</Text>
 
-      <TextInput
-        label={t("phone", language)}
-        value={formData.phone_number}
-        onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
-        mode="outlined"
-        keyboardType="phone-pad"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineColor={COLORS.grey200}
-        activeOutlineColor={COLORS.primary}
-      />
-
-      <View style={styles.genderBox}>
-        <Text style={styles.genderLabel}>{t("gender", language)}</Text>
-
-        <View style={styles.radioGroup}>
-          {["male", "female"].map((g) => (
-            <TouchableOpacity
-              key={g}
-              onPress={() => setFormData({ ...formData, gender: g })}
-              style={[
-                styles.genderOption,
-                formData.gender.toLowerCase() === g &&
-                  styles.genderOptionActive,
-              ]}
-            >
-              <RadioButton.Android
-                value={g}
+          <View style={styles.radioGroup}>
+            {["male", "female"].map((g) => (
+              <TouchableOpacity
+                key={g}
                 onPress={() => setFormData({ ...formData, gender: g })}
-                status={
-                  formData.gender.toLowerCase() === g ? "checked" : "unchecked"
-                }
-                color={COLORS.primary}
-              />
-              <Text
                 style={[
-                  styles.genderText,
+                  styles.genderOption,
                   formData.gender.toLowerCase() === g &&
-                    styles.genderTextActive,
+                    styles.genderOptionActive,
                 ]}
               >
-                {t(g, language) || g.charAt(0).toUpperCase() + g.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <RadioButton.Android
+                  value={g}
+                  onPress={() => setFormData({ ...formData, gender: g })}
+                  status={
+                    formData.gender.toLowerCase() === g
+                      ? "checked"
+                      : "unchecked"
+                  }
+                  color={COLORS.primary}
+                />
+                <Text
+                  style={[
+                    styles.genderText,
+                    formData.gender.toLowerCase() === g &&
+                      styles.genderTextActive,
+                  ]}
+                >
+                  {t(g, language) || g.charAt(0).toUpperCase() + g.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      </View>
 
-      <Button
-        mode="contained"
-        onPress={() => onSave(formData)}
-        loading={updating}
-        textColor="white"
-        style={styles.saveBtn}
-      >
-        {t("save_changes", language)}
-      </Button>
+        <Button
+          mode="contained"
+          onPress={() => onSave(formData)}
+          loading={updating}
+          textColor="white"
+          style={styles.saveBtn}
+        >
+          {t("save_changes", language)}
+        </Button>
       </ScrollView>
     </View>
   );
