@@ -54,7 +54,7 @@ export default function AccountScreen() {
               source={{
                 uri: user?.profile_image
                   ? `${FILE_BASE_URL}/file/${user.profile_image}`
-                  : ``,
+                  : null,
               }}
               style={styles.avatar}
             />
