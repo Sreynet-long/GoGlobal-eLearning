@@ -258,7 +258,6 @@ function EditUser({ initialData, onSave, updating, language }) {
           value={formData.phone_number}
           onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
           mode="outlined"
-          keyboardType="phone-pad"
           style={styles.input}
           contentStyle={styles.inputContent}
           outlineColor={COLORS.grey200}
