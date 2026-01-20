@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -45,6 +45,13 @@ export default function AccountScreen() {
   const { user: authUser, setUser } = useAuth();
   const [editing, setEditing] = useState(false);
   const [fileUpload, setFileUpload] = useState([]);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const {
     data: userData,
@@ -54,15 +61,22 @@ export default function AccountScreen() {
 
   const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
     onCompleted: (data) => {
+      if (!mountedRef.current) return;
       setFileUpload([]);
-      refetch?.();
       setEditing(false);
+      refetch?.();
       if (data?.mobileUpdateUser?.data) setUser(data?.mobileUpdateUser?.data);
     },
   });
 
   const user = userData?.getUserById || authUser || {};
-  if (userLoading) return null;
+  if (userLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   const handleSave = (formData) => {
     updateUser({
@@ -70,18 +84,18 @@ export default function AccountScreen() {
         id: user?._id,
         input: {
           ...formData,
-          profile_image: fileUpload[0]?.filename
-            ? fileUpload[0]?.filename
-            : user?.profile_image,
+          profile_image: fileUpload[0]?.filename || user?.profile_image || "",
         },
       },
     });
   };
 
   const handleCancel = async () => {
-    setEditing(!editing);
-    await deleteImage(fileUpload[0].filename);
-    setFileUpload([]);
+    setEditing(false);
+    if (fileUpload[0]?.filename) {
+      await deleteImage(fileUpload[0].filename);
+    }
+    if (!mountedRef.current) setFileUpload([]);
   };
 
   const handleBack = () => {
@@ -96,6 +110,12 @@ export default function AccountScreen() {
     if (normalized === "female") return "female";
     return "wc";
   }
+
+  const avatarUri = fileUpload[0]?.filename
+      ? `${FILE_BASE_URL}/file/${fileUpload[0].filename}`
+      :   user?.profile_image
+        ? `${FILE_BASE_URL}/file/${user.profile_image}`
+        : null;
 
   return (
     <KeyboardAvoidingView
@@ -117,16 +137,12 @@ export default function AccountScreen() {
       <View style={styles.headerHero}>
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface} elevation={editing ? 8 : 2}>
-            <Image
-              source={{
-                uri: fileUpload[0]?.filename
-                  ? `${FILE_BASE_URL}/file/${fileUpload[0]?.filename}`
-                  : user?.profile_image
-                    ? `${FILE_BASE_URL}/file/${user?.profile_image}`
-                    : null,
-              }}
-              style={styles.avatar}
-            />
+            {avatarUri ? (
+              <Image source={{ uri: avatarUri }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
+            )}
+
             {editing && <UploadImage setFileUpload={setFileUpload} />}
           </Surface>
         </View>
