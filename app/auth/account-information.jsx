@@ -1,6 +1,7 @@
+import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -11,11 +12,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Surface, Text } from "react-native-paper";
+import {
+  Button,
+  RadioButton,
+  Surface,
+  Text,
+  TextInput,
+} from "react-native-paper";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
+import { GET_USER_BY_ID, MOBILE_UPDATE_USER } from "../../schema/login";
 // import { uploadFiles } from "../../utils/uploadImage";
 import UploadImage from "./GlobalUtils/UploadImage";
+import deleteImage from "./GlobalUtils/deleteImage";
+import { useAuth } from "../../context/AuthContext";
 
 const COLORS = {
   primary: "#25375A",
@@ -31,28 +42,62 @@ const COLORS = {
 export default function AccountScreen() {
   const router = useRouter();
   const { language } = useLanguage();
-
+  const { user: authUser, setUser } = useAuth();
   const [editing, setEditing] = useState(false);
   const [fileUpload, setFileUpload] = useState([]);
   const mountedRef = useRef(true);
 
-  const user = {
-    __typename: "User",
-    _id: "6944ae452c5bcb7e9231af17",
-    createdAt: "2025-12-19T01:45:41.440Z",
-    email: "sreynetlong168@gmail.com",
-    first_name: "Sreyyyyy",
-    gender: "female",
-    is_enabled: true,
-    last_name: "Net",
-    phone_number: "098646489",
-    profile_image: "1000001804__4d453764cee0491b0527134b72d5c014572a.jpg",
-    remark: null,
-    role: "mobile_user",
-    updatedAt: "2026-01-19T09:17:20.046Z",
-  };
-  // console.log("userData", user);
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
+  const {
+    data: userData,
+    refetch,
+    loading: userLoading,
+  } = useQuery(GET_USER_BY_ID, { fetchPolicy: "network-only" });
+
+  const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
+    onCompleted: (data) => {
+      if (!mountedRef.current) return;
+      setFileUpload([]);
+      setEditing(false);
+      refetch?.();
+      if (data?.mobileUpdateUser?.data) setUser(data?.mobileUpdateUser?.data);
+    },
+  });
+
+  const user = userData?.getUserById || authUser || {};
+
+  if (userLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  const handleSave = (formData) => {
+    updateUser({
+      variables: {
+        id: user?._id,
+        input: {
+          ...formData,
+          profile_image: fileUpload[0]?.filename || user?.profile_image || "",
+        },
+      },
+    });
+  };
+
+  const handleCancel = async () => {
+    setEditing(false);
+    if (fileUpload[0]?.filename) {
+      await deleteImage(fileUpload[0].filename);
+    }
+    if (!mountedRef.current) setFileUpload([]);
+  };
 
   const handleBack = () => {
     if (router?.canGoBack()) router.back();
@@ -67,7 +112,12 @@ export default function AccountScreen() {
     return "wc";
   }
 
-  const avatarUri = null;
+  const avatarUri = fileUpload[0]?.filename
+    ? `${FILE_BASE_URL}/file/${fileUpload[0].filename}`
+    : user?.profile_image
+      ? `${FILE_BASE_URL}/file/${user.profile_image}`
+      : null;
+  // const avatarUri = null;
 
   return (
     <KeyboardAvoidingView
@@ -112,7 +162,7 @@ export default function AccountScreen() {
           </Text>
 
           <TouchableOpacity
-            onPress={() => setEditing(true)}
+            onPress={editing ? handleCancel : () => setEditing(true)}
             style={[styles.editActionBtn, editing && styles.cancelActionBtn]}
           >
             <MaterialIcons
@@ -128,32 +178,143 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <View style={styles.infoGrid}>
-            <InfoTile
-              label={t("first_name", language)}
-              value={user?.first_name}
-              icon="account-box"
-            />
-            <InfoTile
-              label={t("last_name", language)}
-              value={user?.last_name}
-              icon="badge"
-            />
-            <InfoTile
-              label={t("phone", language)}
-              value={user?.phone_number}
-              icon="contact-phone"
-            />
-            <InfoTile
-              label={t("gender", language)}
-              value={user?.gender}
-              icon={getGenderIcon(user?.gender)}
-            />
-          </View>
-        </ScrollView>
+        {editing ? (
+          <EditUser
+            initialData={user}
+            onSave={handleSave}
+            updating={updating}
+            language={language}
+          />
+        ) : (
+          <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+            <View style={styles.infoGrid}>
+              <InfoTile
+                label={t("first_name", language)}
+                value={user?.first_name}
+                icon="account-box"
+              />
+              <InfoTile
+                label={t("last_name", language)}
+                value={user?.last_name}
+                icon="badge"
+              />
+              <InfoTile
+                label={t("phone", language)}
+                value={user?.phone_number}
+                icon="contact-phone"
+              />
+              <InfoTile
+                label={t("gender", language)}
+                value={user?.gender}
+                icon={getGenderIcon(user?.gender)}
+              />
+            </View>
+          </ScrollView>
+        )}
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+function EditUser({ initialData, onSave, updating, language }) {
+  const [formData, setFormData] = useState({
+    first_name: initialData.first_name || "",
+    last_name: initialData.last_name || "",
+    phone_number: initialData.phone_number || "",
+    gender: initialData.gender || "Male",
+  });
+
+  return (
+    <View style={styles.formContainer}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ flexDirection: "row", marginBottom: 10 }}>
+          <TextInput
+            label={t("first_name", language)}
+            value={formData.first_name}
+            onChangeText={(v) => setFormData({ ...formData, first_name: v })}
+            mode="outlined"
+            style={[styles.input, { flex: 1, marginRight: 8 }]}
+            contentStyle={styles.inputContent}
+            outlineColor={COLORS.grey200}
+            activeOutlineColor={COLORS.primary}
+          />
+
+          <TextInput
+            label={t("last_name", language)}
+            value={formData.last_name}
+            onChangeText={(v) => setFormData({ ...formData, last_name: v })}
+            mode="outlined"
+            style={[styles.input, { flex: 1 }]}
+            contentStyle={styles.inputContent}
+            outlineColor={COLORS.grey200}
+            activeOutlineColor={COLORS.primary}
+          />
+        </View>
+
+        <TextInput
+          label={t("phone", language)}
+          value={formData.phone_number}
+          onChangeText={(v) => setFormData({ ...formData, phone_number: v })}
+          mode="outlined"
+          style={styles.input}
+          contentStyle={styles.inputContent}
+          outlineColor={COLORS.grey200}
+          activeOutlineColor={COLORS.primary}
+        />
+
+        <View style={styles.genderBox}>
+          <Text style={styles.genderLabel}>{t("gender", language)}</Text>
+
+          <View style={styles.radioGroup}>
+            {["male", "female"].map((g) => (
+              <TouchableOpacity
+                key={g}
+                onPress={() => setFormData({ ...formData, gender: g })}
+                style={[
+                  styles.genderOption,
+                  formData.gender.toLowerCase() === g &&
+                    styles.genderOptionActive,
+                ]}
+              >
+                <RadioButton.Android
+                  value={g}
+                  onPress={() => setFormData({ ...formData, gender: g })}
+                  status={
+                    formData.gender.toLowerCase() === g
+                      ? "checked"
+                      : "unchecked"
+                  }
+                  color={COLORS.primary}
+                />
+                <Text
+                  style={[
+                    styles.genderText,
+                    formData.gender.toLowerCase() === g &&
+                      styles.genderTextActive,
+                  ]}
+                >
+                  {t(g, language) || g.charAt(0).toUpperCase() + g.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <Button
+          mode="contained"
+          onPress={() => onSave(formData)}
+          loading={updating}
+          textColor="white"
+          style={styles.saveBtn}
+        >
+          {t("save_changes", language)}
+        </Button>
+      </ScrollView>
+    </View>
   );
 }
 

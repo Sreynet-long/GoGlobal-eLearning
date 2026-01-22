@@ -1,17 +1,12 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
   primary: "#25375A",
   accent: "#D4AF37",
-  background: "#F1F5F9",
   white: "#FFFFFF",
-  error: "#F43F5E",
-  textDark: "#0F172A",
-  grey600: "#475569",
-  grey200: "#E2E8F0",
 };
 
 export default function UploadImage({ setFileUpload }) {
@@ -21,8 +16,8 @@ export default function UploadImage({ setFileUpload }) {
     files.forEach((file, index) => {
       formData.append("files", {
         uri: file.uri,
-        name: file.fileName || `file_${index}.jpg`,
-        type: file.mimeType || "image/jpeg",
+        name: file.fileName || `image_${index}.jpg`,
+        type: file.type || "image/jpeg",
       });
     });
 
@@ -30,19 +25,26 @@ export default function UploadImage({ setFileUpload }) {
   };
 
   const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType,
-      // allowsMultipleSelection: true,
-      quality: 1,
-    });
+      if (permission.status !== "granted") {
+        Alert.alert("Permission required", "Please allow photo access");
+        return [];
+      }
 
-    if (!result.canceled) {
-      return result.assets;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+
+      if (!result.canceled) return result.assets;
+      return [];
+    } catch (err) {
+      console.log("Pick image error:", err);
+      return [];
     }
-    return [];
   };
 
   const uploadFiles = async () => {
@@ -54,19 +56,14 @@ export default function UploadImage({ setFileUpload }) {
 
       const response = await fetch(`${FILE_BASE_URL}/upload`, {
         method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        body: formData, // ⚠️ do NOT set headers
       });
 
       const result = await response.json();
-      setFileUpload(result?.files, "result?.files");
-      // await AsyncStorage.setItem("uploadLocalFiles", result?.files);
-
-      console.log("Upload result:", result);
-    } catch (error) {
-      console.error("Upload error:", error);
+      setFileUpload(result?.files || []);
+    } catch (err) {
+      console.log("Upload error:", err);
+      Alert.alert("Upload failed", "Please try again");
     }
   };
 
@@ -74,9 +71,6 @@ export default function UploadImage({ setFileUpload }) {
     <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
-    // <TouchableOpacity onPress={uploadFiles}>
-    //   <MaterialIcons name="photo-camera" size={20} color={"#FFFFFF"}/>
-    // </TouchableOpacity>
   );
 }
 
@@ -85,10 +79,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: -10,
     right: 0,
-    backgroundColor: COLORS.primary,
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,

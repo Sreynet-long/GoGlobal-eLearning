@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 import { Button, Surface, Text } from "react-native-paper";
-import { FILE_BASE_URL } from "../../config/env";
 import Topbar from "../../components/headers/Topbar";
+import { FILE_BASE_URL } from "../../config/env";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.5,
-    lineHeight: 26
+    lineHeight: 26,
   },
   versionText: {
     textAlign: "center",
