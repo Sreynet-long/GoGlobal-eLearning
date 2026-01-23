@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import {
@@ -10,6 +11,9 @@ import {
   View,
 } from "react-native";
 import { Surface, Text } from "react-native-paper";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../lang";
+import { GET_USER_BY_ID } from "../../schema/login";
 
 const COLORS = {
   primary: "#25375A",
@@ -24,6 +28,12 @@ const COLORS = {
 
 export default function AccountScreen() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const { data: userData } = useQuery(GET_USER_BY_ID, {
+    fetchPolicy: "network-only",
+  });
+
+  const user = userData?.getUserById || {};
 
   const handleBack = () => {
     if (router?.canGoBack()) router.back();
@@ -68,10 +78,26 @@ export default function AccountScreen() {
 
         <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
           <View style={styles.infoGrid}>
-            <InfoTile label="first_name" value="Chan" icon="account-box" />
-            <InfoTile label="last_name" value="Dara" icon="badge" />
-            <InfoTile label="phone" value="026548954" icon="contact-phone" />
-            <InfoTile label="gender" value="Male" icon="people" />
+            <InfoTile
+              label={t("first_name", language)}
+              value={user?.first_name}
+              icon="account-box"
+            />
+            <InfoTile
+              label={t("last_name", language)}
+              value={user?.last_name}
+              icon="badge"
+            />
+            <InfoTile
+              label={t("phone", language)}
+              value={user?.phone_number}
+              icon="contact-phone"
+            />
+            <InfoTile
+              label={t("gender", language)}
+              value={user?.gender}
+              icon="people"
+            />
           </View>
         </ScrollView>
       </View>
@@ -156,5 +182,29 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.textDark,
     marginTop: 2,
+  },
+  contentBody: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingVertical: 25,
+    paddingHorizontal: 25,
+    borderTopWidth: 5,
+    borderColor: COLORS.accent,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  contentTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 20,
   },
 });
