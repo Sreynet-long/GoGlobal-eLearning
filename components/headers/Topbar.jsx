@@ -60,7 +60,7 @@ export default function Topbar({ showBack = false }) {
               <Text style={styles.brandTitle}>GO <Text style={styles.lightText}>eLEARNING</Text></Text>
               <View style={styles.statusRow}>
                 <Text style={styles.statusText}>
-Innovation • Education • Global</Text>
+Innovation • Education • Global</Text>  
               </View>
             </View>
           </View>
