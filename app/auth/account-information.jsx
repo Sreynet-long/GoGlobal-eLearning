@@ -6,8 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView
 } from "react-native";
-import { Text } from "react-native-paper";
+import { Text , Surface} from "react-native-paper";
 
 const COLORS = {
   primary: "#25375A",
@@ -29,31 +30,65 @@ export default function AccountScreen() {
   };
 
   return (
-    <View behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView   
+      style={styles.screenContainer}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <StatusBar barStyle="light-content" />
 
       <View style={styles.navBar}>
+        
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <MaterialIcons
             name="arrow-back-ios-new"
             size={20}
-            color={COLORS.primary}
+            color={COLORS.white}
           />
         </TouchableOpacity>
       </View>
 
-      <View>
-        <Text>Sreynet</Text>
-        <Text>net@gmail.com</Text>
+      <View style={styles.headerHero}>
+        <View style={styles.avatarWrapper}>
+          <Surface style={styles.avatarSurface}>
+            <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
+          </Surface>
+        </View>
+        <Text style={styles.heroName}>Sreynet</Text>
+        <Text style={styles.userEmailText}>net@gmail.com</Text>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 const styles = StyleSheet.create({
+  screenContainer: { flex: 1, backgroundColor: COLORS.primary },
+  navBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 25 : 10,
+  },
   backButton: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
+  avatarWrapper: { marginBottom: 5 },
+  avatarSurface: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    position: "relative",
+    borderWidth: 5,
+    borderColor: COLORS.accent,
+  },
+  headerHero: { paddingBottom: 30, alignItems: "center" },
+  heroName: {
+    color: COLORS.white,
+    fontSize: 24,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+  },
+  userEmailText: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 4 },
 });
