@@ -1,7 +1,9 @@
 import { useQuery } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,9 +13,11 @@ import {
   View,
 } from "react-native";
 import { Surface, Text } from "react-native-paper";
+import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_USER_BY_ID } from "../../schema/login";
+import { use } from "react";
 
 const COLORS = {
   primary: "#25375A",
@@ -29,16 +33,22 @@ const COLORS = {
 export default function AccountScreen() {
   const router = useRouter();
   const { language } = useLanguage();
-  const { data: userData } = useQuery(GET_USER_BY_ID, {
+  const { data: userData, refetch } = useQuery(GET_USER_BY_ID, {
     fetchPolicy: "network-only",
   });
 
+  useEffect(() => {
+    refetch();
+  },[]);
+  
   const user = userData?.getUserById || {};
 
   const handleBack = () => {
     if (router?.canGoBack()) router.back();
     else router.replace("/(tabs)/account&Aboutus");
   };
+
+  const avatarUri = `${FILE_BASE_URL}/file/${user?.profile_image}`;
 
   return (
     <KeyboardAvoidingView
@@ -60,16 +70,22 @@ export default function AccountScreen() {
       <View style={styles.headerHero}>
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface}>
-            <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
+            {avatarUri && (
+              <Image source={{ uri: avatarUri }} style={styles.avatar} />
+            )}
           </Surface>
         </View>
-        <Text style={styles.heroName}>Sreynet</Text>
-        <Text style={styles.userEmailText}>net@gmail.com</Text>
+        <Text style={styles.heroName}>
+          {user?.first_name} {user?.last_name}
+        </Text>
+        <Text style={styles.userEmailText}>{user?.email}</Text>
       </View>
 
       <View style={styles.contentBody}>
         <View style={styles.titleRow}>
-          <Text style={styles.contentTitle}>account information</Text>
+          <Text style={styles.contentTitle}>
+            {t("account_information", language)}
+          </Text>
 
           <TouchableOpacity>
             <MaterialIcons size={16} color={COLORS.white} />
@@ -96,7 +112,7 @@ export default function AccountScreen() {
             <InfoTile
               label={t("gender", language)}
               value={user?.gender}
-              icon="people"
+              icon="female"
             />
           </View>
         </ScrollView>
@@ -143,6 +159,7 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: COLORS.accent,
   },
+  avatar: { width: "100%", height: "100%", borderRadius: 65 },
   headerHero: { paddingBottom: 30, alignItems: "center" },
   heroName: {
     color: COLORS.white,
