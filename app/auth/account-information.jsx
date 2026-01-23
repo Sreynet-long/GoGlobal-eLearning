@@ -1,14 +1,15 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import {
+  KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
-  KeyboardAvoidingView
 } from "react-native";
-import { Text , Surface} from "react-native-paper";
+import { Surface, Text } from "react-native-paper";
 
 const COLORS = {
   primary: "#25375A",
@@ -30,14 +31,13 @@ export default function AccountScreen() {
   };
 
   return (
-    <KeyboardAvoidingView   
+    <KeyboardAvoidingView
       style={styles.screenContainer}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <StatusBar barStyle="light-content" />
 
       <View style={styles.navBar}>
-        
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <MaterialIcons
             name="arrow-back-ios-new"
@@ -56,9 +56,43 @@ export default function AccountScreen() {
         <Text style={styles.heroName}>Sreynet</Text>
         <Text style={styles.userEmailText}>net@gmail.com</Text>
       </View>
+
+      <View style={styles.contentBody}>
+        <View style={styles.titleRow}>
+          <Text style={styles.contentTitle}>account information</Text>
+
+          <TouchableOpacity>
+            <MaterialIcons size={16} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+          <View style={styles.infoGrid}>
+            <InfoTile label="first_name" value="Chan" icon="account-box" />
+            <InfoTile label="last_name" value="Dara" icon="badge" />
+            <InfoTile label="phone" value="026548954" icon="contact-phone" />
+            <InfoTile label="gender" value="Male" icon="people" />
+          </View>
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
+
+function InfoTile({ label, value, icon }) {
+  return (
+    <View style={styles.tile}>
+      <View style={styles.tileIconBg}>
+        <MaterialIcons name={icon} size={30} color={COLORS.primary} />
+      </View>
+      <View>
+        <Text style={styles.tileLabel}>{label}</Text>
+        <Text style={styles.tileValue}>{value || "-"}</Text>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   screenContainer: { flex: 1, backgroundColor: COLORS.primary },
   navBar: {
@@ -91,4 +125,36 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   userEmailText: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 4 },
+  infoGrid: { marginBottom: 20 },
+  tile: {
+    backgroundColor: COLORS.white,
+    padding: 10,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.grey200,
+    marginBottom: 12,
+  },
+  tileIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  tileLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.grey600,
+    textTransform: "uppercase",
+  },
+  tileValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.textDark,
+    marginTop: 2,
+  },
 });
