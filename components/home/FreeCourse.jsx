@@ -285,9 +285,6 @@ export default function FreeCourse() {
 
   if (error || !data?.getFreeCourse?.length) return null;
 
-  console.log("FREE COURSES:", data?.getFreeCourse);
-  console.log("Free Course COUNT:", data?.getFreeCourse?.length);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>

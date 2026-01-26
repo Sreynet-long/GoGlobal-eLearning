@@ -23,6 +23,8 @@ import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_USER_BY_ID, MOBILE_UPDATE_USER } from "../../schema/login";
+import UploadImage from "../auth/GlobalUtils/UploadImage";
+import deleteImage from "../auth/GlobalUtils/deleteImage";
 
 const COLORS = {
   primary: "#25375A",
@@ -38,8 +40,6 @@ const COLORS = {
 export default function AccountScreen() {
   const router = useRouter();
   const { language } = useLanguage();
-
-  const [authUser, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [fileUpload, setFileUpload] = useState([]);
 
@@ -52,10 +52,16 @@ export default function AccountScreen() {
   }, []);
 
   const [updateUser, { loading: updating }] = useMutation(MOBILE_UPDATE_USER, {
-    onCompleted: (data) => {
+    onCompleted: () => {
+      setFileUpload([]);
       setEditing(false);
-      refetch?.();
-      if (data?.mobileUpdateUser?.data) setUser(data?.mobileUpdateUser?.data);
+      refetch();
+    },
+    onError: async () => {
+      if (fileUpload[0]?.filename) {
+        await deleteImage(fileUpload[0].filename);
+      }
+      setFileUpload([]);
     },
   });
 
@@ -72,13 +78,33 @@ export default function AccountScreen() {
         id: user?._id,
         input: {
           ...formData,
-          profile_image: user?.profile_image || "",
+          profile_image: fileUpload[0]?.filename || user?.profile_image || "",
         },
       },
     });
   };
+  const handleCancel = async () => {
+    setEditing(false);
+    if (fileUpload[0]?.filename) {
+      await deleteImage(fileUpload[0].filename);
+    }
+    setFileUpload([]);
+  };
 
-  const avatarUri = `${FILE_BASE_URL}/file/${user?.profile_image}`;
+  function getGenderIcon(gender) {
+    if (!gender) return "wc";
+    const normalized = gender.toLowerCase();
+    if (normalized === "male") return "male";
+    if (normalized === "female") return "female";
+    return "wc";
+  }
+  const avatarUri = fileUpload[0]?.filename
+    ? `${FILE_BASE_URL}/file/${fileUpload[0].filename}`
+    : user?.profile_image
+      ? `${FILE_BASE_URL}/file/${user.profile_image}`
+      : null;
+
+  console.log("Avatar uri:", avatarUri);
 
   return (
     <KeyboardAvoidingView
@@ -101,10 +127,16 @@ export default function AccountScreen() {
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface}>
             {avatarUri ? (
-              <Image source={{ uri: avatarUri }} style={styles.avatar} />
+              <Image
+                key={avatarUri}
+                source={{ uri: avatarUri }}
+                style={styles.avatar}
+              />
             ) : (
               <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
             )}
+
+            {editing && <UploadImage setFileUpload={setFileUpload} />}
           </Surface>
         </View>
         <Text style={styles.heroName}>
@@ -119,7 +151,7 @@ export default function AccountScreen() {
             {t("account_information", language)}
           </Text>
           <TouchableOpacity
-            onPress={() => setEditing(!editing)}
+            onPress={() => (editing ? handleCancel() : setEditing(!editing))}
             style={[styles.editActionBtn, editing && styles.cancelActionBtn]}
           >
             <MaterialIcons
@@ -163,7 +195,7 @@ export default function AccountScreen() {
               <InfoTile
                 label={t("gender", language)}
                 value={user?.gender}
-                icon="female"
+                icon={getGenderIcon(user?.gender)}
               />
             </View>
           </ScrollView>

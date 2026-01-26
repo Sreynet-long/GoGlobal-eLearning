@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
-import { StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
@@ -10,60 +10,55 @@ const COLORS = {
 };
 
 export default function UploadImage({ setFileUpload }) {
-  const createFormData = (files) => {
-    const formData = new FormData();
+  const pickImages = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    files.forEach((file, index) => {
-      formData.append("files", {
-        uri: file.uri,
-        name: file.fileName || `image_${index}.jpg`,
-        type: file.type || "image/jpeg",
-      });
-    });
-
-    return formData;
-  };
-
-  const pickImage = async () => {
-    try {
-      const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permission.status !== "granted") {
-        Alert.alert("Permission required", "Please allow photo access");
-        return [];
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-      });
-
-      if (!result.canceled) return result.assets;
-      return [];
-    } catch (err) {
-      console.log("Pick image error:", err);
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Please allow photo access");
       return [];
     }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      // mediaTypes: ImagePicker.MediaType.Image,
+      mediaTypes: ["images"],
+      quality: 1,
+    });
+
+    if (result.canceled) return [];
+
+    // ✅ Always return array
+    return result.assets ?? [];
   };
 
   const uploadFiles = async () => {
     try {
-      const files = await pickImage();
+      const files = await pickImages();
       if (!files.length) return;
 
-      const formData = createFormData(files);
+      const formData = new FormData();
+     
+      files?.forEach((file, index) => {
+        formData?.append("files", {
+          uri: file.uri,
+          name: file.fileName || `profile_${Date.now()}_${index}.jpg`,
+          type: file.mimeType || "image/jpeg",
+        });
+      });
 
       const response = await fetch(`${FILE_BASE_URL}/upload`, {
         method: "POST",
-        body: formData, // ⚠️ do NOT set headers
+        body: formData,
       });
 
-      const result = await response.json();
-      setFileUpload(result?.files || []);
+      const text = await response.text();
+
+      if (!response.ok) throw new Error(text);
+
+      const result = JSON.parse(text);
+      setFileUpload(result.files || [result.file]);
     } catch (err) {
-      console.log("Upload error:", err);
-      Alert.alert("Upload failed", "Please try again");
+      console.log("Upload error:", err.message);
+      Alert.alert("Upload failed");
     }
   };
 

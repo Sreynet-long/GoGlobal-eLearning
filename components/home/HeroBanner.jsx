@@ -67,7 +67,7 @@ const HeroBanner = () => {
       >
         {banners.map(
           (item) => (
-            console.log("banner item", `${FILE_BASE_URL}/file/${item.image}`),
+            // console.log("banner item", `${FILE_BASE_URL}/file/${item.image}`),
             (
               <ImageBackground
                 key={String(item._id)}

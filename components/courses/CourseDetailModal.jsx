@@ -62,7 +62,7 @@ export default function CourseDetailModal({ visible, course, onClose }) {
   }, [data]);
 
   // console.log("course detail modal", course);
-  console.log("full course detail modal", fullCourse);
+  // console.log("full course detail modal", fullCourse);
 
   if (!fullCourse) return null;
 

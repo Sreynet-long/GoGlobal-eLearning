@@ -52,10 +52,10 @@ export default function VideoList({
   );
 
   // console.log("videos", videos);
-  console.log(
-    "data?.getVideoContentWithPagination?.data",
-    data?.getVideoContentWithPagination?.data
-  );
+  // console.log(
+  //   "data?.getVideoContentWithPagination?.data",
+  //   data?.getVideoContentWithPagination?.data
+  // );
 
   return (
     <View>
