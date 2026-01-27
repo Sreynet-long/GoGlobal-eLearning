@@ -23,7 +23,6 @@ import { FILE_BASE_URL } from "../../config/env";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../lang";
 import { GET_USER_BY_ID, MOBILE_UPDATE_USER } from "../../schema/login";
-import UploadImage from "../auth/GlobalUtils/UploadImage";
 import deleteImage from "../auth/GlobalUtils/deleteImage";
 
 const COLORS = {
@@ -133,7 +132,7 @@ export default function AccountScreen() {
               <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
             )}
 
-            {editing && <UploadImage setFileUpload={setFileUpload} />}
+            {/* {editing && <UploadImage setFileUpload={setFileUpload} />} */}
           </Surface>
         </View>
         <Text style={styles.heroName}>
