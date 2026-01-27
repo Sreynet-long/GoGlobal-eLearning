@@ -1,5 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
   primary: "#25375A",
@@ -15,12 +17,19 @@ export default function UploadImage({ setFileUpload }) {
       Alert.alert("Permission required", "Please allow photo access");
       return [];
     }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes:ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (result.canceled) return [];
+
     // ✅ Always return array
-    return [];
+    return result.assets ?? [];
   };
 
+
   return (
-    <TouchableOpacity style={styles.camera}>
+    <TouchableOpacity style={styles.camera} >
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
   );
