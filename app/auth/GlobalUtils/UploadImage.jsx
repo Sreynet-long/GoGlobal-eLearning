@@ -8,6 +8,17 @@ const COLORS = {
 };
 
 export default function UploadImage({ setFileUpload }) {
+  const pickImages = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Please allow photo access");
+      return [];
+    }
+    // ✅ Always return array
+    return [];
+  };
+
   return (
     <TouchableOpacity style={styles.camera}>
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
