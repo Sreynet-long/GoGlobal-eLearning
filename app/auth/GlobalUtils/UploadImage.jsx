@@ -30,8 +30,29 @@ export default function UploadImage({ setFileUpload }) {
     return result.assets ?? [];
   };
 
+   const uploadFiles = async () => {
+      try {
+        const files = await pickImages();
+        if (!files.length) return;
+  
+        const formData = new FormData();
+       
+        files?.forEach((file, index) => {
+          formData?.append("files", {
+            uri: file.uri,
+            name: file.fileName || `profile_${Date.now()}_${index}.jpg`,
+            type: file.mimeType || "image/jpeg",
+          });
+        });
+  
+
+      } catch (err) {
+        console.log("Upload error:", err.message);
+        Alert.alert("Upload failed");
+      }
+    };
   return (
-    <TouchableOpacity style={styles.camera}>
+    <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
   );
