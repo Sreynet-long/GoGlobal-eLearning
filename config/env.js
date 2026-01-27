@@ -4,4 +4,3 @@ export const FILE_BASE_URL =
 
 //LOCAL
 // export const FILE_BASE_URL = "http://192.168.5.36:5210/api";
-s

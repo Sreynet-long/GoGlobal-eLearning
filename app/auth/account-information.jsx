@@ -34,7 +34,7 @@ const COLORS = {
   error: "#F43F5E",
   textDark: "#0F172A",
   grey600: "#475569",
-  grey200: "#E2E8F0",
+  grey200: "#E2E8F0", 
 };
 
 export default function AccountScreen() {
@@ -91,6 +91,7 @@ export default function AccountScreen() {
     setFileUpload([]);
   };
 
+
   function getGenderIcon(gender) {
     if (!gender) return "wc";
     const normalized = gender.toLowerCase();
@@ -104,7 +105,7 @@ export default function AccountScreen() {
       ? `${FILE_BASE_URL}/file/${user.profile_image}`
       : null;
 
-  console.log("Avatar uri:", avatarUri);
+      console.log("Avatar uri:", avatarUri);
 
   return (
     <KeyboardAvoidingView
@@ -127,11 +128,7 @@ export default function AccountScreen() {
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface}>
             {avatarUri ? (
-              <Image
-                key={avatarUri}
-                source={{ uri: avatarUri }}
-                style={styles.avatar}
-              />
+              <Image key={avatarUri} source={{ uri: avatarUri }} style={styles.avatar} />
             ) : (
               <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
             )}
