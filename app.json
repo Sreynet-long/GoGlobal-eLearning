@@ -57,6 +57,7 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
+      
     ],
     "experiments": {
       "typedRoutes": true,
@@ -65,7 +66,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "12ca8b09-6350-49dd-9fef-1f0814ad25d1"
+        "projectId": "68c60700-d98f-456d-b104-5f62840bbcb3"
       }
     }
   }
