@@ -1,7 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
-import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
   primary: "#25375A",
@@ -24,35 +23,14 @@ export default function UploadImage({ setFileUpload }) {
       quality: 1,
     });
 
-    if (result.canceled) return [];
+    if (result?.canceled) return [];
 
     // ✅ Always return array
-    return result.assets ?? [];
+    return result?.assets ?? [];
   };
 
-   const uploadFiles = async () => {
-      try {
-        const files = await pickImages();
-        if (!files.length) return;
-  
-        const formData = new FormData();
-       
-        files?.forEach((file, index) => {
-          formData?.append("files", {
-            uri: file.uri,
-            name: file.fileName || `profile_${Date.now()}_${index}.jpg`,
-            type: file.mimeType || "image/jpeg",
-          });
-        });
-  
-
-      } catch (err) {
-        console.log("Upload error:", err.message);
-        Alert.alert("Upload failed");
-      }
-    };
   return (
-    <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
+    <TouchableOpacity style={styles.camera} >
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
   );
