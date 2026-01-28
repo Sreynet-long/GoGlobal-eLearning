@@ -34,44 +34,13 @@ export default function UploadImage({ setFileUpload }) {
 
     // ✅ Always return array
     // return result.assets ?? [];
-    return [];
+    return null;
   };
 
-  const uploadFiles = async () => {
-    try {
-      const file = await pickImages();
-      if (!file) return;
 
-      const formData = new FormData();
-
-      
-      formData?.append("files", {
-        uri: file.uri,
-        name: file.fileName || `profile_${Date.now()}_${index}.jpg`,
-        type: file.mimeType || "image/jpeg",
-      });
-      
-      
-      const response = await fetch(`${FILE_BASE_URL}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const text = await response.text();
-
-      if (!response.ok) throw new Error(text);
-
-      const result = JSON.parse(text);
-      setFileUpload(result.files || [result.file]);
-      console.log("RESULT:", result);
-    } catch (err) {
-      console.log("Upload error:", err.message);
-      Alert.alert("Upload failed");
-    }
-  };
 
   return (
-    <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
+    <TouchableOpacity style={styles.camera} >
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
   );
