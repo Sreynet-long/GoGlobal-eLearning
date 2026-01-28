@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as ImagePicker from "expo-image-picker";
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
 import { FILE_BASE_URL } from "../../../config/env";
 
 const COLORS = {
@@ -18,18 +18,60 @@ export default function UploadImage({ setFileUpload }) {
       return [];
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes:ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
-    if (result.canceled) return [];
+    // if (result.canceled) return [];
+    if (!result.canceled) {
+      try {
+        Alert.alert("Success", "Image uploaded successfully!");
+        return result.assets[0];
+      } catch (error) {
+        Alert.alert("Error", "Image upload failed.");
+        console.error(error);
+      }
+    }
 
     // ✅ Always return array
-    return result.assets ?? [];
+    // return result.assets ?? [];
+    return [];
   };
 
+  const uploadFiles = async () => {
+    try {
+      const file = await pickImages();
+      if (!file) return;
+
+      const formData = new FormData();
+
+      
+      formData?.append("files", {
+        uri: file.uri,
+        name: file.fileName || `profile_${Date.now()}_${index}.jpg`,
+        type: file.mimeType || "image/jpeg",
+      });
+      
+      
+      const response = await fetch(`${FILE_BASE_URL}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const text = await response.text();
+
+      if (!response.ok) throw new Error(text);
+
+      const result = JSON.parse(text);
+      setFileUpload(result.files || [result.file]);
+      console.log("RESULT:", result);
+    } catch (err) {
+      console.log("Upload error:", err.message);
+      Alert.alert("Upload failed");
+    }
+  };
 
   return (
-    <TouchableOpacity style={styles.camera} >
+    <TouchableOpacity style={styles.camera} onPress={uploadFiles}>
       <MaterialIcons name="photo-camera" size={20} color={COLORS.white} />
     </TouchableOpacity>
   );
