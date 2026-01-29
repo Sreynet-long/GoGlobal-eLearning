@@ -11,7 +11,6 @@ const COLORS = {
 
 export default function UploadImageProfile({ setFileUpload }) {
   const pickImage = async () => {
-    console.log("PICKIMAGE:", pickImage);
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
     if (status !== "granted") {
@@ -44,22 +43,19 @@ export default function UploadImageProfile({ setFileUpload }) {
   };
 
   const handleImage = async (uri) => {
-    console.log("handleImage:", handleImage)
     setFileUpload((prev) => [...prev, uri]);
-    // const newName = `image_${Date.now()}`;
-    const newName = `profile_${Date.now()}.jpg`;
+    const newName = `image_${Date.now()}`;
 
     try {
       const formData = new FormData();
-      console.log("FORMDATA:",formData);
-      formData.append("file", {
+      formData.append("image", {
         uri,
-        name: newName + ".jpg",
-        type: "image/jpeg",
+        name: newName + ".png",
+        type: "image/png",
       });
       const uploadedImageURL = await UploadImage(formData, newName);
       setFileUpload((prev) => [...prev, uploadedImageURL]);
-      console.log("uploadImage", uploadedImageURL)
+      // console.log("uploadImage", uploadedImageURL)
     } catch (e) {
       console.error("Image upload error:", e);
     }
