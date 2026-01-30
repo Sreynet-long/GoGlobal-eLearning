@@ -34,7 +34,7 @@ const COLORS = {
   error: "#F43F5E",
   textDark: "#0F172A",
   grey600: "#475569",
-  grey200: "#E2E8F0", 
+  grey200: "#E2E8F0",
 };
 
 export default function AccountScreen() {
@@ -73,16 +73,19 @@ export default function AccountScreen() {
   };
 
   const handleSave = (formData) => {
+    // console.log("final111111:", fileUpload[1]);
     updateUser({
       variables: {
         id: user?._id,
         input: {
           ...formData,
-          profile_image: fileUpload[0]?.filename || user?.profile_image || "",
+          profile_image: fileUpload[1] || user?.profile_image || "",
+          // profile_image: fileUpload || user?.profile_image || "",
         },
       },
     });
   };
+  // console.log("final:", fileUpload);
   const handleCancel = async () => {
     setEditing(false);
     if (fileUpload[0]?.filename) {
@@ -91,7 +94,6 @@ export default function AccountScreen() {
     setFileUpload([]);
   };
 
-
   function getGenderIcon(gender) {
     if (!gender) return "wc";
     const normalized = gender.toLowerCase();
@@ -99,13 +101,30 @@ export default function AccountScreen() {
     if (normalized === "female") return "female";
     return "wc";
   }
-  const avatarUri = fileUpload[0]?.filename
-    ? `${FILE_BASE_URL}/file/${fileUpload[0].filename}`
-    : user?.profile_image
-      ? `${FILE_BASE_URL}/file/${user.profile_image}`
-      : null;
+  // const avatarUri = fileUpload[1]?.filename
+  //   ? `${FILE_BASE_URL}/file/${fileUpload[1].filename}`
+  //   : user?.profile_image
+  //     ? `${FILE_BASE_URL}/file/${user.profile_image}`
+  //     : null;
+  // const avatarUri = fileUpload[1]
+  //   ? fileUpload[1]
+  //   : user?.profile_image
+  //     ? `${FILE_BASE_URL}/file/${user.profile_image}`
+  //     : null;
 
-      console.log("Avatar uri:", avatarUri);
+  const avatarUri =
+    // 1️⃣ Show LOCAL preview immediately
+    fileUpload[0]
+      ? fileUpload[0]
+      : // 2️⃣ Or show uploaded image (after upload finished)
+        fileUpload[1]
+        ? `${FILE_BASE_URL}/file/${fileUpload[1]}`
+        : // 3️⃣ Or show existing profile image from backend
+          user?.profile_image
+          ? `${FILE_BASE_URL}/file/${user.profile_image}`
+          : null;
+
+  // console.log("Avatar uri:", avatarUri);
 
   return (
     <KeyboardAvoidingView
@@ -128,7 +147,11 @@ export default function AccountScreen() {
         <View style={styles.avatarWrapper}>
           <Surface style={styles.avatarSurface}>
             {avatarUri ? (
-              <Image key={avatarUri} source={{ uri: avatarUri }} style={styles.avatar} />
+              <Image
+                key={avatarUri}
+                source={{ uri: avatarUri }}
+                style={styles.avatar}
+              />
             ) : (
               <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
             )}

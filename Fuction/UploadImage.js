@@ -1,55 +1,49 @@
-// import { apiClient } from "../Config/StorageAPI";
+import * as ImageManipulator from "expo-image-manipulator";
 import { FILE_BASE_URL } from "../config/env";
 
 const storageName = "goglobalit_hrms";
 const folderName = "hrms_images";
 
-// export async function DeleteImage(fileName) {
-//   // console.log("delet", fileName);
-//   const response = await apiClient.post(`/storages/delete-file`, {
-//     storage: storageName,
-//     folder: folderName,
-//     file: fileName,
-//   });
-//   return response?.data;
-// }
-
-export async function UploadImage(file, fileName) {
-  if (!file) return;
-  const formData = new FormData();
-  console.log("formData:", formData);
-  let newFile = file?._parts[0];
-
-  console.log("file:::::::", file, fileName);
-
-  formData.append("file", newFile[1]);
-  formData.append("storage", storageName);
-  formData.append("folder", folderName);
+export async function UploadImage(uri, fileName) {
+  if (!uri) return "";
 
   try {
-    // console.log("formData-->", formData, newFile[1]);
+    // Convert HEIC/large images to JPEG and resize
+    const manipulated = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 1024 } }], // optional resize to reduce size
+      { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG },
+    );
+    // console.log("manipulated", manipulated);
+    const formData = new FormData();
+    formData.append("files", {
+      uri: manipulated.uri,
+      name: fileName + ".jpg",
+      type: "image/jpeg",
+    });
+    formData.append("storage", storageName);
+    formData.append("folder", folderName);
+    // console.log("FORM DATA:", formData);
     const response = await fetch(`${FILE_BASE_URL}/upload`, {
       method: "POST",
       body: formData,
       headers: {
-        Accept: "application/json", //Ensure the server responds with JSON
+        Accept: "application/json", // let fetch set the Content-Type boundary
       },
     });
 
-    const uploadImageServer = await response.json();
-    // (response?._bodyBlob?.type === "text/html"
-    //   ? response.text()
-    //   :
-    // console.log("uploadImageServer", uploadImageServer);
-    if (uploadImageServer?.status) {
-      //   return `https://goglobalit-storage-v2.go-globalit.com/client/storage:${storageName}/folder:${folderName}/fileName:${fileName}.png/user:65f900d7f1cf8bddbfe5cd3d/key:eoIyOFQi6SXDQkyt0WhtAZyMh0bwZNGkM6j6fvkzJ7T`;
-      return `${FILE_BASE_URL}/file/${fileName}`;
+    // Parse JSON
+    const result = await response.json();
+
+    if (result?.status) {
+      // return `${FILE_BASE_URL}/file/${result?.files[0]?.filename}`;
+      return result?.files[0]?.filename;
     } else {
-      console.error("Upload failed:", uploadImageServer);
+      console.error("Upload failed:", result);
       return "";
     }
   } catch (error) {
-    console.log("error upload image", error.message);
+    console.log("error upload image:", error.message);
     return "";
   }
 }

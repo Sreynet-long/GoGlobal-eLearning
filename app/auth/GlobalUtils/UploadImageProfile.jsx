@@ -43,19 +43,21 @@ export default function UploadImageProfile({ setFileUpload }) {
   };
 
   const handleImage = async (uri) => {
+    // Add local URI to state for preview
     setFileUpload((prev) => [...prev, uri]);
+
     const newName = `image_${Date.now()}`;
 
     try {
-      const formData = new FormData();
-      formData.append("image", {
-        uri,
-        name: newName + ".png",
-        type: "image/png",
-      });
-      const uploadedImageURL = await UploadImage(formData, newName);
-      setFileUpload((prev) => [...prev, uploadedImageURL]);
-      // console.log("uploadImage", uploadedImageURL)
+      // Upload the image (HEIC → JPEG conversion done inside UploadImage)
+      const uploadedImageURL = await UploadImage(uri, newName);
+
+      if (uploadedImageURL) {
+        // Add uploaded URL to state
+        setFileUpload((prev) => [...prev, uploadedImageURL]);
+      } else {
+        console.error("Upload failed or returned empty URL");
+      }
     } catch (e) {
       console.error("Image upload error:", e);
     }
