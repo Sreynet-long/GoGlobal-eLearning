@@ -34,7 +34,6 @@ export async function UploadImage(uri, fileName) {
 
     // Parse JSON
     const result = await response.json();
-
     if (result?.status) {
       // return `${FILE_BASE_URL}/file/${result?.files[0]?.filename}`;
       return result?.files[0]?.filename;

@@ -73,7 +73,7 @@ export default function AccountScreen() {
   };
 
   const handleSave = (formData) => {
-    // console.log("final111111:", fileUpload[1]);
+    console.log("final111111:", fileUpload[1]);
     updateUser({
       variables: {
         id: user?._id,
@@ -85,7 +85,7 @@ export default function AccountScreen() {
       },
     });
   };
-  // console.log("final:", fileUpload);
+  console.log("final:", fileUpload);
   const handleCancel = async () => {
     setEditing(false);
     if (fileUpload[0]?.filename) {
@@ -113,18 +113,18 @@ export default function AccountScreen() {
   //     : null;
 
   const avatarUri =
-    // 1️⃣ Show LOCAL preview immediately
-    fileUpload[0]
-      ? fileUpload[0]
-      : // 2️⃣ Or show uploaded image (after upload finished)
-        fileUpload[1]
-        ? `${FILE_BASE_URL}/file/${fileUpload[1]}`
-        : // 3️⃣ Or show existing profile image from backend
-          user?.profile_image
-          ? `${FILE_BASE_URL}/file/${user.profile_image}`
-          : null;
+  // 1️⃣ Show LOCAL preview immediately
+  fileUpload[0]
+    ? fileUpload[0]
+    : // 2️⃣ Or show uploaded image (after upload finished)
+    fileUpload[1]
+      ? `${FILE_BASE_URL}/file/${fileUpload[1]}`
+      : // 3️⃣ Or show existing profile image from backend
+      user?.profile_image
+        ? `${FILE_BASE_URL}/file/${user.profile_image}`
+        : null;
 
-  // console.log("Avatar uri:", avatarUri);
+  console.log("Avatar uri:", avatarUri);
 
   return (
     <KeyboardAvoidingView
