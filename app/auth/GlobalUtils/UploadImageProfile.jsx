@@ -9,7 +9,7 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-export default function UploadImageProfile({ setFileUpload }) {
+export default function  UploadImageProfile({ setFileUpload }) {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -26,7 +26,7 @@ export default function UploadImageProfile({ setFileUpload }) {
             allowsEditing: true,
             quality: 1,
           });
-          if (!result.canceled) handleImage(result.assets[0].uri);
+          if (!result?.canceled) handleImage(result?.assets[0]?.uri);
         },
       },
       {
@@ -35,7 +35,7 @@ export default function UploadImageProfile({ setFileUpload }) {
           const result = await ImagePicker.launchImageLibraryAsync({
             quality: 1,
           });
-          if (!result.canceled) handleImage(result.assets[0].uri);
+          if (!result?.canceled) handleImage(result?.assets[0]?.uri);
         },
       },
       { text: "Cancel", style: "cancel" },

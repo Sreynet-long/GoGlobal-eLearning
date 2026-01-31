@@ -16,13 +16,13 @@ export async function UploadImage(uri, fileName) {
     );
     // console.log("manipulated", manipulated);
     const formData = new FormData();
-    formData.append("files", {
-      uri: manipulated.uri,
+    formData?.append("files", {
+      uri: manipulated?.uri,
       name: fileName + ".jpg",
       type: "image/jpeg",
     });
-    formData.append("storage", storageName);
-    formData.append("folder", folderName);
+    formData?.append("storage", storageName);
+    formData?.append("folder", folderName);
     // console.log("FORM DATA:", formData);
     const response = await fetch(`${FILE_BASE_URL}/upload`, {
       method: "POST",
@@ -33,7 +33,7 @@ export async function UploadImage(uri, fileName) {
     });
 
     // Parse JSON
-    const result = await response.json();
+    const result = await response?.json();
     if (result?.status) {
       // return `${FILE_BASE_URL}/file/${result?.files[0]?.filename}`;
       return result?.files[0]?.filename;
